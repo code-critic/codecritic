@@ -1,0 +1,48 @@
+- name:     01-Hello world
+  id:       T01
+  group:    cv-01
+  enabled:  true
+  avail:    2018-09-09 23:59:59
+  tests:
+    - !StaticTest
+      id: sada-1
+      time: 5.5
+    - !StaticTest
+      id: sada-2
+      time: 5.5
+
+- name:     02-Palindrom
+  id:       PAL
+  group:    cv-01
+  avail:    2018-10-09 23:59:59
+  tests:
+    - !StaticTest
+      id: sada-1
+      time: 5.5
+    - !StaticTest
+      id: sada-2
+      time: 5.5
+
+- name:     03-Palindrom-cisla
+  id:       PAC
+  group:    cv-01
+  avail:    2018-10-09 23:59:59
+  tests:
+    - !StaticTest
+      id: sada-1
+      time: 5.5
+    - !StaticTest
+      id: sada-2
+      time: 5.5
+
+- name:     04-IEEE-754
+  id:       02BIN
+  group:    cv-02
+  avail:    2018-10-16 23:59:59
+  tests:
+    - !StaticTest
+      id: sada-1
+      time: 5.5
+    - !StaticTest
+      id: sada-2
+      time: 5.5
