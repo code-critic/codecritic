@@ -1,0 +1,45 @@
+<div class="execution status-section">
+  {% for item in result.tests %}
+    <div class="execution-test" id="exec-{{ item.id }}">
+      <div class="waiting">
+        <div class="status-badge">
+          <i class="fa fa-clock-o" aria-hidden="true"></i>
+        </div>
+        <span class="result-text"><code>{{ item.id }}</code>: </span>
+        <span class="result-text">ve frontě</span>
+      </div>
+      
+      <div class="running" style="display: none;">
+        <div class="spinner loader status-badge">
+          <div class="rect1"></div>
+          <div class="rect2"></div>
+          <div class="rect3"></div>
+          <div class="rect4"></div>
+          <div class="rect5"></div>
+        </div>
+        <span class="result-text"><code>{{ item.id }}</code>: </span>
+        <span class="result-text">probíhá zpracování</span>
+      </div>
+
+      
+      <div class="success" style="display: none;">
+        <span class="status-badge">
+          <i class="fa fa-check" aria-hidden="true"></i>
+        </span>
+        <span class="result-text"><code>{{ item.id }}</code>: </span>
+        <span class="result-text">zpracování v pořádku</span>
+        <div class="result-details stdout-stderr"></div>
+      </div>
+      
+      
+      <div class="error" style="display: none;">
+        <span class="status-badge">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </span>
+        <span class="result-text"><code>{{ item.id }}</code>: </span>
+        <span class="result-text">chyba při běhu </span>
+        <div class="result-details stdout-stderr"></div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

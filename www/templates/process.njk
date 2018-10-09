@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <title>ADA 2018-2019</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+      {# <link href="https://mdbootstrap.com/wp-content/themes/mdbootstrap4/css/compiled-4.5.9.min.css?ver=4.5.9" rel="stylesheet"> #}
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.10/css/mdb.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="https://getbootstrap.com/docs/4.1/assets/css/docs.min.css">
+      {# <link rel="stylesheet" href="https://highlightjs.org/static/demo/styles/default.css"> #}
+      <link rel="stylesheet" href="https://highlightjs.org/static/demo/styles/github.css">
+      <link rel="stylesheet" href="/static/css/main.css">
+      
+   </head>
+   <body>
+     
+     <div class="container-fluid">
+       <div class="row flex-xl-nowrap">
+         <div class="bd-content">
+           <div class="row" id="charts-sm">
+
+              <div class="col-xs-12 col-sm-10 col-lg-8 m-auto">
+                
+                <div class="card grey lighten-3">
+                  <div class="card-image mb-3 rounded-top" style="background-size: cover; background-image: url('/static/imgs/intro.jpeg');">
+                    <div class="text-white align-items-center rgba-blue-strong p-4 rounded-top">
+                      <a href="/" title="Zpět na zadání">
+                        <h3 class="card-title m-0 text-white">
+                            <i class="fa fa-angle-double-left"></i>
+                            Zpracování řešení
+                        </h3>
+                      </a>
+                    </div>
+                  </div>
+                  
+                  <div class="card-body px-5 pb-5 pt-1">
+                    {# <h2>Probíhá zpracování</h2>
+                    <div class="progress">
+                      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                    </div> #}
+                    <h3>Úloha <code>{{ request.prob.name }}</code> od uživatele <code>{{ request.user }}</code></h3>
+                    
+                    <h4>Zdrojový kód</h4>
+                    <div class="my-3 mb-4 ">
+                      <pre class="m-0 rounded smaller"><code class="{{ lang.ext[0] }}">{{ source_code }}</code></pre>
+                    </div>
+                    
+                    <h4>Zhodnocení</h4>
+                    <div class="">
+                      {% if result.compilation.code != -1 %}
+                        {% if result.compilation.code == 6 %}
+                          <p>Program byl zkompilován bez problémů</p>
+                        {% else %}
+                          <p>Program nebylo možné zkompilovat:</p>
+                          <pre class="m-0 rounded smaller"><code class="p-4">{{ result.compilation.error }}</code></pre>
+                        {% endif %}
+                        
+                      {% endif %}
+                        {# nebyla provedena kompilace #}
+                        
+                        {% if result.code == 0 %}
+                          <p>Odevzdané řešení je správné</p>
+                        {% else %}
+                          <p>Odevzdáné řešení je chybné:</p>
+                        {% endif %}
+                        
+                        
+                        <ul class="list-group list-group-flush">
+                        {% for test in result.tests %}
+                            {% if test.code == -1 %}
+                            <li class="list-group-item">
+                              <h5 class="font-weight-bold">Test <span class="text-monospace">[{{ test.id }}]</span></h5>
+                              <div class="p-2 rounded">
+                                <span class="text-danger">
+                                  test byl preskočen
+                                </span>
+                              </div>
+                            </li>
+                            {% elif test.code == 0 %}
+                            <li class="list-group-item list-group-item-success">
+                              <h5 class="font-weight-bold">Test <span class="text-monospace">[{{ test.id }}]</span></h5>
+                              <div class="p-2 rounded-top green lighten-5">
+                                <span class="text-success">
+                                  test uspěl
+                                </span>
+                              </div>
+                              <hr class="m-0" />
+                              <div class="p-2 rounded-bottom green lighten-5">
+                                <span>
+                                  
+                                  {% if test.error %}
+                                    {% if test.error is sequence and test.error is not string %}
+                                      <ol class="stdout-list">
+                                        {% for line in test.error %}
+                                          <li class="text-monospace small">{{ line }}</li>
+                                        {% endfor %}
+                                      </ol>
+                                    {% else %}
+                                      <pre class="m-0 small"><code class="nohighlight">{{ test.error }}</code></pre>
+                                    {% endif %}
+                                  {% else %}
+                                    <em class="small">Nebyl zachycen žádný výstup programu.</em>
+                                  {% endif %}
+                                </span>
+                              </div>
+                            </li>
+                            {% elif test.code == 4 %}
+                            <li class="list-group-item list-group-item-success">
+                              <h5 class="font-weight-bold">Test <span class="text-monospace">[{{ test.id }}]</span></h5>
+                              <div class="p-2 rounded-top green lighten-5">
+                                <span class="text-success">
+                                  Výstupní soubory vygenerovány
+                                </span>
+                              </div>
+                              <hr class="m-0" />
+                              <div class="p-2 rounded-bottom green lighten-5">
+                                <span>
+                                  {% if test.error %}
+                                    {% if test.error is sequence and test.error is not string %}
+                                      <ol class="stdout-list">
+                                        {% for line in test.error %}
+                                          <li class="text-monospace small">{{ line }}</li>
+                                        {% endfor %}
+                                      </ol>
+                                    {% else %}
+                                      <pre class="m-0 small"><code class="nohighlight">{{ test.error }}</code></pre>
+                                    {% endif %}
+                                  {% else %}
+                                    <em class="small">Nebyl zachycen žádný výstup programu.</em>
+                                  {% endif %}
+                                </span>
+                              </div>
+                            </li>
+                            {% elif test.code != 0 %}
+                            <li class="list-group-item red lighten-4">
+                              <h5 class="font-weight-bold">Test <span class="text-monospace">[{{ test.id }}]</span></h5>
+                              <div class="p-2 rounded-top red lighten-5">
+                                <span class="text-danger">
+                                  test selhal
+                                </span>
+                              </div>
+                              <hr class="m-0" />
+                              <div class="p-2 rounded-bottom red lighten-5">
+                                <span>
+                                  {% if test.error %}
+                                    {% if test.error is sequence and test.error is not string %}
+                                      <ul class="stdout-list">
+                                        {% for line in test.error %}
+                                          <li class="text-monospace small">{{ line }}</li>
+                                        {% endfor %}
+                                      </ul>
+                                    {% else %}
+                                      <pre class="m-0 small"><code class="nohighlight">{{ test.error }}</code></pre>
+                                    {% endif %}
+                                  {% else %}
+                                    <em class="small">Nebyl zachycen žádný výstup programu.</em>
+                                  {% endif %}
+                                </span>
+                              </div>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+           </div>
+         </div>
+       </div>
+     </div>
+     
+   </body>
+   <!-- JQuery -->
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <!-- Bootstrap tooltips -->
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+   <!-- Bootstrap core JavaScript -->
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+   <!-- MDB core JavaScript -->
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.9/js/mdb.min.js"></script>
+   <!-- Highlight js -->
+   <script src="https://highlightjs.org/static/highlight.site.pack.js"></script>
+   <script>hljs.initHighlightingOnLoad();</script>
+</html>

@@ -1,0 +1,55 @@
+{% if stderr %}
+  
+  {% if stderr.lines | length %}
+    <h4>Výstup</h4>
+    {% if stderr.numbered %}
+      <ol class="std-list">
+        {% for line in stderr.lines %}
+          <li>{{ line }}</li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <ul class="std-list">
+        {% for line in stderr.lines %}
+          <li>{{ line }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endif %}
+  
+  
+  {% if stdout.lines | length %}
+    <h4>Výstup</h4>
+    {% if stdout.numbered %}
+      <ol class="std-list">
+        {% for line in stdout.lines %}
+          <li>{{ line }}</li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <ul class="std-list">
+        {% for line in stdout.lines %}
+          <li>{{ line }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endif %}
+  
+    
+{% else %}
+
+  {% if numbered %}
+    <ol class="std-list">
+      {% for line in lines %}
+        <li>{{ line }}</li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <ul class="std-list">
+      {% for line in lines %}
+        <li>{{ line }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+{% endif %}
