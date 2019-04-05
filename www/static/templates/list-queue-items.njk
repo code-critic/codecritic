@@ -1,0 +1,13 @@
+<div>
+  <h3>Submitions from other users</h3>
+  <ul>
+    {% for item in items %}
+      <li id='queue-{{ item.id }}'>
+        Solution from
+        <code>{{ item.user }}</code>
+        solving problem
+        <code>{{ item.prob.name }}</code>
+      </li>
+    {% endfor %}
+  </ul>
+</div>

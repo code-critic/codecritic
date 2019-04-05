@@ -1,55 +1,41 @@
-{% if stderr %}
-  
-  {% if stderr.lines | length %}
-    <h4>Výstup</h4>
-    {% if stderr.numbered %}
-      <ol class="std-list">
-        {% for line in stderr.lines %}
-          <li>{{ line }}</li>
-        {% endfor %}
-      </ol>
-    {% else %}
-      <ul class="std-list">
-        {% for line in stderr.lines %}
-          <li>{{ line }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
+{% if message %}
+  <h6>{{ message }}</h6>
+  {% if message_details | length %}
+    {% for line in message_details %}
+      <p>{{ line }}</p>
+    {% endfor %}
   {% endif %}
-  
-  
-  {% if stdout.lines | length %}
-    <h4>Výstup</h4>
-    {% if stdout.numbered %}
-      <ol class="std-list">
-        {% for line in stdout.lines %}
-          <li>{{ line }}</li>
-        {% endfor %}
-      </ol>
-    {% else %}
-      <ul class="std-list">
-        {% for line in stdout.lines %}
-          <li>{{ line }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endif %}
-  
-    
-{% else %}
+{% endif %}
 
-  {% if numbered %}
-    <ol class="std-list">
-      {% for line in lines %}
-        <li>{{ line }}</li>
-      {% endfor %}
-    </ol>
-  {% else %}
+{% if console | length %}
+  <p class="result-text">
+    <h6>Console:</h6>
     <ul class="std-list">
-      {% for line in lines %}
+      {% for line in console %}
         <li>{{ line }}</li>
       {% endfor %}
     </ul>
-  {% endif %}
+  </p>
+{% endif %}
 
+{% if stderr | length %}
+  <p class="result-text">
+    <h6>Stderr:</h6>
+    <ol class="std-list">
+      {% for line in stderr %}
+        <li>{{ line }}</li>
+      {% endfor %}
+    </ol>
+  </p>
+{% endif %}
+
+{% if stdout | length %}
+  <p class="result-text">
+    <h6>Stdout:</h6>
+    <ol class="std-list">
+      {% for line in stdout %}
+        <li>{{ line }}</li>
+      {% endfor %}
+    </ol>
+  </p>
 {% endif %}

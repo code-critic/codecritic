@@ -1,0 +1,354 @@
+div, nav {
+  /* border: 1px solid red; */
+}
+body {
+  margin: 0;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.428571;
+  color: #404040;
+  text-align: left;
+  background-color: #eee;
+}
+
+.tooltip {
+  z-index: 9999;
+  font-size: 0.8em;
+}
+.tooltip code {
+  color: inherit;
+  font-weight: bold;
+}
+.bd-content {
+  margin: 20px;
+  width: 100%;
+}
+.smaller {
+  font-size: 0.70em;
+}
+.small {
+  font-size: 0.80em;
+}
+.collapsing {
+  transition: height .2s ease !important;
+}
+
+.prob-desc {
+  /* background: #d8e5ef; */
+  padding: 0.5rem;
+}
+.prob-desc > h1 {
+  font-size: 1.4em;
+}
+.prob-desc > h2 {
+  font-size: 1.2em;
+}
+.prob-desc > h3 {
+  font-size: 1.0em;
+}
+.prob-desc > h4 {
+  font-size: 0.8em;
+}
+.prob-desc p {
+  font-size: 85%;
+}
+.prob-desc .fmt code {
+  white-space: pre;
+  width: 100%;
+  display: block;
+  background: rgba(228, 242, 251, 0.5);
+  border: 1px solid #9abbc7;
+  color: #555;
+  font-size: 80%;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+/* .prob-desc p code.ignore {
+  white-space: inherit;
+  display: inline;
+  background: inherit;
+  border: inherit;
+  font-size: 87.5%;
+  color: #e83e8c;
+  padding: inherit;
+  border-radius: inherit;
+} */
+
+.result {
+    background: #FFF;
+    padding: 1.5rem;
+    border-radius: 0.25rem;
+    margin-bottom: 2rem;
+}
+
+.result-text code {
+  font-size: inherit;
+}
+
+.result-details.stdout-stderr .std-list {
+  border-radius: 0.25em;
+  width: 100%;
+  display: block;
+  padding: 1rem 2rem;
+  border: none;
+  margin-bottom: 1rem;
+  padding-left: 40px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.status-badge {
+  border: none !important;
+  display: inline-block;
+  background: #fafafa;
+  border-radius: 0.25rem;
+  padding: 0;
+  margin: 0;
+  width: 50px;
+  height: 26px;
+  line-height: 26px;
+  text-align: center;
+}
+
+.running .status-badge {
+  line-height: 33px;
+}
+
+.std-list li {
+  font-size: .7rem;
+  font-family: Menlo,Monaco,Consolas,"Liberation Mono",monospace,SFMono-Regular,"Courier New";
+}
+
+ol.std-list {
+    counter-reset: item;
+    list-style-type: none;
+    margin: 0;
+}
+ol.std-list li {
+  display: block;
+  white-space: pre;
+}
+ol.std-list li:before {
+  content: counter(item, decimal-leading-zero) "| ";
+  counter-increment: item;
+  opacity: 0.5;
+  margin-left: -10px;
+  padding-right: 10px;
+}
+
+ul.std-list {
+  list-style-type: none;
+  margin: 0;
+}
+ul.std-list li {
+  display: block;
+  white-space: pre;
+}
+ul.std-list li::before {
+  content: ">";
+  display: inline-block;
+  width: 2em;
+  margin-left: -1em;
+  opacity: 0.5;
+}
+
+.btn-block-anim {
+  text-align: left;
+  display: inline-block;
+  background: #efefef;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-weight: bold;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+ .test-icon {
+   display: inline-block;
+   padding-right: 0.5rem;
+ }
+
+.result-text {
+  margin-left: 60px;
+}
+.result-text .title {
+  margin: 0;
+  padding: 0.25rem;
+  font-size: 0.8rem;
+  display: block;
+  border-radius: 0.25rem 0.25rem 0 0;
+  border-bottom: 2px solid #fff;
+}
+
+.console.result-text .title,
+.stdout.result-text .title {
+  color: #2a2a2a;
+  background: #dadada;
+}
+.console .std-list,
+.stdout .std-list {
+  color: #2a2a2a;
+  background: #efefef;
+}
+
+.stderr.result-text .title,
+.stderr .std-list {
+  color: #6c0404;
+  background: #ffefef;
+}
+
+.grey {
+  background: #eeeeee;
+}
+body {
+  background: #ffffff;
+}
+
+.hr-danger {
+    border-top: 1px solid #ff3547;
+}
+
+.hr-warning {
+    border-top: 1px solid #ff9835;
+}
+
+.card-danger {
+  background-color: #ffe4e6;
+  border: 1px solid #ff3547 !important;
+}
+
+.card-warning {
+  background-color: #fff8e4;
+  border: 2px solid #ff9835 !important;
+}
+
+#editor {
+  height: 150px;
+}
+#editor.fullscreen {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  z-index: 9;
+}
+
+.code {
+  font-family: monospace;
+}
+
+/* ------------------------------------------ */
+.rgba-admin-strong,
+body.admin .header-grad {
+  background: linear-gradient(to bottom, rgba(255, 116, 0, 0.9) 0%,rgba(255, 116, 0, 0.85) 100%);
+}
+body.admin .btn-primary.dropdown-toggle:focus,
+body.admin .btn-primary.dropdown-toggle:hover {
+  background-color: #f7802a !important;
+}
+body.admin .btn-primary.dropdown-toggle {
+    background-color: #f8771a !important;
+}
+
+a.back-btn {
+  color: #fff;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0);
+  border-radius: 0.25rem;
+}
+a.back-btn:hover, a.back-btn:focus {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+/* ------------------------------------------ */
+
+.admin-zone > h3 {
+  background: #9b2626;
+  margin: 0;
+  padding: .75rem;
+  color: #fff;
+  border-radius: .25rem .25rem 0 0;
+}
+.md-tabs {
+    border: 0;
+    padding: .75rem;
+    margin-bottom: -20px;
+    background-color: #c22f2f;
+    z-index: 1;
+    position: relative;
+    border-radius: 0 0 .25rem .25rem;
+}
+
+.md-tabs .nav-link {
+    -webkit-transition: all .4s;
+    -o-transition: all .4s;
+    transition: all .4s;
+    border: 0;
+        border-top-color: currentcolor;
+        border-right-color: currentcolor;
+        border-bottom-color: currentcolor;
+        border-left-color: currentcolor;
+    color: #fff;
+}
+.md-tabs .nav-item.open .nav-link, .md-tabs .nav-link.active {
+    background-color: rgba(0,0,0,.2);
+    color: #fff;
+    -webkit-transition: all 1s;
+    -o-transition: all 1s;
+    transition: all 1s;
+    -webkit-border-radius: .25rem;
+    border-radius: .25rem;
+}
+form.disabled {
+  pointer-events: none !important;
+  opacity: 0.5;
+}
+
+.text-muted.use-docker-info {
+  font-size: .8rem;
+}
+.use-docker-info {
+  display: block;
+}
+form .input-use-docker:checked ~ .use-docker-info {
+  display: none;
+}
+
+.solution-result {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+
+
+.evaluation .test-icon {
+  height: 80px;
+}
+
+.evaluation .btn-block-anim {
+  height: 80px;
+  line-height: 80px;
+  font-size: 1.0rem;
+  padding-left: 1rem;
+}
+
+.evaluation .status-badge {
+  height: 80px;
+  line-height: 80px;
+  font-size: 1.0rem;
+}
+
+.btn.fullscreen:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+.btn.fullscreen {
+  position: absolute;
+  top: 0.25rem;
+  right: 1rem;
+  z-index: 10;
+  padding: 0.25rem 0.5rem;
+  margin: 0;
+  line-height: 1rem;
+}

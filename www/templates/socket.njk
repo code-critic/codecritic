@@ -1,541 +1,132 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
-     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-     {# <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> #}
-     <title>ADA 2018-2019</title>
-     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
-     {# <link href="https://mdbootstrap.com/wp-content/themes/mdbootstrap4/css/compiled-4.5.9.min.css?ver=4.5.9" rel="stylesheet"> #}
-     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.10/css/mdb.min.css" rel="stylesheet">
-     <link rel="stylesheet" href="https://getbootstrap.com/docs/4.1/assets/css/docs.min.css">
-     <link rel="stylesheet" href="/static/css/main.css">
+    {% include "core/head.njk" %}
+    <script type="text/javascript" src="/static/js/solution.js" charset="utf-8"></script>
+  </style>
+</head>
+<body class="{{ 'admin' if user.is_admin() else 'student' }}">
+  <div class="container-fluid">
+    <div class="row flex-xl-nowrap">
+      <div class="bd-content w-100">
+        <div class="row">
+          <div class="col-xs-12 col-sm-11 col-lg-10 m-auto">
+            <div class="card grey lighten-3">
 
+              {% include "header.njk" %}
 
+              <div class="card-body row">
+                {% if problems %}
 
-     <!-- JQuery -->
-     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-     <!-- Bootstrap tooltips -->
-     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
-     <!-- Bootstrap core JavaScript -->
-     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
-     <!-- MDB core JavaScript -->
-     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.9/js/mdb.min.js"></script>
-     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/nunjucks/3.0.1/nunjucks.min.js"></script>
-     {# <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/6.1.3/highcharts.js"></script> #}
-     {# <script language="javascript" type="text/javascript" src="https://momentjs.com/downloads/moment.min.js"></script> #}
-     <script language="javascript" type="text/javascript" src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
-     <script type="text/javascript" src="static/js/ace/ace.js" charset="utf-8"></script>
-     <script type="text/javascript" src="static/js/ace/ext-language_tools.js" charset="utf-8"></script>
+                  <div class="accordion col-12 col-md-6" id="accordionSubmit">
+                    <div class="card">
+                      <div class="card-header" id="headingOne">
+                        <h5 class="mb-0">
+                          <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#submit-solution" aria-expanded="true" aria-controls="submit-solution">
+                            Submit solution
+                          </button>
+                        </h5>
+                      </div>
 
+                      <div id="submit-solution" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionSubmit">
+                        <div class="card-body">
+                          <form class="form" method="post">
 
+                            <!-- Problem -->
+                            <label>Problem</label>
+                            <div class="custom-control mb-4">
+                              <select class="browser-default custom-select prob-select" name="prob-id" data-course="{{ course.id }}">
+                                {% for problem in problems %}
+                                  <option data-problem-name="{{ problem.name }}" value="{{ problem.id }}">{{ problem.name }}
+                                    {% if not problem.is_active() %}
+                                      [odevzdání ukončeno]
+                                    {% endif %}
+                                  </option>
+                                {% endfor %}
+                              </select>
+                              {% if user.is_admin() %}
+                                <a href="#" class="manage-problem-link" data-href="{{
+                              url_for('admin_problem', course_name=course.name, course_year=course.year, problem_id='')
+                            }}">» manage problem
+                                  <span class="prolem-name-placeholder"></span></a>
+                              {% endif %}
+                            </div>
 
-     <style>
-       .loader {
-         display: inline-block;
-         border: 1px solid #aeabab;
-         background: #fafafa;
-         border-radius: 0.25rem;
-         padding: 0.1rem 0.25rem;
-         margin: 0.25rem;
-       }
-       .sk-three-bounce {
-         width: 50px;
-         text-align: center; }
-       .sk-three-bounce .sk-child {
-         width: 8px;
-         height: 8px;
-         background-color: #333;
-         border-radius: 100%;
-         display: inline-block;
-         -webkit-animation: sk-three-bounce 1.0s ease-in-out 0s infinite both;
-                 animation: sk-three-bounce 1.0s ease-in-out 0s infinite both; }
-       .sk-three-bounce .sk-bounce1 {
-         -webkit-animation-delay: -0.32s;
-                 animation-delay: -0.32s; }
-       .sk-three-bounce .sk-bounce2 {
-         -webkit-animation-delay: -0.16s;
-                 animation-delay: -0.16s; }
-       @-webkit-keyframes sk-three-bounce {
-         0%, 80%, 100% {
-           -webkit-transform: scale(0);
-                   transform: scale(0); }
-         40% {
-           -webkit-transform: scale(1);
-                   transform: scale(1); } }
-       @keyframes sk-three-bounce {
-         0%, 80%, 100% {
-           -webkit-transform: scale(0);
-                   transform: scale(0); }
-         40% {
-           -webkit-transform: scale(1);
-                   transform: scale(1); } }
-       .spinner {
-         width: 45px;
-         height: 23px;
-         text-align: center;
-         font-size: 10px;
-       }
-       .spinner > div {
-         background-color: #333;
-         height: 100%;
-         width: 4px;
-         display: inline-block;
+                            <!-- Prog language -->
+                            <label>Language</label>
+                            <div class="custom-control mb-4">
+                              <select class="browser-default custom-select mb-4 lang-select" name="lang-id">
+                                {% for language in languages %}
+                                  <option value="{{ language.id }}" data-style="{{ language.style }}">{{ language.pretty_name }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
 
-         -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
-         animation: sk-stretchdelay 1.2s infinite ease-in-out;
-       }
-       .spinner .rect2 {
-         -webkit-animation-delay: -1.1s;
-         animation-delay: -1.1s;
-       }
-       .spinner .rect3 {
-         -webkit-animation-delay: -1.0s;
-         animation-delay: -1.0s;
-       }
-       .spinner .rect4 {
-         -webkit-animation-delay: -0.9s;
-         animation-delay: -0.9s;
-       }
-       .spinner .rect5 {
-         -webkit-animation-delay: -0.8s;
-         animation-delay: -0.8s;
-       }
+                            <!-- Source code -->
+                            <div class="form-group mb-4">
+                              <label for="srcTA">Source code</label>
+                              <textarea class="d-none form-control smaller text-monospace src-textarea" name="src" id="srcTA" rows="3" placeholder="Source code" required="required">import sys for name in sys.stdin.read().splitlines(): print("Hello, {name}!".format(name=name))</textarea>
+                              <div id="editor" class="rounded border border-light"></div>
+                            </div>
 
-       @-webkit-keyframes sk-stretchdelay {
-         0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
-         20% { -webkit-transform: scaleY(1.0) }
-       }
+                            <div class="custom-control custom-checkbox" {% if not user.is_admin() %} style="display: none !important;" {% endif %}>
+                              <input type="checkbox" name="use-docker" class="custom-control-input input-use-docker" id="output-use-docker" checked="checked">
+                              <label class="custom-control-label" for="output-use-docker">Use docker container</label>
+                              <p class="use-docker-info text-muted text-danger">
+                                Running the code outside of docker environment is a
+                                <strong>security risk</strong>
+                                and can easily damage system. If checked, solution
+                                <strong>will be processed faster</strong>, using native compilers/interpreters. Double check your solution before continuing.
+                              </p>
+                            </div>
 
-       @keyframes sk-stretchdelay {
-         0%, 40%, 100% {
-           transform: scaleY(0.4);
-           -webkit-transform: scaleY(0.4);
-         }  20% {
-           transform: scaleY(1.0);
-           -webkit-transform: scaleY(1.0);
-         }
-       }
-      .queue-list li {
-        list-style: none;
-      }
-      .queue-list li .sk-three-bounce {
-        display: none;
-      }
-      .queue-list li.running .sk-three-bounce {
-        display: inline-block;
-      }
-      .status-section .result-text {
-        /* font-size: 1.5em;
-        line-height: 2em; */
-      }
-      .status-badge {
-        display: inline-block;
-        border: 1px solid #aeabab;
-        background: #fafafa;
-        border-radius: 0.25rem;
-        padding: 0.1rem 0.25rem;
-        margin: 0.25rem;
-        width: 50px;
-        text-align: center;
-      }
-      .status-icon {
-        font-size: 2em;
-      }
-      .status-section code {
-        color: inherit;
-      }
-      .std-list li {
-        font-size: 70%;
-      }
-      #editor {
-          width: 100%;
-          height: 300px;
-      }
-      .count-down.prob-over {
-        border: 1px solid #e96a6a;
-        background: #ffdcdc;
-        color: #a73c3c;
-        padding: 0.25rem;
-        margin: 0.5rem 0;
-        border-radius: 0.25rem;
-        text-align: center;
-        font-size: 0.75rem;
-      }
-      .count-down.prob-almost-over {
-        border: 1px solid #e9926a;
-        background: #ffebdc;
-        color: #a7623c;
-        padding: 0.25rem;
-        margin: 0.5rem 0;
-        border-radius: 0.25rem;
-        text-align: center;
-        font-size: 0.75rem;
-      }
+                            <hr/>
 
-     </style>
-  </head>
-  <body>
+                            <!-- Send button -->
+                            <button class="btn btn-info btn-block submit-button" value="solve:docker" type="submit">Submit solution</button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card">
+                      <div class="card-header" id="solution-result-heading">
+                        <h5 class="mb-0">
+                          <button class="btn btn-link collapsed disabled" type="button" data-toggle="collapse" data-target="#solution-result" aria-expanded="false" aria-controls="solution-result">
+                            Solution result
+                          </button>
+                        </h5>
+                      </div>
+                      <div id="solution-result" class="collapse" aria-labelledby="solution-result-heading" data-parent="#accordionSubmit">
+                        <div class="solution-result card-body"></div>
+                      </div>
+                    </div>
+                  </div>
 
-    <div class="container-fluid">
-      <div class="row flex-xl-nowrap">
-        <div class="bd-content w-100">
-          <div class="row" id="charts-sm">
+                  <div class="col-12 col-md-6">
+                    <pre style="font-size: 0.75rem; display: block;" id="log" /></pre>
+                    {% for problem in problems %}
+                      <div class="d-none prob-desc" id="desc-{{ problem.id }}" data-time-left="{{ problem.time_left }}">
+                        <div class="count-down d-none" data-time-left="{{ problem.time_left }}"></div>
+                        <h3>Zadání pro úlohu
+                          <code>{{ problem.name }}</code>
+                        </h3>
+                        {{ problem.description }}
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="p-3">
+                    <h3>There are not problems specified in course configuration file </h3>
+                    <p class="text-muted">The file is here: <code>{{ course.yaml_file }}</code></p>
+                  </div>
+                {% endif %}
+              </div>
 
-             <div class="col-xs-12 col-sm-11 col-lg-10 m-auto">
-
-               <div class="card grey lighten-3">
-                 <div class="card-image mb-3 rounded-top" style="background-size: cover; background-image: url('/static/imgs/intro.jpeg');">
-                   <div class="text-white align-items-center rgba-blue-strong p-4 rounded-top">
-                     <div class="d-flex justify-content-between">
-                       <h3 class="card-title m-0 text-white">ADA 2018</h3>
-                       <span class="rounded py-2 px-3 border">
-                         {{ user.full_name }} <small>({{ user.affi }})</small>
-                       </span>
-                     </div>
-                   </div>
-                 </div>
-
-                 <div class="card-body p-0">
-
-                   <div class="row px-5 pt-0 pb-5">
-
-                     <div class="col-12 col-md-6 row">
-                       <div class="col-12 status" style="display: none;">
-                         <h3>Zpracování úlohy</h3>
-                         <div class="result">
-
-                         </div>
-                       </div>
-
-
-                       <div class="col-12 form">
-                         <form class="form" method="post">
-                           <h3>Odevzdání řešení</h3>
-                           <!-- Problem -->
-                           <label>Název úlohy</label>
-                           <select class="browser-default custom-select mb-4 prob-select" name="prob-id">
-                             {% for gid, grp in problems.items() %}
-                               <optgroup label="{{ gid }}">
-                                   {% for id, prob in grp.items() %}
-                                     <option value="{{ id }}">{{ prob.name }}
-                                     {% if not prob.is_active() %}
-                                       [odevzdání ukončeno]
-                                     {% endif %}
-                                   </option>
-                                   {% endfor %}
-                               </optgroup>
-                             {% endfor %}
-                           </select>
-
-                           <!-- Prog language -->
-                           <label>Programovací jazyk</label>
-                           <select class="browser-default custom-select mb-4 lang-select" name="lang-id">
-                             {% for id, lang in languages.items() %}
-                               <option value="{{ id }}" data-ext="{{ lang.ext[0] }}">{{ lang.name }}</option>
-                             {% endfor %}
-                           </select>
-
-
-                           <!-- Source code -->
-                           <div class="form-group mb-4">
-                             <label for="srcTA">Zdrojový kód</label>
-                             {# <textarea class="d-none form-control smaller text-monospace src-textarea" name="src" id="srcTA" rows="10" placeholder="Vložte zdrojový kód" required>import sys
-
-  for name in sys.stdin.read().splitlines():
-      print("Hello, {name}!".format(name=name))</textarea> #}
-                           <div id="editor" class="rounded border border-light"></div>
-                           </div>
-
-                           <hr />
-
-
-                           <!-- Send button -->
-                           <button class="btn btn-info btn-block submit-button" type="submit">Odeslat</button>
-                         </form>
-                       </div>
-
-                       <div class="col-12 queue" style="display: none;">
-                         <h3>Úlohy čekající ve frontě</h3>
-                         <ul class="queue-list"></ul>
-                       </div>
-                   </div>
-
-                   <div class="col-12 col-md-6">
-                     {% for gid, grp in problems.items() %}
-                       {% for id, prob in grp.items() %}
-                         <div class="d-none prob-desc" id="desc-{{ id }}" data-time-left="{{ prob.time_left }}">
-                           <div class="count-down d-none" data-time-left="{{ prob.time_left }}"></div>
-                           <h3>Zadání pro úlohu <code>{{ prob.name }}</code></h3>
-                           {{ prob.description }}
-                           {# <div id="stats-{{ id }}"></div>
-                           <script type="text/javascript">
-                              $(document).ready(function() {
-                                Highcharts.chart('stats-{{ id }}', {{ prob.stats() | safe }});
-                              });
-                           </script> #}
-                         </div>
-                       {% endfor %}
-                     {% endfor %}
-                   </div>
-                 </div>
-               </div>
-             </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-  </body>
-
-  <script type="text/javascript" charset="utf-8">
-      $(document).ready(function() {
-
-        $('.count-down').each(function(index, item) {
-          var $item = $(item);
-          var timeLeft = Number($item.data('time-left'));
-          var m = moment().locale('cs').add(timeLeft, 'seconds');
-          if (timeLeft > 0) {
-            if (timeLeft < (86400*8)) {
-              $item.html('Odevzdávání bude uzavřeno <strong>' +
-                m.fromNow() +
-                '</strong>' +
-                ' (' + m.format('llll') + ')'
-              ).removeClass('d-none').addClass('prob-almost-over')
-            }
-          }else{
-            $item.html('Odevzdávání bylo uzavřeno <strong>' +
-              m.fromNow()
-            ).removeClass('d-none').addClass('prob-over')
-          }
-        });
-        var editor = ace.edit("editor");
-
-        editor.setTheme("ace/theme/github");
-        editor.session.setMode("ace/mode/java");
-        editor.setOptions({
-            enableBasicAutocompletion: true,
-            enableSnippets: true,
-            enableLiveAutocompletion: true
-        });
-
-        editor.session.on('change', function() {
-            saveLocalStorage();
-        });
-
-        var loadLocalStorageCode = function() {
-          var local_prob = $('.prob-select').val();
-          var local_lang = $('.lang-select').val();
-          try {
-            var local_src = localStorage.getItem('src'+'.'+local_prob+'.'+local_lang);
-            if (local_src) editor.setValue(local_src);
-          } catch (e) {
-            // ignore local storage error
-          }
-        };
-
-        var saveLocalStorage = function() {
-          var local_prob = $('.prob-select').val();
-          var local_lang = $('.lang-select').val();
-          var local_src = editor.getValue();
-
-          try {
-            localStorage.setItem('prob', local_prob);
-            localStorage.setItem('lang', local_lang);
-            localStorage.setItem('src'+'.'+local_prob+'.'+local_lang, local_src);
-          } catch (e) {
-            // ignore local storage error
-          }
-        };
-
-        try {
-          var local_prob = localStorage.getItem('prob');
-          var local_lang = localStorage.getItem('lang');
-          console.log(local_prob);
-          if (local_prob) $('.prob-select').val(local_prob);
-          if (local_lang) $('.lang-select').val(local_lang);
-          loadLocalStorageCode();
-        } catch (e) {
-          // ignore local storage error
-        }
-
-        var namespace = '/test';
-        var namespace = '';
-        var inQueue = false;
-        // var socket = io.connect('http://hybs.nti.tul.cz:22122' + namespace);
-        var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-        nunjucks.configure({ autoescape: true });
-
-        socket.on('connect', function() {
-            socket.emit('my_event', {data: 'I\'m connected!'});
-        });
-
-        $('.lang-select').change(function(){
-          var mode = $('.lang-select option:checked').text().toLowerCase();
-          editor.session.setMode('ace/mode/' + mode);
-          loadLocalStorageCode();
-        });
-
-        $('.prob-select').change(function(){
-          var $id = $('#desc-' + $(this).val());
-          $('.prob-desc').addClass('d-none');
-          $id.removeClass('d-none');
-
-          var elms = '#editor, form button, .lang-select';
-          var timeLeft = Number($id.data('time-left'));
-          if (timeLeft > 0) {
-            $(elms).css('opacity', '1.0').removeClass('disabled').show('normal');
-          } else {
-            $(elms).addClass('disabled').css('opacity', '0.5');
-          }
-          loadLocalStorageCode();
-        });
-
-        $('form').submit(function() {
-
-          var local_prob = $('.prob-select').val();
-          var local_lang = $('.lang-select').val();
-          var local_src = editor.getValue();
-          saveLocalStorage();
-
-
-          socket.emit('student-solution-submit', {
-            prob: local_prob,
-            lang: local_lang,
-            src: local_src,
-          });
-          $('form').addClass('disabled').css('opacity', '0.5');
-          $('form').slideUp();
-          $('.queue').show();
-          inQueue = true;
-          return false;
-        });
-
-        socket.on('my_response', function(data) {
-          console.log(data);
-        });
-
-        socket.on('queue-push', function(data) {
-          if (!inQueue) return;
-          console.log('[GLOBAL] queue-push');
-          $('.queue-list').append(
-            nunjucks.render('static/templates/list-queue-item.njk', data)
-          );
-          $('#queue-' + data.item.id).css('display', 'none').show('fast');
-        });
-
-        socket.on('queue-pop', function(data) {
-          if (!inQueue) return;
-          console.log('[GLOBAL] queue-pop');
-          $('#queue-' + data.item.id).slideUp();
-        });
-
-        socket.on('queue-status', function(data) {
-          if (!inQueue) return;
-          console.log('queue-status');
-          $('.queue-list').empty();
-          for (item of data.queue.items) {
-            $('.queue-list').append(
-              nunjucks.render('static/templates/list-queue-item.njk', {item: item})
-            );
-            if (item.running) {
-              $('#queue-' + item.id).addClass('running');
-              $('#queue-' + item.id + ' .loading').fadeIn();
-            }
-          }
-        });
-
-        socket.on('process-start', function(data) {
-          console.log('[GLOBAL] process-start');
-        });
-
-        socket.on('process-end', function(data) {
-          console.log('[GLOBAL] process-end')
-          $('.queue').hide('normal');
-        });
-
-        socket.on('process-start-me', function(data) {
-          console.log('process-start-me ');
-          inQueue = false;
-          $('.queue').hide('normal');
-          $('.status').show('normal');
-          $('.status .result').empty();
-        });
-
-        socket.on('process-end-me', function(data) {
-          console.log('process-end-me ');
-          inQueue = false;
-          $('form').css('opacity', '1.0').removeClass('disabled').show('normal');
-        });
-
-        socket.on('execute-start-me', function(data) {
-          console.log('execute-start-me');
-          $('.status .result').append(
-            nunjucks.render('static/templates/process-execute.njk', data)
-          );
-        });
-        socket.on('execute-end-me', function(data) {
-          console.log('execute-end-me ');
-        });
-
-
-        socket.on('execute-test-start-me', function(data) {
-          console.log('execute-test-start-me');
-          $('#exec-' + data.test.id + ' .waiting').hide();
-          $('#exec-' + data.test.id + ' .running').show();
-        });
-        socket.on('execute-test-end-me', function(data) {
-          console.log('execute-test-end-me');
-          console.log(data);
-          $('#exec-' + data.test.id + ' .running').hide();
-          if (data.result.status == "ANSWER_OK") {
-            $('#exec-' + data.test.id + ' .success').show();
-            $('#exec-' + data.test.id + ' .stdout-stderr').html(
-              nunjucks.render('static/templates/line-output.njk', {
-                stderr: {lines: data.result.info.stderr},
-                stdout: {lines: data.result.info.stdout},
-              })
-            );
-          } else {
-            $('#exec-' + data.test.id + ' .error').show();
-            $('#exec-' + data.test.id + ' .stdout-stderr').html(
-              nunjucks.render('static/templates/line-output.njk', {
-                stderr: {lines: data.result.info.stderr},
-                stdout: {lines: data.result.info.stdout},
-              })
-            );
-          }
-
-        });
-
-
-        socket.on('compile-start-me', function(data) {
-          console.log('compile-start-me ');
-          $('.status .result').append(
-            nunjucks.render('static/templates/process-compile.njk', {item: data.item})
-          )
-        });
-        socket.on('compile-end-me', function(data) {
-          console.log('compile-end-me ');
-          console.log(data);
-          if (data.result.status == 'COMPILE_OK') {
-            $('.compilation .running').hide();
-            $('.compilation .success').show();
-          } else {
-            $('.compilation .running').hide();
-            $('.compilation .error').show();
-            $('.compilation .stdout-stderr').html(
-              nunjucks.render('static/templates/line-output.njk', {
-                stderr: {lines: data.result.info.stderr},
-                stdout: {lines: data.result.info.stdout},
-              })
-            );
-          }
-        });
-
-        $('.prob-select').trigger('change');
-      });
-  </script>
+  </div>
+</body>
 </html>

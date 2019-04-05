@@ -1,0 +1,62 @@
+<!doctype html>
+<title>My Application</title>
+<a href="upload">Upload file</a>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+{% if content %}
+<code><pre>{{ content }}</pre></code>
+{% endif %}
+
+<div class="col-md-6 mb-4">
+    <!--Form without header-->
+    <div class="card">
+        <div class="card-body">
+
+            <!--Header-->
+            <div class="text-center cyan-text">
+                <h3>
+                    <i class="fa fa-lock cyan-text"></i> Login:</h3>
+                <hr class="my-4">
+            </div>
+
+            <!--Body-->
+            <div class="md-form">
+                <i class="fa fa-envelope prefix grey-text"></i>
+                <input id="cyanForm-email" class="form-control" type="text">
+                <label for="cyanForm-email">Your email</label>
+            </div>
+
+            <div class="md-form">
+                <i class="fa fa-lock prefix grey-text"></i>
+                <input id="cyanForm-pass" class="form-control" type="password">
+                <label for="cyanForm-pass">Your password</label>
+            </div>
+
+            <div class="text-center">
+                <button class="btn btn-info waves-effect waves-light">Login</button>
+            </div>
+
+        </div>
+
+        <!--Footer-->
+        <div class="modal-footer">
+            <div class="options">
+                <p>Not a member?
+                    <a href="#">Sign Up</a>
+                </p>
+                <p>Forgot
+                    <a href="#">Password?</a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+    <!--/Form without header-->
+</div>

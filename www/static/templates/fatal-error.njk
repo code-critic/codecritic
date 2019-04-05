@@ -1,0 +1,12 @@
+<h4>{{ error.message }}</h4>
+
+{% if error.details | length %}
+<p class="result-text">
+  <h6>Details:</h6>
+  <ul class="std-list">
+    {% for line in error.details %}
+      <li>{{ line }}</li>
+    {% endfor %}
+  </ul>
+</p>
+{% endif %}

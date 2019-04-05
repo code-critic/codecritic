@@ -1,0 +1,58 @@
+<div class="header-image card-image mb-1 rounded-top" style="background-size: cover; background-image: url('/static/imgs/intro.jpeg');">
+  <div class="header-grad text-white align-items-center p-4 rounded-top rgba-blue-strong">
+    <div class="d-flex justify-content-between">
+      <div>
+        <h2 class="card-title m-0 text-white">
+          {% if back %}
+            <a href="{{ back.url }}" class="back-btn">
+              <i class="fas fa-chevron-left"></i>
+            </a>
+          {% endif %}
+
+          {{ title }}
+          {% if subtitle %}
+            &middot;{{ subtitle }}
+          {% endif %}
+        </h2>
+      </div>
+
+      <button class="btn btn-primary rounded dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {% if user.is_admin() %}
+          <i class="fas fa-user-shield" title="Elevated privileged (role {{ user.role }})"></i>
+        {% endif %}
+        {{ user.name }}
+        {# <small>
+      <small>({{ user.affi }})</small>
+    </small> #}
+      </button>
+      <div class="dropdown-menu">
+        {% if user.role %}
+          <div class="mx-2 my-1">
+            <strong>{{ user.role }}</strong>
+          </div>
+        {% endif %}
+
+        {% if user.affi %}
+          <div class="mx-2 my-1 text-muted smaller">
+            {% for affi in user.affi_pairs %}
+              {{ affi }}<br/>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% if user.is_admin() %}
+          <a class="dropdown-item" href="{{ url_for('admin_switch_role', role='student') }}">
+            <i class="fas fa-user-tag"></i>
+            Switch to role <strong>student</strong>
+          </a>
+        {% endif %}
+
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="{{ url_for('logout') }}">
+          <i class="fas fa-power-off"></i>
+          Logout
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    {% include "core/head.njk" %}
+    <script type="text/javascript" src="/static/js/manage-problem.js" charset="utf-8"></script>
+  </style>
+</head>
+<body class="{{ 'admin' if user.is_admin() else 'student' }}">
+  <div class="container-fluid">
+    <div class="row flex-xl-nowrap">
+      <div class="bd-content w-100">
+        <div class="row">
+          <div class="col-xs-12 col-sm-10 col-lg-8 m-auto">
+            <div class="card grey lighten-3">
+
+              {% include "header.njk" %}
+
+              <div class="card-body mx-2 row">
+                {% if user.is_admin() %}
+                  <div class="card my-2 p-3 card-danger rounded-lg">
+                    {% include "admin-settings.njk" %}
+                  </div>
+                {% endif %}
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
