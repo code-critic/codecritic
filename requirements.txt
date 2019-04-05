@@ -1,0 +1,7 @@
+docker
+flask
+Flask-CORS
+flask-socketio
+tinydb
+pyyaml
+loguru
