@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# check if stdout is a terminal...
+if [[ -z "$nocolor" ]]; then
+  if test -t 1; then
+      # see if it supports colors...
+      ncolors=$(tput colors)
+      if test -n "$ncolors" && test $ncolors -ge 8; then
+          bold="$(tput bold)"
+          reset="$(tput sgr0)"
+          red="$(tput setaf 1)"
+          green="$(tput setaf 2)"
+          yellow="$(tput setaf 3)"
+          blue="$(tput setaf 4)"
+          bblue="$bold$blue"
+          bgreen="$bold$green"
+          byellow="$bold$yellow"
+          bred="$bold$red"
+      fi
+  fi
+fi
+
+function pv() {
+  binary=$1
+  version=${2:---version}
+  echo "${bgreen}>>>${reset} ${bblue}$binary${reset} ${yellow}$version${reset}"
+
+  if command -v $1 2>/dev/null; then
+    $binary $version
+  else
+    echo "    ${bred}MISSING${reset}"
+  fi
+  echo ""
+}
+
+
+pv bash
+
+pv java  -version
+pv javac -version
+
+pv mc
+pv mono
+
+pv python2
+pv pip2
+
+pv python3
+pv pip3
+
+pv gcc
+pv g++
