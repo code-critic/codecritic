@@ -1,0 +1,69 @@
+- id: PY-367
+  name: Python 3.6.8
+  scale: 5
+  image: automatest/python3
+  version: Python 3.6.8
+  extension: py
+  style: python
+  run: [python3, <filename>]
+
+- id: C
+  name: C
+  scale: 1
+  image: automatest/cc
+  version: gcc 8.2.0
+  extension: c
+  style: c_cpp
+  compile: [gcc, <filename>, -o, main]
+  run: [./main]
+
+- id: CPP
+  name: C++
+  scale: 1
+  image: automatest/cc
+  version: g++ 8.2.0
+  extension: cpp
+  style: c_cpp
+  compile: [g++, <filename>, -o, main]
+  run: [./main]
+
+- id: JAVA
+  name: Java
+  scale: 2.6
+  image: automatest/java
+  version: Java 1.8.0_91
+  extension: java
+  style: java
+  run: [java, main]
+  compile: [javac, <filename>]
+
+- id: PY-276
+  name: Python 2.7.15
+  scale: 4.4
+  image: automatest/python2
+  version: Python 2.7.15
+  extension: py
+  style: python
+  run: [python2.7, <filename>]
+
+- id: PASCAL
+  name: Pascal
+  scale: 2.6
+  image: automatest/pascal
+  version: fpc 2.4.0
+  extension: pas
+  style: pascal
+  compile: [fpc, <filename>]
+  run: [./main]
+  disabled: true
+
+- id: CS
+  name: C#
+  scale: 2
+  image: automatest/cs
+  version: Mono 3.0.7
+  extension: cs
+  style: csharp
+  run: [mono, <filename>]
+  compile: [gmcs, main]
+  disabled: true

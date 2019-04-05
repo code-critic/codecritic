@@ -1,0 +1,28 @@
+- id: P01
+  name: problem-01
+  timeout: 120 # max time per solution, default is 60
+  reference:
+    name: main.py
+    lang: PY-367
+  tests:
+    - id: HELLO-WORLD
+    - id: HELLO-WORLD-2
+      size: 50
+    - id: HELLO-WORLD-3
+      random: 5
+      size: 15
+
+
+- id: P02
+  name: problem-02
+  avail: 2019-03-11 16:00:00
+  reference:
+    name: foobar.py
+    lang: PY-367
+  tests:
+    - id: HELLO-WORLD
+    - id: HELLO-WORLD-2
+      size: 50
+    - id: HELLO-WORLD-3
+      random: 5
+      size: 15
