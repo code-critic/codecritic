@@ -12,27 +12,33 @@ class ContainerAPI(object):
         self.container = container
 
     def exec(self, cmds) -> str:
+        if self.container.status == 'exited':
+            self.container.start()
+
         return self.container.exec_run(cmds).output.decode()
 
     def _cp(self, src, dest, timeout=10):
         cmd = 'docker cp {src} {dest}'
         cmds = [x.format(src=src, dest=dest) for x in cmd.split()]
+        print(' '.join(cmds))
         process = sp.Popen(cmds)
         try:
-            return process.wait(10)
+            return process.wait(timeout)
         except Exception:
             return False
 
     def copy_from_container(self, src, dest, timeout=10):
         return self._cp(
             src='{name}:{src}'.format(name=self.container.name, src=src),
-            dest=dest
+            dest=dest,
+            timeout=timeout
         )
 
     def copy_to_container(self, src, dest, timeout=10):
         return self._cp(
             src=src,
             dest='{name}:{dest}'.format(name=self.container.name, dest=dest),
+            timeout=timeout
         )
 
 
@@ -71,5 +77,7 @@ class DockerAPI(object):
             return None
 
     @classmethod
-    def create_container(cls, image, name=None, **kwargs) -> ContainerAPI:
-        return cls.get_container(name) or ContainerAPI(cls.client().containers.run(image, detach=True, name=name, stdin_open=True, **kwargs))
+    def create_container(cls, image, name=None, user=None, **kwargs) -> ContainerAPI:
+        return cls.get_container(name) or ContainerAPI(cls.client().containers.run(
+            image, detach=True, name=name, stdin_open=True, user=user, **kwargs
+        ))

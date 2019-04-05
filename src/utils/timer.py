@@ -6,7 +6,7 @@ import time
 
 
 class Timer(object):
-    def __init__(self, name=None, log=print):
+    def __init__(self, name=None, log=None):
         self.start_time = None
         self.stop_time = None
         self.name = name

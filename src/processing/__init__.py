@@ -1,34 +1,98 @@
 #!/bin/python3
 # author: Jan Hybs
-
-import os
-
-from cfg.languages import Lang
-from cfg.problems import Prob
-from cfg.env import variables as env
-from cfg.requests import Request
-from processing.processor import Processor
-from utils import yamlex
-from utils.dates import get_datetime
-
-yamlex.extend_yaml()
-Lang.read_config(env.lang_conf)
-Prob.read_config(env.prob_conf)
+import enum
 
 
-def create_request(user, prob_id, lang_id, docker=False, src=None, action=Request.Action.TEST, **kwargs):
-    prob = Prob.get(prob_id)
-    lang = Lang.get(lang_id)
+class ExecutorStatus(enum.IntEnum):
 
-    conf = {
-        'user': user,
-        'root': os.path.join(env.tmp, user, prob.id, lang.id, get_datetime()),
-        'prob': prob,
-        'lang': lang,
-        'src': src,
-        'action': action,
-        'docker': docker,
-    }
-    conf.update(kwargs)
+    # system results
+    IN_QUEUE = 96
+    RUNNING = 97
+    IGNORE = 98
 
-    return Request(conf)
+    # good results
+    OK = 99
+    ANSWER_CORRECT = 100
+    ANSWER_CORRECT_TIMEOUT = 101
+
+    # bad results
+    ANSWER_WRONG = 200
+    ANSWER_WRONG_TIMEOUT = 201
+
+    # even worse
+    SKIPPED = 300
+    SOFT_TIMEOUT = 301
+
+    # really bad one
+    GLOBAL_TIMEOUT = 400
+    FILE_NOT_FOUND = 401
+    ERROR_WHILE_RUNNING = 402
+
+    @property
+    def abbr(self):
+        return {
+            self.IN_QUEUE: 'Q',
+            self.RUNNING: 'R',
+            self.IGNORE: 'S',
+
+            self.OK: 'O',
+            self.ANSWER_CORRECT: 'A',
+            self.ANSWER_CORRECT_TIMEOUT: 'AT',
+
+            self.ANSWER_WRONG: 'W',
+            self.ANSWER_WRONG_TIMEOUT: 'WT',
+
+            self.SKIPPED: 'S',
+            self.SOFT_TIMEOUT: 'T',
+
+            self.GLOBAL_TIMEOUT: 'T',
+            self.FILE_NOT_FOUND: 'X',
+            self.ERROR_WHILE_RUNNING: 'X',
+        }.get(self)
+
+    @property
+    def message(self):
+        return {
+            self.IN_QUEUE: 'in queue',
+            self.RUNNING: 'is running',
+            self.IGNORE: 'skipped',
+
+            self.OK: 'OK',
+            self.ANSWER_CORRECT: 'Submitted solution is correct',
+            self.ANSWER_CORRECT_TIMEOUT: 'Submitted solution is correct, but does not meet duration criteria',
+
+            self.ANSWER_WRONG: 'Submitted solution is wrong',
+            self.ANSWER_WRONG_TIMEOUT: 'Submitted solution is wrong and does not meet duration criteria',
+
+            self.SKIPPED: 'skipped',
+            self.SOFT_TIMEOUT: 'timeout',
+
+            self.GLOBAL_TIMEOUT: 'Submitted solution did not finish in time',
+            self.FILE_NOT_FOUND: 'Fatal error, file not found',
+            self.ERROR_WHILE_RUNNING: 'There was an error while running',
+        }.get(self)
+
+    @property
+    def str(self):
+        return self.name.replace('_', '-').lower()
+
+    def __repr__(self):
+        return '<{self.__class__.__name__}.{self.name}: {self.str}({self.value})>'.format(self=self)
+
+
+class ProcessRequestType(enum.Enum):
+    GENERATE_OUTPUT = 'generate-output'
+    GENERATE_INPUT = 'generate-input'
+    SOLVE = 'solve'
+
+
+docker_bash_template = '''
+#!/bin/bash
+cd {tmp_dir}
+START=$(date +%s.%N)
+{timeout_args} {pipeline_args} {in_name} {out_name} {err_name}
+echo $?
+END=$(date +%s.%N)
+echo $START
+echo $END
+'''.lstrip()
