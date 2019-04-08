@@ -44,7 +44,8 @@ class Env(object):
 
     # -------------------------------------------------------------------------
 
-    url_slave = 'http://hybs.nti.tul.cz:5000'
+    # url_slave = 'http://hybs.nti.tul.cz:5000' # for testing only
+    url_slave = 'http://flowdb.nti.tul.cz:5000'
     url_login = 'https://flowdb.nti.tul.cz/secure'
     url_logout = 'https://flowdb.nti.tul.cz/Shibboleth.sso/Logout'
 
