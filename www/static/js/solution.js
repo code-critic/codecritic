@@ -161,4 +161,5 @@ $(document).ready(function() {
 
   loadProblemAndLang();
   loadCode();
+  $('.prob-select').trigger('change');
 });
