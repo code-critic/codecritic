@@ -12,7 +12,7 @@ from utils.strings import string_hash
 from www import app
 
 
-Link = collections.namedtuple('Link', ['url', 'text'], verbose=False)
+Link = collections.namedtuple('Link', ['url', 'text'])
 
 
 def serve_pil_image(pil_img):
