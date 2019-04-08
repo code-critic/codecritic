@@ -5,9 +5,9 @@ import sys
 from loguru import logger
 logger.configure(handlers=[dict(sink=sys.stdout)])
 
-import logging
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+# import logging
+# log = logging.getLogger('werkzeug')
+# log.setLevel(logging.ERROR)
 
 
 parser = argparse.ArgumentParser(add_help=False)
