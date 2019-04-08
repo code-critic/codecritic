@@ -5,10 +5,6 @@ import sys
 from loguru import logger
 logger.configure(handlers=[dict(sink=sys.stdout)])
 
-# import logging
-# log = logging.getLogger('werkzeug')
-# log.setLevel(logging.ERROR)
-
 
 parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument('--help', action='help', default=argparse.SUPPRESS,
@@ -18,7 +14,16 @@ flask_server = parser.add_argument_group('flask server')
 flask_server.add_argument('-p', '--port', type=int, default=5000)
 flask_server.add_argument('-h', '--host', type=str, default='0.0.0.0')
 flask_server.add_argument('-d', '--debug', action='store_true')
+flask_server.add_argument('-v', '--verbose', action='store_true')
 args = parser.parse_args()
+
+if args.verbose:
+    # do not filter logger
+    pass
+else:
+    import logging
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
 
 
 from www import app
