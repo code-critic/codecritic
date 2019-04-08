@@ -30,7 +30,7 @@
 
 - id: WEBISL
   name: Web islands
-  avail: 2019-04-04 00:00:00
+  avail: 2019-04-30 00:00:00
   
   reference:
     name: webisl.cpp
