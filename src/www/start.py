@@ -1,7 +1,6 @@
 #!/bin/python3
 # author: Jan Hybs
-
-
+import argparse
 import sys
 from loguru import logger
 logger.configure(handlers=[dict(sink=sys.stdout)])
@@ -10,15 +9,33 @@ import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
+
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('--help', action='help', default=argparse.SUPPRESS,
+        help=argparse._('show this help message and exit'))
+
+flask_server = parser.add_argument_group('flask server')
+flask_server.add_argument('-p', '--port', type=int, default=5000)
+flask_server.add_argument('-h', '--host', type=str, default='0.0.0.0')
+flask_server.add_argument('-d', '--debug', action='store_true')
+args = parser.parse_args()
+
+
 from www import app
 from www import auth
 from www import index
 from www import course
 from www import sockets
 from www import utils_www
+from env import Env
+
+logger.info('Running automate version {}', Env.version)
+logger.info('Listening on {host}:{port} (debug={debug})', **vars(args))
+info = '\n'.join(['{:>20s}: {:s}'.format(k, str(v)) for k, v in Env.info()])
+logger.info('Configuration in env.py:\n{}', info)
 
 
-app.run(debug=False, host='0.0.0.0')
+app.run(debug=args.debug, host=args.host, port=args.port)
 
 #
 #

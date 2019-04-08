@@ -23,6 +23,7 @@ Final evaluation {status.name}
 
 
 class Env(object):
+    version = '0.1.0'
     root = _root
     src = _root / 'src'
     cfg = _root / 'cfg'
@@ -66,4 +67,18 @@ class Env(object):
     def database_config(cls):
         import yaml
         return yaml.load(cls.database_secret.read_text())
+
+    @classmethod
+    def info(cls):
+        for k, v in cls.__dict__.items():
+            if str(k).startswith('_'):
+                continue
+            if str(k).endswith('_format'):
+                continue
+            if str(k).endswith('_secret'):
+                continue
+            if isinstance(v, classmethod):
+                continue
+
+            yield k, v
 
