@@ -352,3 +352,15 @@ form .input-use-docker:checked ~ .use-docker-info {
   margin: 0;
   line-height: 1rem;
 }
+.attachments .empty-padding {
+  width: 58px;
+  height: 26px;
+}
+
+.attachment-btns .attachment-btn{
+  text-transform: uppercase;
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: .70rem;
+  cursor: pointer;
+}

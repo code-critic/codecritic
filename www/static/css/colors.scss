@@ -23,7 +23,10 @@ $statuses: (
         color: darken($color, 30) !important;
         background: lighten($color, 30);
       }
-  }
+      .attachment-btns .attachment-btn {
+        color: darken($color, 30) !important;
+      }
+    }
 }
 // .in-queue {
 //   .status-badge, .btn-block-anim {
