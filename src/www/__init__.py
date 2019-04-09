@@ -39,6 +39,17 @@ def login_required(f):
     return decorated_function
 
 
+def dump_error(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            import traceback, html
+            return '<pre>%s</pre>' % html.escape(traceback.format_exc())
+    return decorated_function
+
+
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):

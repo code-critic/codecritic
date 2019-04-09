@@ -3,12 +3,13 @@
 
 from flask import render_template, session, url_for
 from database.objects import Course, Languages, User
-from www import app, login_required, admin_required
+from www import app, login_required, admin_required, dump_error
 from www.utils_www import Link
 
 
 @app.route('/submit/<string:course_name>/<string:course_year>')
 @login_required
+@dump_error
 def view_course(course_name, course_year):
     user = User(session['user'])
     course = Course.db().find_one(name=course_name, year=course_year)
@@ -31,6 +32,7 @@ def view_course(course_name, course_year):
 @app.route('/admin/<string:course_name>/<string:course_year>/<string:problem_id>')
 @login_required
 @admin_required
+@dump_error
 def admin_problem(course_name, course_year, problem_id):
     user = User(session['user'])
     course = Course.db().find_one(name=course_name, year=course_year)
@@ -52,6 +54,7 @@ def admin_problem(course_name, course_year, problem_id):
 
 @app.route('/courses')
 @login_required
+@dump_error
 def view_courses():
     user = User(session['user'])
     filters = dict() if user.is_admin() else dict(disabled=(None, False))
