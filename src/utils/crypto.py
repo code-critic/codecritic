@@ -51,5 +51,13 @@ class SimpleCrypto(object):
         return '{self.__class__.__name__}(key={self.secret_key}, iv={self.iv}, {self.new})'.format(self=self)
 
 
+def b64encode(s, func=json.dumps):
+    bytes = func(s).encode()
+    return base64.b64encode(bytes).decode().replace('/', ':')
+
+def b64decode(s, func=json.loads):
+    bytes = str(s).replace(':', '/').encode()
+    return func(base64.b64decode(bytes).decode())
+
 def sha1(s):
     return hashlib.sha1(s.encode('utf-8')).hexdigest()

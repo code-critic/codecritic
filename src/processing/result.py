@@ -73,7 +73,7 @@ class ExecutorResult(object):
                 console=ensure_iterable(self.console)[:100],
                 message=self.message,
                 message_details=ensure_iterable(self.message_details)[:100],
-                attachments=self.attachments,
+                attachments=ensure_iterable(self.attachments),
             )
 
         doc = dict(

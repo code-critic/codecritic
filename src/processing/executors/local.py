@@ -136,6 +136,6 @@ class LocalExecutor(object):
         return result(status=status, returncode=rc, duration=duration)
 
     def destroy(self):
-        if self.delete_dir:
+        if self.delete_dir and False:
             logger.info('deleting {}', self.delete_dir)
             shutil.rmtree(self.delete_dir, ignore_errors=True)

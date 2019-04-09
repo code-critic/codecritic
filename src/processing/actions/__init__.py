@@ -9,12 +9,16 @@ from loguru import logger
 from database.objects import Script
 from processing.comparator import Comparator
 from processing.executors.local import LocalExecutor
+from processing.executors.docker import DockerExecutor
 from processing.result import ExecutorResult
 from processing import ExecutorStatus
 from processing.request import ProcessRequest, FatalException, add_cmd_to_result, CompileException
 
 
 class AbstractAction(object):
+    """
+    :type executor: processing.executors.local.LocalExecutor or processing.executors.docker.DockerExecutor
+    """
     def __init__(self, request: ProcessRequest, result_dir: pathlib.Path):
         self.request = request
         self.result_dir = pathlib.Path(result_dir)
@@ -104,15 +108,20 @@ class AbstractAction(object):
                     f2=out
                 )
                 result = cls._evaluate_result(result, compare_result, subcase)
-                result.add_attachment(
-                    dict(path=inn, name='input'),
-                    dict(path=out, name='output'),
-                    dict(path=err, name='error'),
-                    dict(path=ref, name='reference'),
-                )
 
             request[id] = result
             request[id] = add_cmd_to_result(id, request[id])
+            request._register_attachment(id=id, name='input', path=inn)
+            request._register_attachment(id=id, name='output', path=out)
+            request._register_attachment(id=id, name='error', path=err)
+            request._register_attachment(id=id, name='reference', path=ref)
+            # request[id].add_attachment(
+            #     dict(path=inn, name='input'),
+            #     dict(path=out, name='output'),
+            #     dict(path=err, name='error'),
+            #     dict(path=ref, name='reference'),
+            # )
+
             request.event_execute_test.close_event.trigger(
                 request, request[id]
             )

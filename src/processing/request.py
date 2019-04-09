@@ -4,6 +4,8 @@ import datetime
 import os
 import pathlib
 import shutil
+import json
+from utils.crypto import b64encode
 from collections import OrderedDict
 from uuid import uuid4
 
@@ -291,6 +293,17 @@ class ProcessRequest(object):
             base['tests'] = tests
 
         return base
+
+    def _register_attachment(self, id, name, path: pathlib.Path):
+        in_ref = path.parent.parent == self.problem_dir
+
+        if in_ref:
+            url = path.parts[-5:]
+        else:
+            url = path.parts[-6:]
+
+        parts64 = b64encode(dict(url=url))
+        self[id].add_attachment(dict(name=name+'.txt', url=parts64))
 
 
 def _configure_cmd(cmd, file):
