@@ -30,8 +30,7 @@
 
 - id: WEBISL
   name: Web islands
-  avail: 2019-04-30 00:00:00
-  
+  avail: 2019-03-30 00:00:00  
   reference:
     name: webisl.cpp
     lang: CPP
@@ -66,102 +65,103 @@
       size: 500000
       timeout: 10                 # 5 s
 
-    
-    
-    
-#BIGLOKO1:
-  #id: BIGLOKO1
-  #name: Zeleznice
-  #ref_script: "../generic"
-  #input:
-  #- id: BIGLOKO1_1
-    #time: 0.1
-  #- id: BIGLOKO1_2
-    #time: 0.1
-  #- id: BIGLOKO1_100
-    #time: 0.1
-  #- id: BIGLOKO1_1000
-    #time: 0.1
-  #- id: BIGLOKO1_10k
-    #time: 0.3
-  #- id: BIGLOKO1_100k
-    #time: 3
+- id: BIGLOKO1
+  name: Zeleznice
+  avail: 2019-03-30 00:00:00
+  reference:
+    name: bigloko.py
+    lang: PYTHON35
+  input:
+  - id: BIGLOKO1_1
+    timeout: 0.1
+  - id: BIGLOKO1_2
+    timeout: 0.1
+  - id: BIGLOKO1_100
+    timeout: 0.1
+  - id: BIGLOKO1_1000
+    timeout: 0.1
+  - id: BIGLOKO1_10k
+    timeout: 0.3
+  - id: BIGLOKO1_100k
+    timeout: 3
 
     
-#SCHEDULE:
-  #id: SCHEDULE
-  #name: Rozvrh
-  #ref_script: schedule.py
-  #ref_lang: PYTHON35
-  #problem_size_description: 'Number of subjects = n_vtx.'
-  #input:
-  #- id: SCHEDULE_1
-    #time: 0.1
-  #- problem_size: 100
-    #id: SCHEDULE_2
-    #time: 0.1
-  #- problem_size: 101
-    #id: SCHEDULE_3
-    #time: 0.1
-  #- problem_size: 102
-    #id: SCHEDULE_4
-    #time: 0.1  
-  #- problem_size: 103
-    #id: SCHEDULE_5
-    #time: 0.1                
-  #- problem_size: 300
-    #id: SCHEDULE_6
-    #time: 4               
-  #- problem_size: 312
-    #id: SCHEDULE_7
-    #time: 8               
-  #- problem_size: 307
-    #id: SCHEDULE_8
-    #time: 10               
-##  - problem_size: 294
-##    id: SCHEDULE_9
-##    time: 90              
+- id: SCHEDULE
+  name: Rozvrh
+  avail: 2019-03-30 00:00:00
+  reference:
+    name: schedule.py
+    lang: PYTHON35
+  problem_size_description: 'Number of subjects = n_vtx.'
+  input:
+  - id: SCHEDULE_1
+    timeout: 0.1
+  - problem_size: 100
+    id: SCHEDULE_2
+    timeout: 0.1
+  - problem_size: 101
+    id: SCHEDULE_3
+    timeout: 0.1
+  - problem_size: 102
+    id: SCHEDULE_4
+    timeout: 0.1  
+  - problem_size: 103
+    id: SCHEDULE_5
+    timeout: 0.1                
+  - problem_size: 300
+    id: SCHEDULE_6
+    timeout: 4               
+  - problem_size: 312
+    id: SCHEDULE_7
+    timeout: 8               
+  - problem_size: 307
+    id: SCHEDULE_8
+    timeout: 10               
+#  - problem_size: 294
+#    id: SCHEDULE_9
+#    time: 90              
 
-##    size    time [s]
-##    300     2.6
-##    312     5
-##    320     5
-##    298     6
-##    307     7
-##    296     10
-##    305     11
-##    308     23
-##    309     27
-##    294     15
-##    317     15
-##    301     38
-##    311     46
+#    size    time [s]
+#    300     2.6
+#    312     5
+#    320     5
+#    298     6
+#    307     7
+#    296     10
+#    305     11
+#    308     23
+#    309     27
+#    294     15
+#    317     15
+#    301     38
+#    311     46
     
     
     
-#SEGMENT:
-  #id: SEGMENT
-  #name: Segmentace obrazu
-  #ref_script: segment.py
-  #ref_lang: PYTHON27
-  #input:
-  #- id: SEGMENT_1
-    #time: 0.02
-  #- id: SEGMENT_2
-    #time: 0.5
 
-  #- id: SEGMENT_3
-    #problem_size: 16
-    #time: 0.02
-  #- id: SEGMENT_4
-    #problem_size: 64
-    #time: 0.04
-  #- id: SEGMENT_5
-    #problem_size: 256
-    #time: 0.5
-  #- id: SEGMENT_6
-    #problem_size: 1024
-    #time: 10
+- id: SEGMENT
+  name: Segmentace obrazu
+  avail: 2019-03-30 00:00:00
+  reference:
+    name: segment.py
+    lang: PYTHON27
+  input:
+  - id: SEGMENT_1
+    timeout: 0.02
+  - id: SEGMENT_2
+    timeout: 0.5
+  - id: SEGMENT_3
+    problem_size: 16
+    timeout: 0.02
+  - id: SEGMENT_4
+    problem_size: 64
+    timeout: 0.04
+  - id: SEGMENT_5
+    problem_size: 256
+    timeout: 0.5
+  - id: SEGMENT_6
+    problem_size: 1024
+    timeout: 10
 
     
     
