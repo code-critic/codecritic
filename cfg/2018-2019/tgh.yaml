@@ -164,6 +164,43 @@
     timeout: 10
 
     
+- id:DELIVERY
+  name: Dodávky elektřiny
+  avail: 2019-03-30 00:00:00
+  reference:
+    name: delivery.py
+    lang: PYTHON35
+  input:
+  - id: DELIVERY_01.s
+    timeout: 0.02
+  - id: DELIVERY_02.s
+    timeout: 0.5
+  - id: DELIVERY_03.s    
+    timeout: 0.02
+  - id: DELIVERY_05.s
+    problem_size: 64
+    
+    
+  - id: DELIVERY_06
+    problem_size: 10
+    timeout: 3          # 1.5s
+  - id: DELIVERY_07
+    problem_size: 30
+    timeout: 5          # 2.5s
+  - id: DELIVERY_08
+    problem_size: 70
+    timeout: 12          # 7.5s
+  - id: DELIVERY_09     
+    problem_size: 100
+    timeout: 18          # 10s
+  #- id: DELIVERY_10
+    #problem_size: 200
+    #timeout: 60         # 35s
+
+    
+    
+    
+    
     
 #---
 ###############################
