@@ -67,12 +67,12 @@ class ExecutorResult(object):
                 cmd=self.cmd,
                 duration=self.duration,
                 returncode=self.returncode,
-                stdin=ensure_iterable(self.stdinn),
-                stdout=ensure_iterable(self.stdout),
-                stderr=ensure_iterable(self.stderr),
-                console=ensure_iterable(self.console),
+                stdin=ensure_iterable(self.stdinn)[:100],
+                stdout=ensure_iterable(self.stdout)[:100],
+                stderr=ensure_iterable(self.stderr)[:100],
+                console=ensure_iterable(self.console)[:100],
                 message=self.message,
-                message_details=ensure_iterable(self.message_details),
+                message_details=ensure_iterable(self.message_details)[:100],
                 attachments=self.attachments,
             )
 

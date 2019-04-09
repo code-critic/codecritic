@@ -77,7 +77,7 @@ class DockerExecutor(LocalExecutor):
             # skip first line because it says 'killed'
             returncode, start, stop = int(cmd_output[1]), float(cmd_output[2]), float(cmd_output[3])
 
-        duration = max(1.0, stop - start)
+        duration = stop - start
         self._time_left -= duration
 
         if isinstance(self.stdout_path, pathlib.Path):
