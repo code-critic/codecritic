@@ -38,33 +38,33 @@
   tests:
     - id: WEBISL_case_1
       size: 4
-      time: 0.02
+      timeout: 0.02
     - id: WEBISL_case_2
       size: 6
-      time: 0.02
+      timeout: 0.02
     - id: WEBISL_case_3
       size: 8
-      time: 0.02
+      timeout: 0.02
     - id: WEBISL_case_4
       size: 10
-      time: 0.02
+      timeout: 0.02
       random: 2
     - id: WEBISL_case_5
       size: 100
-      time: 0.02
+      timeout: 0.02
       random: 2
     - id: WEBISL_case_6
       size: 1000
-      time: 0.05               # 0.016 s
+      timeout: 0.05               # 0.016 s
     - id: WEBISL_case_7
       size: 10000
-      time: 0.2                # 0.113 s
+      timeout: 0.2                # 0.113 s
     - id: WEBISL_case_8
       size: 100000
-      time: 2                  # 1 s
+      timeout: 2                  # 1 s
     - id: WEBISL_case_9
       size: 500000
-      time: 10                 # 5 s
+      timeout: 10                 # 5 s
 
     
     

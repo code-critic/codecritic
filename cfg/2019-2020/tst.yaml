@@ -1,0 +1,26 @@
+- id: P01
+  name: problem-01            # what student will see
+  timeout: 120                # max time per solution, default is 60
+  avail: 2020-03-11 16:00:00  # problem will be active until YYYY-mm-dd HH:MM:SS
+  
+  reference: main.py          # reference file, which should be in the repository
+                              # file name (for sake of consistency) the name should be
+                              # in this short format, the language will be detected
+                              # automatically (which may be incorrect, i.e.
+                              # can't differentiate between python3 and python2)
+                        
+  # reference:                # you can also use long format, where you specify 
+    # name: main.py           # name of the script
+    # lang: PY-367            # and language ID from (langs.yaml) explicitely
+    
+  tests:
+    - id: HELLO-WORLD-1.s     # by adding extension .s, .stat, .static
+                              # the input will be part of a repository
+      timeout: 5.0
+      
+    - id: HELLO-WORLD-2
+      size: 50
+      
+    - id: HELLO-WORLD-3
+      random: 5
+      size: 15

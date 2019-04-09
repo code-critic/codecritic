@@ -16,3 +16,13 @@
   teachers:
   - jan.hybs
   students: []
+
+- id: TST-19-20
+  name: TST
+  year: 2019-2020
+  desc: Testovaci kurz
+  disabled: true
+  teachers:
+  - jan.hybs
+  - jan.brezina
+  students: []
