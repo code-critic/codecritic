@@ -89,10 +89,10 @@ class ProcessRequestType(enum.Enum):
 docker_bash_template = '''
 #!/bin/bash
 cd {tmp_dir}
-START=$(date +%s.%N)
+START=$(python3 -c "import time; print(time.time())")
 {timeout_args} {pipeline_args} {in_name} {out_name} {err_name}
 echo $?
-END=$(date +%s.%N)
+END=$(python3 -c "import time; print(time.time())")
 echo $START
 echo $END
 '''.lstrip()
