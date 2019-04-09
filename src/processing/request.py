@@ -28,6 +28,17 @@ class FatalException(Exception):
             details=self.details,
         )
 
+class CompileException(Exception):
+    def __init__(self, message, details=None):
+        self.message = message
+        self.details = ensure_iterable(details)
+
+    def peek(self):
+        return dict(
+            message=self.message,
+            details=self.details,
+        )
+
 
 def hook_warn_empty_input(id, result: ExecutorResult):
     if not result.stdinn:
@@ -125,29 +136,29 @@ class ProcessRequest(object):
             self[id] = ExecutorResult.empty_result(id=id)
 
         # emit event
-        self.event_process.open_event.trigger(self, self._run_results)
-
         if self.type is ProcessRequestType.GENERATE_INPUT:
             from processing.actions.generate_input import ProcessRequestGenerateInput
-
             self.action_executor = ProcessRequestGenerateInput(self, self.problem_dir)
-            self.action_executor.run()
 
         elif self.type is ProcessRequestType.GENERATE_OUTPUT:
             from processing.actions.generate_output import ProcessRequestGenerateOutput
-
             self.action_executor = ProcessRequestGenerateOutput(self, self.problem_dir)
-            self.action_executor.run()
 
         elif self.type is ProcessRequestType.SOLVE:
             from processing.actions.solve import ProcessRequestSolve
-
             self.action_executor = ProcessRequestSolve(self, self.result_dir)
-            self.action_executor.run()
+        else:
+            raise FatalException('Unsupported action {}'.format(self.type))
 
-        # emit event
-        self.evaluate_solution()
-        self.event_process.close_event.trigger(self, self._run_results)
+        try:
+            self.event_process.open_event.trigger(self, self._run_results)
+            self.action_executor.run()
+            self.evaluate_solution()
+            self.event_process.close_event.trigger(self, self._run_results)
+        except CompileException as ex:
+            logger.info('compilation failed')
+            self.evaluate_solution()
+            raise ex
 
         return self._run_results
 
@@ -174,6 +185,11 @@ class ProcessRequest(object):
     def evaluate_solution(self):
         statuses = [x.status for x in self._run_results.values()]
         if self._compile_result:
+            if self._compile_result.status in (ExecutorStatus.COMPILATION_FAILED, ExecutorStatus.GLOBAL_TIMEOUT):
+                for k, v in self._run_results.items():
+                    self._run_results[k].status = ExecutorStatus.SKIPPED
+
+            statuses = [x.status for x in self._run_results.values()]
             statuses.append(self._compile_result.status)
 
         unique = set(statuses)

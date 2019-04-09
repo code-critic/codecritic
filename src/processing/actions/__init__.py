@@ -11,7 +11,7 @@ from processing.comparator import Comparator
 from processing.executors.local import LocalExecutor
 from processing.result import ExecutorResult
 from processing import ExecutorStatus
-from processing.request import ProcessRequest, FatalException, add_cmd_to_result
+from processing.request import ProcessRequest, FatalException, add_cmd_to_result, CompileException
 
 
 class AbstractAction(object):
@@ -46,13 +46,15 @@ class AbstractAction(object):
         with executor.set_streams(stdin=inn, stdout=out, stderr=err) as ex:
             result = ex.run(cmd)
 
+        request._compile_result = add_cmd_to_result(result_id, result).register(result_id)
+
         if result.failed():
             if result.status is ExecutorStatus.GLOBAL_TIMEOUT:
-                raise FatalException('Compilation was interrupted (did not finish in time)', details=result.stdout)
+                raise CompileException('Compilation was interrupted (did not finish in time)', details=result.stdout)
             else:
-                raise FatalException('Compilation failed', details=result.stdout)
+                result.status = ExecutorStatus.COMPILATION_FAILED
+                raise CompileException('Compilation failed', details=result.stdout)
 
-        request._compile_result = add_cmd_to_result(result_id, result).register(result_id)
         request.event_compile.close_event.trigger(request, request._compile_result)
 
         return result

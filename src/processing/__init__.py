@@ -27,6 +27,7 @@ class ExecutorStatus(enum.IntEnum):
     GLOBAL_TIMEOUT = 400
     FILE_NOT_FOUND = 401
     ERROR_WHILE_RUNNING = 402
+    COMPILATION_FAILED = 403
 
     @property
     def abbr(self):
@@ -48,6 +49,7 @@ class ExecutorStatus(enum.IntEnum):
             self.GLOBAL_TIMEOUT: 'T',
             self.FILE_NOT_FOUND: 'X',
             self.ERROR_WHILE_RUNNING: 'X',
+            self.COMPILATION_FAILED: 'X',
         }.get(self)
 
     @property
@@ -70,6 +72,7 @@ class ExecutorStatus(enum.IntEnum):
             self.GLOBAL_TIMEOUT: 'Submitted solution did not finish in time',
             self.FILE_NOT_FOUND: 'Fatal error, file not found',
             self.ERROR_WHILE_RUNNING: 'There was an error while running',
+            self.COMPILATION_FAILED: 'There was an error during compilation',
         }.get(self)
 
     @property

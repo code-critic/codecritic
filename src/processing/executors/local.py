@@ -1,6 +1,7 @@
 #!/bin/python3
 # author: Jan Hybs
 import shutil
+import subprocess
 import subprocess as sp
 
 from loguru import logger
@@ -53,6 +54,8 @@ class LocalExecutor(object):
                     fp = getattr(self, stream_path).open(m)
                     setattr(self, stream_fp, fp)
                 except: pass
+            elif getattr(self, stream_path) == subprocess.STDOUT:
+                setattr(self, stream_fp, subprocess.STDOUT)
 
         return self
 
@@ -100,6 +103,7 @@ class LocalExecutor(object):
         with timer.Timer() as t:
             # try to execute the command
             try:
+                print(cmd, args, cp)
                 process = sp.Popen(cmd, *args, **cp)
             except FileNotFoundError as ex:
                 duration = t.duration

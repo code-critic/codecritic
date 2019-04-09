@@ -4,7 +4,7 @@ import traceback
 
 from flask_socketio import emit
 from loguru import logger
-from processing.request import FatalException
+from processing.request import FatalException, CompileException
 
 
 class Emittor(object):
@@ -119,6 +119,8 @@ class Emittor(object):
     @classmethod
     def exception(cls, ex):
         if isinstance(ex, FatalException):
+            return emit('fatal-error', dict(event='fatal-error', error=ex))
+        elif isinstance(ex, CompileException):
             return emit('fatal-error', dict(event='fatal-error', error=ex))
         elif isinstance(ex, Exception):
             details = traceback.format_exc().splitlines()
