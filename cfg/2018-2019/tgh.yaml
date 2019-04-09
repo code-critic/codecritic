@@ -164,7 +164,7 @@
     timeout: 10
 
     
-- id:DELIVERY
+- id: DELIVERY
   name: Dodávky elektřiny
   avail: 2020-03-30 00:00:00
   reference:
