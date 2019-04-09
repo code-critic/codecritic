@@ -198,7 +198,7 @@
     #timeout: 60         # 35s
 
     
-- id:MINSPILL
+- id: MINSPILL
   name: Přelévání nádob
   avail: 2020-03-30 00:00:00
   reference:
