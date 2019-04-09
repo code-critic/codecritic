@@ -30,7 +30,7 @@
 
 - id: WEBISL
   name: Web islands
-  avail: 2019-03-30 00:00:00  
+  avail: 2020-03-30 00:00:00  
   reference:
     name: webisl.cpp
     lang: CPP
@@ -61,13 +61,13 @@
     - id: WEBISL_case_8
       size: 100000
       timeout: 2                  # 1 s
-    - id: WEBISL_case_9
-      size: 500000
-      timeout: 10                 # 5 s
+    # - id: WEBISL_case_9
+    #   size: 500000
+    #   timeout: 10                 # 5 s
 
 - id: BIGLOKO1
   name: Zeleznice
-  avail: 2019-03-30 00:00:00
+  avail: 2020-03-30 00:00:00
   reference:
     name: bigloko.py
     lang: PYTHON35
@@ -88,7 +88,7 @@
     
 - id: SCHEDULE
   name: Rozvrh
-  avail: 2019-03-30 00:00:00
+  avail: 2020-03-30 00:00:00
   reference:
     name: schedule.py
     lang: PYTHON35
@@ -141,7 +141,7 @@
 
 - id: SEGMENT
   name: Segmentace obrazu
-  avail: 2019-03-30 00:00:00
+  avail: 2020-03-30 00:00:00
   reference:
     name: segment.py
     lang: PYTHON27
