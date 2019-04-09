@@ -3,7 +3,12 @@
 import argparse
 import sys
 from loguru import logger
-logger.configure(handlers=[dict(sink=sys.stdout)])
+from env import Env
+
+logger.configure(handlers=[
+    dict(sink=sys.stdout),
+    dict(sink=Env.log_file)
+])
 
 
 parser = argparse.ArgumentParser(add_help=False)
@@ -32,7 +37,7 @@ from www import index
 from www import course
 from www import sockets
 from www import utils_www
-from env import Env
+
 
 logger.info('Running automate version {}', Env.version)
 logger.info('Listening on {host}:{port} (debug={debug})', **vars(args))

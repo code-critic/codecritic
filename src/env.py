@@ -29,6 +29,7 @@ class Env(object):
     cfg = _root / 'cfg'
     www = _root / 'www'
     tmp = _root / '.tmp'
+    log_file = _root / '.automate.log'
 
     problems = _root / 'problems'
     results = _root / 'results'
