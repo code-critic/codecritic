@@ -8,6 +8,8 @@ from www import app, login_required
 from loguru import logger
 from utils.crypto import b64decode
 
+max_file_view_limit = 1024*1024
+
 @app.route('/')
 @app.route('/index')
 @login_required
@@ -43,5 +45,10 @@ def serve_file(data: str, as_name: str):
     result = b64decode(data)
     local = Env.root.joinpath(*result['url'])
     assert local.parts[-2] in ('input', 'output', '.error')
-    return send_file(str(local), mimetype='text/plain', attachment_filename=as_name)
+    if local.exists():
+        if local.stat().st_size > max_file_view_limit:
+            return send_file(str(local), mimetype='text/plain', as_attachment=True, attachment_filename=as_name)
+        else:
+            return send_file(str(local), mimetype='text/plain', attachment_filename=as_name)
+    return 'File not found'
     # return send_file(str(local), mimetype='text/plain', as_attachment=True, attachment_filename=as_name)
