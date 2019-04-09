@@ -12,6 +12,11 @@ from database.yamldb import ADB, YamlDB
 from utils import strings
 from env import Env
 
+from loguru import logger
+
+
+class InvalidConfiguration(Exception):
+    pass
 
 class User(ADB):
     """
@@ -67,6 +72,7 @@ class User(ADB):
         items = self.affi.split(', ') if self.affi else list()
         for i in range(0, len(items), 3):
             yield ', '.join(items[i:i+3])
+
 
 class Course(ADB):
     """
@@ -157,8 +163,20 @@ class Script(object):
     """
     def __init__(self, item: dict):
         super().__init__()
-        self.name = item['name']
-        self.lang = item['lang']
+        if isinstance(item, dict):
+            self.name = item['name']
+            self.lang = item['lang']
+        elif isinstance(item, str):
+            self.name = item
+            ext = str(self.name).split('.')[-1]
+            try:
+                langs = list(Languages.db().find(extension=ext))
+                if len(langs) > 1:
+                    logger.warning('ambiguous language language auto detected from file %s' % self.name)
+                    
+                self.lang = langs[0].id
+            except:
+                raise InvalidConfiguration('Could not find the language of a reference file %s' % self.name)
 
     @property
     def lang_ref(self):
@@ -261,7 +279,7 @@ class ProblemCase(ADB):
         super().__init__()
         self.id = item['id']
         self.size = item.get('size')
-        self.timeout = item.get('timeout')
+        self.timeout = item.get('timeout', 5.0)
         self.problem = problem
         random = item.get('random')
 

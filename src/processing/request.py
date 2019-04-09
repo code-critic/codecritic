@@ -87,6 +87,12 @@ class ProcessRequest(object):
         self.problem_dir = pathlib.Path(Env.problems, self.course.id, self.problem.id)
         self.result_dir = pathlib.Path(Env.tmp, self.course.id, self.problem.id, self.rand)
 
+        # create dirs, but it SHOULD ALREADY EXISTS
+        self.problem_dir.mkdir(parents=True, exist_ok=True)
+        self.problem_dir.joinpath('output').mkdir(parents=True, exist_ok=True)
+        self.problem_dir.joinpath('input').mkdir(parents=True, exist_ok=True)
+        self.problem_dir.joinpath('.error').mkdir(parents=True, exist_ok=True)
+
     def __repr__(self):
         return ('Request(\n'
                 '  user={self.user.id}\n'

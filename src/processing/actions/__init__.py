@@ -76,10 +76,16 @@ class AbstractAction(object):
             else:
                 logger.opt(ansi=True).warning(
                     '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id} - '
-                    'input file does not exists, empty file will be created',
+                    'input file does not exists, test will be skipped',
                     case=subcase, problem=request.problem, course=request.course
                 )
-                inn.touch()
+                request[id].status = ExecutorStatus.SKIPPED
+                request[id].message = 'skipped'
+                request[id].console = 'Input file does not exists'.splitlines()
+                request.event_execute_test.close_event.trigger(
+                    request, request[id]
+                )
+                continue
 
             request[id].status = ExecutorStatus.RUNNING
             request.event_execute_test.open_event.trigger(
