@@ -166,7 +166,7 @@
     
 - id:DELIVERY
   name: Dodávky elektřiny
-  avail: 2019-03-30 00:00:00
+  avail: 2020-03-30 00:00:00
   reference:
     name: delivery.py
     lang: PYTHON35
@@ -198,6 +198,33 @@
     #timeout: 60         # 35s
 
     
+- id:MINSPILL
+  name: Přelévání nádob
+  avail: 2020-03-30 00:00:00
+  reference:
+    name: minspill.py
+    lang: PYTHON35
+  input:
+  - id: MINSPILL_01.s
+    timeout: 0.02
+  - id: MINSPILL_02.s
+    timeout: 0.5
+  - id: MINSPILL_03.s
+    timeout: 0.02
+  - id: MINSPILL_04.s
+    timeout: 0.02
+  - id: MINSPILL_05.s
+    timeout: 0.02
+        
+  - id: MINSPILL_19000.s    
+    timeout: 1          # 0.5s
+  - id: MINSPILL_44000.s
+    timeout: 2          # 1s
+  - id: MINSPILL_440000.s    
+    timeout: 16         # 8s
+  - id: MINSPILL_1e6.s
+    timeout: 40         # 27s
+
     
     
     
