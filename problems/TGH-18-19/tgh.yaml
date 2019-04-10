@@ -105,13 +105,13 @@
   - id: BIGLOKO1_2.s
     timeout: 0.1
   - id: BIGLOKO1_100.s
-    timeout: 0.1
+    timeout: 0.2
   - id: BIGLOKO1_1000.s
-    timeout: 0.1
+    timeout: 0.2
   - id: BIGLOKO1_10k.s
-    timeout: 0.3
+    timeout: 1.5
   - id: BIGLOKO1_100k.s
-    timeout: 3
+    timeout: 15
 
     
 - id: SCHEDULE
