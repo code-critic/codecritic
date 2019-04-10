@@ -57,4 +57,5 @@ class ProcessRequestGenerateOutput(AbstractAction):
             self.problem_dir.joinpath('output'),
             self.problem_dir.joinpath('.error'),
             self.problem_dir.joinpath('output'),
+            teacher=True
         )
