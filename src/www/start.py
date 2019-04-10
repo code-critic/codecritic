@@ -62,16 +62,16 @@ def wsgi(*args, **kwargs):
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(port=5000, host='0.0.0.0', debug=False)
+    from geventwebsocket import WebSocketServer
+
+    # from gevent.pywsgi import WSGIServer
+    http_server = WebSocketServer(('', 5000), app)
+    http_server.serve_forever()
 
 
 
 # app.run(debug=args.debug, host=args.host, port=args.port)
 #
-# from geventwebsocket import WebSocketServer
-# # from gevent.pywsgi import WSGIServer
-# http_server = WebSocketServer(('', 5000), app)
-# http_server.serve_forever()
 
 
 
