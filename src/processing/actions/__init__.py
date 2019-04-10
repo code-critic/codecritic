@@ -66,7 +66,7 @@ class AbstractAction(object):
         return result
 
     @classmethod
-    def _solve_raw(cls, request, pipeline: list, executor: LocalExecutor, in_dir, out_dir, err_dir, ref_out):
+    def _solve_raw(cls, request: ProcessRequest, pipeline: list, executor: LocalExecutor, in_dir, out_dir, err_dir, ref_out, teacher=False):
         cmd = pipeline
         logger.opt(ansi=True).info('<red>{}</red> - {}', 'RUNNING', cmd)
 
@@ -101,8 +101,11 @@ class AbstractAction(object):
             )
 
             with executor.set_streams(stdin=inn, stdout=out, stderr=err) as ex:
-                timeout = subcase.timeout or Env.case_timeout
-                result = ex.run(cmd, soft_limit=timeout).register(id)
+                if teacher:
+                    result = ex.run(cmd).register(id)
+                else:
+                    timeout = (subcase.timeout or Env.case_timeout) * request.lang.scale
+                    result = ex.run(cmd, soft_limit=timeout).register(id)
 
             # if ok we compare
             if result.status in (ExecutorStatus.OK, ExecutorStatus.SOFT_TIMEOUT):
