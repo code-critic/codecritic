@@ -36,24 +36,24 @@
     lang: PY-367
   tests:
   - id: MINSPILL_01.s
-    timeout: 0.02
+    timeout: 0.04
   - id: MINSPILL_02.s
-    timeout: 0.5
+    timeout: 0.04
   - id: MINSPILL_03.s
-    timeout: 0.02
+    timeout: 0.04
   - id: MINSPILL_04.s
-    timeout: 0.02
+    timeout: 0.04
   - id: MINSPILL_05.s
-    timeout: 0.02
+    timeout: 0.04
         
   - id: MINSPILL_19000.s    
-    timeout: 1          # 0.5s
+    timeout: 0.3         # 0.5s
   - id: MINSPILL_44000.s
-    timeout: 2          # 1s
+    timeout: 0.7          # 1s
   - id: MINSPILL_440000.s    
-    timeout: 16         # 8s
+    timeout: 8        # 8s
   - id: MINSPILL_1e6.s
-    timeout: 40         # 27s
+    timeout: 26         # 27s
 
       
 - id: WEBISL
@@ -88,10 +88,10 @@
       timeout: 0.2                # 0.113 s
     - id: WEBISL_case_8
       size: 100000
-      timeout: 2                  # 1 s
+      timeout: 1.8               # 1 s
     - id: WEBISL_case_9
       size: 500000
-      timeout: 10                 # 5 s
+      timeout: 8                 # 5 s
 
 - id: BIGLOKO1
   name: Zeleznice
