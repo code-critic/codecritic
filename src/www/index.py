@@ -10,6 +10,7 @@ from utils.crypto import b64decode
 
 max_file_view_limit = 1024*1024
 
+
 @app.route('/')
 @app.route('/index')
 @login_required
@@ -25,6 +26,7 @@ def print_log():
     <h1>Automate log</h1>
     <pre>%s</pre>
     '''.strip() % html.escape(log)
+
 
 @app.route('/log/clear')
 def clear_log():

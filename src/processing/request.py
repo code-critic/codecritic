@@ -4,7 +4,8 @@ import datetime
 import os
 import pathlib
 import shutil
-import json
+
+from exceptions import FatalException, CompileException, ConfigurationException
 from utils.crypto import b64encode
 from collections import OrderedDict
 from uuid import uuid4
@@ -16,30 +17,6 @@ from env import Env
 from processing import ExecutorStatus, ProcessRequestType
 from processing.result import ExecutorResult
 from utils.events import MultiEvent
-from utils.strings import ensure_iterable
-
-
-class FatalException(Exception):
-    def __init__(self, message, details=None):
-        self.message = message
-        self.details = ensure_iterable(details)
-
-    def peek(self):
-        return dict(
-            message=self.message,
-            details=self.details,
-        )
-
-class CompileException(Exception):
-    def __init__(self, message, details=None):
-        self.message = message
-        self.details = ensure_iterable(details)
-
-    def peek(self):
-        return dict(
-            message=self.message,
-            details=self.details,
-        )
 
 
 def hook_warn_empty_input(id, result: ExecutorResult):
@@ -137,6 +114,13 @@ class ProcessRequest(object):
         for id, case, subcase in self._walk_cases():
             self[id] = ExecutorResult.empty_result(id=id)
 
+        # no tests provided
+        if not self._run_results:
+            self.event_process.open_event.trigger(self, self._run_results)
+            self.evaluate_solution()
+            self.event_process.close_event.trigger(self, self._run_results)
+            raise ConfigurationException('No tests provided in yaml config file')
+
         # emit event
         if self.type is ProcessRequestType.GENERATE_INPUT:
             from processing.actions.generate_input import ProcessRequestGenerateInput
@@ -180,11 +164,19 @@ class ProcessRequest(object):
 
     def destroy(self):
         try:
-            self.action_executor.destroy()
+            if self.action_executor:
+                self.action_executor.destroy()
+            else:
+                logger.warning('cannot destroy empty action_executor')
         except:
             logger.exception('could not destroy executor')
 
     def evaluate_solution(self):
+        if not self._run_results:
+            self._evaluation = ExecutorResult(status=ExecutorStatus.SKIPPED).register('FINAL RESULT')
+            self._evaluation.message = 'No tests to run'
+            return
+
         statuses = [x.status for x in self._run_results.values()]
         if self._compile_result:
             if self._compile_result.status in (ExecutorStatus.COMPILATION_FAILED, ExecutorStatus.GLOBAL_TIMEOUT):
@@ -247,7 +239,10 @@ class ProcessRequest(object):
         student_full_dir = student_base_dir.joinpath(student_version)
         logger.info('Saving result to {}', student_full_dir)
 
-        shutil.copytree(self.result_dir, student_full_dir)
+        if self.result_dir.exists():
+            shutil.copytree(self.result_dir, student_full_dir)
+        else:
+            logger.warning('dir {} does not exists', self.result_dir)
         student_full_dir.mkdir(parents=True, exist_ok=True)
 
         # ---------------------------------------------------------------------

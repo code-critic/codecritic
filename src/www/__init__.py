@@ -7,6 +7,8 @@ from flask import Flask, redirect, session
 import flask.json
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from loguru import logger
+
 from env import Env
 from functools import wraps
 
@@ -46,6 +48,7 @@ def dump_error(f):
             return f(*args, **kwargs)
         except Exception as e:
             import traceback, html
+            logger.exception('@dump_error')
             return '<pre>%s</pre>' % html.escape(traceback.format_exc())
     return decorated_function
 

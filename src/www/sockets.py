@@ -11,6 +11,7 @@ from loguru import logger
 import processing.request
 from database.mongo import Mongo
 from database.objects import User
+from exceptions import ConfigurationException
 from processing import ProcessRequestType
 from www import socketio
 from www.emittor import Emittor
@@ -122,7 +123,12 @@ def student_submit_solution(data):
     with thread_lock:
         try:
             request.process()
+        except ConfigurationException as e:
+            if user.is_admin():
+                logger.exception('[visible to admin only] invalid yaml config')
+                Emittor.exception(e)
         except Exception as e:
+            logger.exception('process error:')
             Emittor.exception(e)
         finally:
             mongo.save_result(request.get_result_dict())

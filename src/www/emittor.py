@@ -4,7 +4,7 @@ import traceback
 
 from flask_socketio import emit
 from loguru import logger
-from processing.request import FatalException, CompileException
+from exceptions import FatalException, CompileException
 
 
 class Emittor(object):

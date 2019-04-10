@@ -12,7 +12,8 @@ from processing.executors.local import LocalExecutor
 from processing.executors.docker import DockerExecutor
 from processing.result import ExecutorResult
 from processing import ExecutorStatus
-from processing.request import ProcessRequest, FatalException, add_cmd_to_result, CompileException
+from processing.request import ProcessRequest, add_cmd_to_result
+from exceptions import FatalException, CompileException
 
 
 class AbstractAction(object):

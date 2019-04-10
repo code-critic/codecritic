@@ -6,7 +6,7 @@ from utils.strings import ensure_iterable
 
 
 class ExecutorResult(object):
-    def __init__(self, cmd, status=ExecutorStatus.IN_QUEUE, returncode=None, error=None):
+    def __init__(self, cmd=None, status=ExecutorStatus.IN_QUEUE, returncode=None, error=None):
         self.cmd = cmd
         self.status = status
         self.returncode = returncode
