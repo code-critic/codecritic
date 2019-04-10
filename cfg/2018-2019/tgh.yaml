@@ -70,7 +70,7 @@
   avail: 2020-03-30 00:00:00
   reference:
     name: bigloko.py
-    lang: PYTHON35
+    lang: PY-367
   tests:
   - id: BIGLOKO1_1
     timeout: 0.1
@@ -91,7 +91,7 @@
   avail: 2020-03-30 00:00:00
   reference:
     name: schedule.py
-    lang: PYTHON35
+    lang: PY-367
   problem_size_description: 'Number of subjects = n_vtx.'
   tests:
   - id: SCHEDULE_1
@@ -144,7 +144,7 @@
   avail: 2020-03-30 00:00:00
   reference:
     name: segment.py
-    lang: PYTHON27
+    lang: PY-276
   input:
   - id: SEGMENT_1
     timeout: 0.02
@@ -169,7 +169,7 @@
   avail: 2020-03-30 00:00:00
   reference:
     name: delivery.py
-    lang: PYTHON35
+    lang: PY-367
   tests:
   - id: DELIVERY_01.s
     timeout: 0.02
@@ -203,7 +203,7 @@
   avail: 2020-03-30 00:00:00
   reference:
     name: minspill.py
-    lang: PYTHON35
+    lang: PY-367
   tests:
   - id: MINSPILL_01.s
     timeout: 0.02
