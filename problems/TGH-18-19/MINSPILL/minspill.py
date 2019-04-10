@@ -3,7 +3,7 @@ from random import randint
 import random
 import sys
 import io
-import numpy as np
+#import numpy as np
 #import statprof
 #from contextlib import contextmanager
 import heapq

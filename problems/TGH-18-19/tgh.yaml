@@ -65,20 +65,20 @@
   tests:
     - id: WEBISL_case_1
       size: 4
-      timeout: 0.02
+      timeout: 0.1
     - id: WEBISL_case_2
       size: 6
-      timeout: 0.02
+      timeout: 0.1
     - id: WEBISL_case_3
       size: 8
-      timeout: 0.02
+      timeout: 0.1
     - id: WEBISL_case_4
       size: 10
-      timeout: 0.02
+      timeout: 0.1
       random: 2
     - id: WEBISL_case_5
       size: 100
-      timeout: 0.02
+      timeout: 0.1
       random: 2
     - id: WEBISL_case_6
       size: 1000
@@ -91,7 +91,7 @@
       timeout: 2                  # 1 s
     - id: WEBISL_case_9
       size: 500000
-      timeout: 1                 # 5 s
+      timeout: 10                 # 5 s
 
 - id: BIGLOKO1
   name: Zeleznice
