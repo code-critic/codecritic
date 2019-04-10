@@ -243,7 +243,7 @@ def make_data(in_stream, problem_size):
     problem_setup.seek(0)
     solve(problem_setup, out_stream)
     #print("====")
-    sys.stderr.write(out_stream.getvalue())
+    #sys.stderr.write(out_stream.getvalue())
     #print("====")
 
     #res_stream = StringIO.StringIO()
