@@ -126,7 +126,7 @@ def student_submit_solution(data):
     # put a barrier here so only certain amount fo users can process code at once
     # while other will see queue list
     import threading
-    thread = threading.Thread()
+
     def target():
     # with thread_lock:
         try:
@@ -146,6 +146,7 @@ def student_submit_solution(data):
         queue.remove(request)
         Emittor.queue_pop(request)
 
+    thread = threading.Thread(target=target)
     thread.start()
     print('ok over')
-    return 
+    return
