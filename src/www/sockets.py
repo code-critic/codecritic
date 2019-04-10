@@ -125,10 +125,7 @@ def student_submit_solution(data):
 
     # put a barrier here so only certain amount fo users can process code at once
     # while other will see queue list
-    import threading
-
-    def target():
-    # with thread_lock:
+    with thread_lock:
         try:
             request.process()
         except ConfigurationException as e:
@@ -143,10 +140,5 @@ def student_submit_solution(data):
             request.save_result()
             request.destroy()
 
-        queue.remove(request)
-        Emittor.queue_pop(request)
-
-    thread = threading.Thread(target=target)
-    thread.start()
-    print('ok over')
-    return
+    queue.remove(request)
+    Emittor.queue_pop(request)
