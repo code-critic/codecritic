@@ -20,6 +20,12 @@ var Automatest = (function() {
   socket.on('connect', function() {
     console.log('connected');
   });
+  socket.on('connect_timeout', function() {
+    console.log('connect_timeout');
+  });
+  socket.on('connect_error', function() {
+    console.log('connect_error');
+  });
 
   socket.on('reconnect', (attemptNumber) => {
     console.log('reconnect' + attemptNumber);
@@ -40,9 +46,9 @@ var Automatest = (function() {
   var oldOnevent = socket.onevent;
   socket.onevent = function (packet) {
     if (packet.data) {
-      console.log(packet)
+      console.log('>>>', {name: packet.data[0], payload: packet.data[1]})
     }
-    oldOnevent.apply(socket, arguments)
+    oldOnevent.apply(socket1, arguments)
   }
 
   socket.on('debug', function(event) {
