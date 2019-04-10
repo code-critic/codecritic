@@ -173,7 +173,7 @@
   reference:
     name: segment.py
     lang: PY-276
-  input:
+  tests:
   - id: SEGMENT_1.s
     timeout: 0.02
   - id: SEGMENT_2.s
@@ -206,9 +206,7 @@
   - id: DELIVERY_03.s    
     timeout: 0.02
   - id: DELIVERY_05.s
-    size: 64
-    
-    
+    timeout: 0.1
   - id: DELIVERY_06
     size: 10
     timeout: 3          # 1.5s
@@ -221,9 +219,9 @@
   - id: DELIVERY_09     
     size: 100
     timeout: 18          # 10s
-  #- id: DELIVERY_10
-    #problem_size: 200
-    #timeout: 60         # 35s
+  - id: DELIVERY_10
+    size: 200
+    timeout: 60         # 35s
 
     
 
