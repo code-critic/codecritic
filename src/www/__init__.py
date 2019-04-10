@@ -1,5 +1,9 @@
 #!/bin/python3
 # author: Jan Hybs
+
+from gevent import monkey
+monkey.patch_all()
+
 import enum
 import pathlib
 
@@ -68,11 +72,10 @@ def admin_required(f):
     return decorated_function
 
 
-async_mode = 'threading'
+async_mode = 'gevent'  # eventlet, gevent_uwsgi, gevent, threading
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.root_path = Env.www
 app.json_encoder = CustomJSONEncoder
 cors = CORS(app)
 socketio = SocketIO(app, json=flask.json, async_mode=async_mode)
-

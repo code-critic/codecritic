@@ -12,43 +12,68 @@ logger.configure(handlers=[
 ])
 
 
-parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument('--help', action='help', default=argparse.SUPPRESS,
-        help=argparse._('show this help message and exit'))
+# app.run(debug=args.debug, host=args.host, port=args.port)
 
-flask_server = parser.add_argument_group('flask server')
-flask_server.add_argument('-p', '--port', type=int, default=5000)
-flask_server.add_argument('-h', '--host', type=str, default='0.0.0.0')
-flask_server.add_argument('-d', '--debug', action='store_true')
-flask_server.add_argument('-v', '--verbose', action='store_true')
-args = parser.parse_args()
-
-if args.verbose:
-    # do not filter logger
-    pass
-else:
-    import logging
-    log = logging.getLogger('werkzeug')
-    log.setLevel(logging.ERROR)
+# from geventwebsocket import WebSocketServer
+# # from gevent.pywsgi import WSGIServer
+# http_server = WebSocketServer(('', 5000), app)
+# http_server.serve_forever()
 
 
-from www import app
-from www import auth
-from www import index
-from www import course
-from www import sockets
-from www import utils_www
+def create_app():
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('--help', action='help', default=argparse.SUPPRESS,
+                        help=argparse._('show this help message and exit'))
+
+    flask_server = parser.add_argument_group('flask server')
+    flask_server.add_argument('-p', '--port', type=int, default=5000)
+    flask_server.add_argument('-h', '--host', type=str, default='0.0.0.0')
+    flask_server.add_argument('-d', '--debug', action='store_true')
+    flask_server.add_argument('-v', '--verbose', action='store_false')
+    args = parser.parse_args()
+
+    if args.verbose:
+        # do not filter logger
+        pass
+    else:
+        import logging
+
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.ERROR)
+
+    from www import app
+    from www import auth
+    from www import index
+    from www import course
+    from www import sockets
+    from www import utils_www
+
+    logger.info('Running automate version {}', Env.version)
+    logger.info('Listening on {host}:{port} (debug={debug})', **vars(args))
+    info = '\n'.join(['{:>20s}: {:s}'.format(k, str(v)) for k, v in Env.info()])
+    logger.info('Configuration in env.py:\n{}', info)
+
+    return app
+
+
+def wsgi(*args, **kwargs):
+    return create_app()(*args, **kwargs)
+
+
+if __name__ == '__main__':
+    app = create_app()
+    from geventwebsocket import WebSocketServer
+
+    # from gevent.pywsgi import WSGIServer
+    http_server = WebSocketServer(('', 5000), app)
+    http_server.serve_forever()
 
 
 
-logger.info('Running automate version {}', Env.version)
-logger.info('Listening on {host}:{port} (debug={debug})', **vars(args))
-info = '\n'.join(['{:>20s}: {:s}'.format(k, str(v)) for k, v in Env.info()])
-logger.info('Configuration in env.py:\n{}', info)
+# app.run(debug=args.debug, host=args.host, port=args.port)
+#
 
 
-
-app.run(debug=args.debug, host=args.host, port=args.port)
 
 #
 #

@@ -8,4 +8,7 @@ pyyaml
 loguru
 pycrypto
 loguru
+eventlet
+gevent
+gevent-websocket
 singleton_decorator

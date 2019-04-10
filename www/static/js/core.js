@@ -4,8 +4,9 @@ var Automatest = (function() {
   var root = '';
   var $target = '';
   var callback = null;
-  var URL = location.protocol + '//' + document.domain + ':' + location.port + namespace
-  var socket = io.connect(URL);
+  var URL = location.protocol + '//' + document.domain + ':' + location.port + namespace;
+  // https://socket.io/docs/client-api/
+  var socket = io.connect(URL, {reconnection: false, upgrade: false, transports: ['websocket']});
   var env = nunjucks.configure(URL, {
     autoescape: true
   });
@@ -18,10 +19,37 @@ var Automatest = (function() {
 
   socket.on('connect', function() {
     console.log('connected');
-    socket.emit('my_event', {
-      data: 'I\'m connected!'
-    });
   });
+  socket.on('connect_timeout', function() {
+    console.log('connect_timeout');
+  });
+  socket.on('connect_error', function() {
+    console.log('connect_error');
+  });
+
+  socket.on('reconnect', (attemptNumber) => {
+    console.log('reconnect' + attemptNumber);
+  });
+  socket.on('reconnecting', (attemptNumber) => {
+    console.log('reconnecting' + attemptNumber);
+  });
+  socket.on('disconnect', (reason) => {
+    console.log('disconnect');
+    console.log(reason);
+    if (reason === 'io server disconnect') {
+      // the disconnection was initiated by the server, you need to reconnect manually
+      socket.connect();
+    }
+    // else the socket will automatically try to reconnect
+  });
+
+  var oldOnevent = socket.onevent;
+  socket.onevent = function (packet) {
+    if (packet.data) {
+      console.log('>>>', {name: packet.data[0], payload: packet.data[1]})
+    }
+    oldOnevent.apply(socket, arguments)
+  }
 
   socket.on('debug', function(event) {
     logData(event);
