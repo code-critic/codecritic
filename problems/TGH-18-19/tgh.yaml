@@ -118,7 +118,7 @@
   name: Rozvrh
   avail: 2020-03-30 00:00:00
   reference:
-    name: schedule.py
+    name: schedule_no_numpy.py
     lang: PY-367
   problem_size_description: 'Number of subjects = n_vtx.'
   tests:
@@ -175,21 +175,21 @@
     lang: PY-276
   tests:
   - id: SEGMENT_1.s
-    timeout: 0.02
+    timeout: 0.1
   - id: SEGMENT_2.s
-    timeout: 0.5
+    timeout: 1.5
   - id: SEGMENT_3
     size: 16
-    timeout: 0.02
+    timeout: 0.1
   - id: SEGMENT_4
     size: 64
-    timeout: 0.04
+    timeout: 0.2
   - id: SEGMENT_5
     size: 256
-    timeout: 0.5
+    timeout: 2.5
   - id: SEGMENT_6
     size: 1024
-    timeout: 10
+    timeout: 30
 
     
 - id: DELIVERY

@@ -4,19 +4,18 @@ import random
 import sys
 import io
 import queue
-import numpy as np
-import statprof
+#import statprof
 from contextlib import contextmanager
 
 
 
 
-@contextmanager
-def stat_profiler():
-    statprof.start()
-    yield  statprof
-    statprof.stop()
-    statprof.display()
+#@contextmanager
+#def stat_profiler():
+    #statprof.start()
+    #yield  statprof
+    #statprof.stop()
+    #statprof.display()
 
 class Edge:
     def __init__(self, i, u, v, cap, flux=0):
@@ -200,6 +199,7 @@ def make_data(in_stream, problem_size):
     1. Generate square grid graph with diagonal edges.
     2. Assign capacities random ints 0-5.
     '''
+    import numpy as np
 
     # random texture in range 0, 1024
 
