@@ -18,9 +18,6 @@ var Automatest = (function() {
 
   socket.on('connect', function() {
     console.log('connected');
-    socket.emit('my_event', {
-      data: 'I\'m connected!'
-    });
   });
 
   socket.on('debug', function(event) {
