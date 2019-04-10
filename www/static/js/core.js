@@ -48,7 +48,7 @@ var Automatest = (function() {
     if (packet.data) {
       console.log('>>>', {name: packet.data[0], payload: packet.data[1]})
     }
-    oldOnevent.apply(socket1, arguments)
+    oldOnevent.apply(socket, arguments)
   }
 
   socket.on('debug', function(event) {
