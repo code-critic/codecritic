@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 from optparse import OptionParser
-import numpy as np
-import scipy.spatial as sc_sp
 import io
 from random import randint
 import random
@@ -103,6 +101,10 @@ def make_data(in_stream, problem_size):
     2. Make Kd tree
     3. For every point find K  neighbors, and generate edges to them with random weights.
     '''
+    import numpy as np
+    import scipy.spatial as sc_sp
+
+
     edges = []
     # random texture in range 0, 1024
     K = 6 + np.log(problem_size)

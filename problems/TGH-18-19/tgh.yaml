@@ -124,26 +124,26 @@
   tests:
   - id: SCHEDULE_1
     timeout: 0.1
-  - problem_size: 100
-    id: SCHEDULE_2
+  - id: SCHEDULE_2
+    size: 100
     timeout: 0.1
-  - problem_size: 101
-    id: SCHEDULE_3
+  - id: SCHEDULE_3
+    size: 101
     timeout: 0.1
-  - problem_size: 102
-    id: SCHEDULE_4
+  - id: SCHEDULE_4
+    size: 102
     timeout: 0.1  
-  - problem_size: 103
-    id: SCHEDULE_5
+  - id: SCHEDULE_5
+    size: 103
     timeout: 0.1                
-  - problem_size: 300
-    id: SCHEDULE_6
+  - id: SCHEDULE_6
+    size: 300
     timeout: 4               
-  - problem_size: 312
-    id: SCHEDULE_7
+  - id: SCHEDULE_7
+    size: 312
     timeout: 8               
-  - problem_size: 307
-    id: SCHEDULE_8
+  - id: SCHEDULE_8
+    size: 307
     timeout: 10               
 #  - problem_size: 294
 #    id: SCHEDULE_9
