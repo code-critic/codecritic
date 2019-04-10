@@ -311,7 +311,7 @@ def solve(in_stream, out_stream) :
         return False
 
 def permute(arr, old_to_new):
-    new_arr = np.empty( (len(arr), ) , dtype=int)
+    new_arr = [0]*len(arr)
     for i_old in range(len(arr)):
         new_arr[old_to_new[i_old]] = arr[i_old]
     return new_arr

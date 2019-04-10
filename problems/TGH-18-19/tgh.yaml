@@ -52,8 +52,8 @@
     timeout: 0.7          # 1s
   - id: MINSPILL_440000.s    
     timeout: 8        # 8s
-  - id: MINSPILL_1e6.s
-    timeout: 26         # 27s
+#  - id: MINSPILL_1e6.s         # reach global timeout in docker
+#    timeout: 26         # 27s
 
       
 - id: WEBISL
@@ -136,15 +136,18 @@
   - id: SCHEDULE_5
     size: 103
     timeout: 0.1                
+  - id: SCHEDULE_51
+    size: 290
+    timeout: 1               
   - id: SCHEDULE_6
     size: 300
-    timeout: 4               
-  - id: SCHEDULE_7
-    size: 312
-    timeout: 8               
-  - id: SCHEDULE_8
-    size: 307
-    timeout: 10               
+    timeout: 10                 
+  #- id: SCHEDULE_7
+    #size: 312
+    #timeout: 8               
+  #- id: SCHEDULE_8
+    #size: 307
+    #timeout: 10               
 #  - problem_size: 294
 #    id: SCHEDULE_9
 #    time: 90              
