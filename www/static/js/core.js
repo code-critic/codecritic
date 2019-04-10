@@ -107,6 +107,7 @@ var Automatest = (function() {
   });
 
   socket.on('execute-test-start-me', function(event) {
+    socket.emit('debug', {ok: 'ok'});
     logData(event);
     $('#e-' + event.test.uuid).html(
       nunjucks.render(root + 'static/templates/test-result.njk', event.test)
