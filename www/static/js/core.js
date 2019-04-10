@@ -37,6 +37,14 @@ var Automatest = (function() {
     // else the socket will automatically try to reconnect
   });
 
+  var oldOnevent = socket.onevent;
+  socket.onevent = function (packet) {
+    if (packet.data) {
+      console.log(packet)
+    }
+    oldOnevent.apply(socket, arguments)
+  }
+
   socket.on('debug', function(event) {
     logData(event);
   });
