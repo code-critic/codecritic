@@ -60,7 +60,7 @@ def emit_market_data():
 
 @socketio.on('debug')
 def socket_debug(data):
-    logger.info('debug {}', data)
+    Emittor.debug('ok, connected' + str(data))
 
 
 @socketio.on('student-solution-submit', namespace=namespace)
