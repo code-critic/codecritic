@@ -4,15 +4,16 @@
 import os
 import io
 import collections
+from env import Env
 
 from flask import send_file
-
-from env import Env
+from flask_autoindex import AutoIndex
 from utils.strings import string_hash
-from www import app
+from www import app, login_required, admin_required
 
 
 Link = collections.namedtuple('Link', ['url', 'text'])
+ai = AutoIndex(app, browse_root=Env.problems, add_url_rules=False)
 
 
 def serve_pil_image(pil_img):
@@ -45,3 +46,11 @@ def placeholder(name, year):
     d.text(((W - w) / 2, (H - h) / 2 - 50 + h1), year, fill="white", font=ubuntu_36)
 
     return serve_pil_image(img)
+
+
+@app.route('/browse/<path:path>')
+@app.route('/browse')
+@login_required
+@admin_required
+def autoindex(path='.'):
+    return ai.render_autoindex(path)

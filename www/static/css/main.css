@@ -370,3 +370,7 @@ form .input-use-docker:checked ~ .use-docker-info {
   font-size: 0.7rem;
   color: #555;
 }
+
+.btn-fa-icon {
+  min-width: 24px;
+}

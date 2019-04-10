@@ -2,6 +2,7 @@ docker
 flask
 Flask-CORS
 flask-socketio
+Flask-AutoIndex
 tinydb
 pyyaml
 loguru
