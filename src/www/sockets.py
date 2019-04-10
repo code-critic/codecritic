@@ -19,7 +19,7 @@ from www.emittor import Emittor
 
 namespace = None
 queue = list()
-thread_lock_max = 1
+thread_lock_max = 10
 thread_lock = Semaphore(value=thread_lock_max)
 mongo = Mongo()
 
