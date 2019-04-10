@@ -1,5 +1,6 @@
 #!/bin/python3
 # author: Jan Hybs
+import time
 import traceback
 
 from flask_socketio import emit
@@ -110,21 +111,26 @@ class Emittor(object):
     def _event(cls, event, data, **kwargs):
         logger.debug('>>> {}', event)
         data['event'] = event
-        return emit(event, data, **kwargs)
+        return cls.emit(event, data, **kwargs)
 
     @classmethod
     def error(cls, message, details=None):
-        return emit('fatal-error', dict(event='fatal-error', error=FatalException(message, details)))
+        return cls.emit('fatal-error', dict(event='fatal-error', error=FatalException(message, details)))
 
     @classmethod
     def exception(cls, ex):
         if isinstance(ex, FatalException):
-            return emit('fatal-error', dict(event='fatal-error', error=ex))
+            return cls.emit('fatal-error', dict(event='fatal-error', error=ex))
         elif isinstance(ex, CompileException):
-            return emit('fatal-error', dict(event='fatal-error', error=ex))
+            return cls.emit('fatal-error', dict(event='fatal-error', error=ex))
         elif isinstance(ex, Exception):
             details = traceback.format_exc().splitlines()
             return cls.error(str(ex), details)
         else:
             return cls.error(str(ex))
+
+    @classmethod
+    def emit(cls, *args, **kwargs):
+        emit(*args, **kwargs)
+        time.sleep(0.25)
 

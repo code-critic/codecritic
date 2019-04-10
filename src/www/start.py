@@ -48,7 +48,12 @@ logger.info('Configuration in env.py:\n{}', info)
 
 
 
-app.run(debug=args.debug, host=args.host, port=args.port)
+# app.run(debug=args.debug, host=args.host, port=args.port)
+
+from geventwebsocket import WebSocketServer
+# from gevent.pywsgi import WSGIServer
+http_server = WebSocketServer(('', 5000), app)
+http_server.serve_forever()
 
 #
 #
