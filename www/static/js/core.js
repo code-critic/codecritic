@@ -68,6 +68,8 @@ var Automatest = (function() {
 
   socket.on('queue-push', function(event) {
     logData(event);
+    socket.emit('debug', {ok: 'ok'});
+
     $target.find('ul').append(
       nunjucks.render(root + 'static/templates/list-queue-item.njk', event.data)
     );
@@ -77,6 +79,8 @@ var Automatest = (function() {
 
   socket.on('queue-pop', function(event) {
     logData(event);
+    socket.emit('debug', {ok: 'ok'});
+    
     var item = document.getElementById('queue-' + event.data.id);
     $(item).hide();
   });
