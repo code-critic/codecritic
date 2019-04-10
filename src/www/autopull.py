@@ -1,18 +1,17 @@
 #!/bin/python3
 # author: Jan Hybs
 
-import pathlib
 import subprocess
 from flask import Flask
+from env import Env
+import sys
 
+src = Env.root / 'src'
+cmd = [sys.executable, 'www/start.py']
 
-root = pathlib.Path(__name__).resolve().parent.parent.parent
-src = root / 'src'
-cmd = 'python3 www/start.py'.split()
 
 class Glob():
     process = None
-
 
 
 Glob.process = subprocess.Popen(cmd, cwd=str(src))
@@ -24,7 +23,7 @@ def webhook():
     if Glob.process:
         Glob.process.kill()
 
-    subprocess.Popen('git pull'.split(), cwd=str(root)).wait()
+    subprocess.Popen('git pull'.split(), cwd=str(Env.root)).wait()
     Glob.process = subprocess.Popen(cmd, cwd=str(src))
     return 'ok'
 
