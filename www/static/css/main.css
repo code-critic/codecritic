@@ -365,3 +365,8 @@ form .input-use-docker:checked ~ .use-docker-info {
   font-size: .70rem;
   cursor: pointer;
 }
+
+.src-status {
+  font-size: 0.7rem;
+  color: #555;
+}

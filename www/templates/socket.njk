@@ -64,7 +64,7 @@
 
                             <!-- Source code -->
                             <div class="form-group mb-4">
-                              <label for="srcTA">Source code</label>
+                              <label for="srcTA">Source code <span data-toggle="tooltip" title="Source code is automatically saved locally on your PC" class="src-status"></span></label>
                               <textarea class="d-none form-control smaller text-monospace src-textarea" name="src" id="srcTA" rows="3" placeholder="Source code" required="required">import sys for name in sys.stdin.read().splitlines(): print("Hello, {name}!".format(name=name))</textarea>
                               <div id="editor" class="rounded border border-light"></div>
                             </div>

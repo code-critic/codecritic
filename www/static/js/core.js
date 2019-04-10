@@ -130,8 +130,12 @@ var Automatest = (function() {
   }
 })();
 
+var toArray = function(arr) {
+  return Array.isArray(arr) ? arr : [arr];
+}
+
 var storagePut = function(idx, value) {
-  var key = Array.isArray(idx) ? idx.join('/') : idx.toString();
+  var key = toArray(idx).join('/');
   try {
     localStorage.setItem(key, value);
   } catch (e) {
@@ -140,7 +144,7 @@ var storagePut = function(idx, value) {
 };
 
 var storageGet = function(idx, def) {
-  var key = Array.isArray(idx) ? idx.join('/') : idx.toString();
+  var key = toArray(idx).join('/');
   try {
     if (key in localStorage) {
       return localStorage.getItem(key);
@@ -152,6 +156,22 @@ var storageGet = function(idx, def) {
     return def === undefined ? null : def;
   }
 };
+
+
+var courseStorage = function(courseID) {
+  var course = toArray(courseID);
+  
+  return {
+    storageGet: function(idx, def) {
+      return storageGet(course.concat(toArray(idx)), def);
+    },
+    storagePut: function(idx, value) {
+      return storagePut(course.concat(toArray(idx)), value);
+    }
+  }
+};
+
+
 
 var logData = function(data) {
   if (data.data == 'ok, connected') {
@@ -353,3 +373,7 @@ var _showcase = {
   "user": "jan.hybs",
   "uuid": "fbf00cd60a3c4419b6410d3145253019"
 };
+
+$(document).ready(function() {
+  $('[data-toggle="tooltip"]').tooltip();
+});

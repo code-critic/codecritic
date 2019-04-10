@@ -4,7 +4,7 @@
       <div>
         <h2 class="card-title m-0 text-white">
           {% if back %}
-            <a href="{{ back.url }}" class="back-btn">
+            <a href="{{ back.url }}" class="back-btn" data-toggle="tooltip" title="Go back to {{ back.text }}">
               <i class="fas fa-chevron-left"></i>
             </a>
           {% endif %}

@@ -25,7 +25,7 @@ def view_course(course_name, course_year):
 
         title=course.name,
         subtitle=course.year,
-        back=Link(url_for('view_courses'), 'go back'),
+        back=Link(url_for('view_courses'), 'course selection'),
     )
 
 
@@ -48,7 +48,7 @@ def admin_problem(course_name, course_year, problem_id):
 
         title='Manage %s' % course.name,
         subtitle=problem.name,
-        back=Link(url_for('view_course', course_name=course_name, course_year=course_year), 'go back'),
+        back=Link(url_for('view_course', course_name=course_name, course_year=course_year), 'course selection'),
     )
 
 

@@ -19,10 +19,12 @@ $(document).ready(function() {
     }
   });
   var editor = ace.edit("editor");
-  var $queue = $('.queue');
+  var courseID = $('.prob-select').data('course');
+  var cs = courseStorage(courseID);
+  var saveTimeout = null;
+  var srcStatus = $('.src-status');
 
   editor.setTheme("ace/theme/github");
-  editor.session.setMode("ace/mode/java");
   editor.setOptions({
     enableBasicAutocompletion: true,
     enableSnippets: true,
@@ -30,9 +32,14 @@ $(document).ready(function() {
   });
 
   editor.session.on('change', function() {
-    saveCode();
+    if(saveTimeout){
+      clearTimeout(saveTimeout);
+      saveTimeout = null;
+    }
+    srcStatus.html('(saving)');
+    saveTimeout = setTimeout(saveCode, 1000);
   });
-  $('#editor').append('<span class="btn btn-link fullscreen"><i class="fas fa-expand"></i></span>');
+  $('#editor').append('<span class="btn btn-link fullscreen" data-toggle="tooltip" title="Toggle fullscreen"><i class="fas fa-expand"></i></span>');
   $('#editor .btn.fullscreen').click(function() {
     $('#editor').toggleClass('fullscreen');
     window.dispatchEvent(new Event('resize'))
@@ -40,10 +47,10 @@ $(document).ready(function() {
 
 
   var loadLocalStorage = function() {
-    var problemID = storageGet('problemID');
-    var languageID = storageGet('languageID');
+    var problemID = cs.storageGet('problemID');
+    var languageID = cs.storageGet('languageID');
     var key = [problemID, languageID];
-    var sourceCode = storageGet(key.concat('sourceCode'));
+    var sourceCode = cs.storageGet(key.concat('sourceCode'));
 
     if (problemID) {
       $('.prob-select').val(problemID);
@@ -62,13 +69,13 @@ $(document).ready(function() {
     var problemID = $('.prob-select').val();
     var languageID = $('.lang-select').val();
 
-    storagePut('problemID', problemID);
-    storagePut('languageID', languageID);
+    cs.storagePut('problemID', problemID);
+    cs.storagePut('languageID', languageID);
   };
 
   var loadProblemAndLang = function() {
-    var problemID = storageGet('problemID');
-    var languageID = storageGet('languageID');
+    var problemID = cs.storageGet('problemID');
+    var languageID = cs.storageGet('languageID');
 
     if (problemID) {
       $('.prob-select').val(problemID);
@@ -86,14 +93,16 @@ $(document).ready(function() {
     var languageID = $('.lang-select').val();
     var key = [problemID, languageID];
     var sourceCode = editor.getValue();
-    storagePut(key.concat('sourceCode'), sourceCode);
+    cs.storagePut(key.concat('sourceCode'), sourceCode);
+    srcStatus.html('(saved)');
   };
 
   var loadCode = function() {
-    var problemID = storageGet('problemID');
-    var languageID = storageGet('languageID');
+    var problemID = cs.storageGet('problemID');
+    var languageID = cs.storageGet('languageID');
     var key = [problemID, languageID];
-    var sourceCode = storageGet(key.concat('sourceCode'));
+    var sourceCode = cs.storageGet(key.concat('sourceCode'));
+    
     if (sourceCode) {
       editor.setValue(sourceCode);
     }
@@ -158,8 +167,12 @@ $(document).ready(function() {
     );
     return false;
   });
-
+  
+  $('[data-toggle="tooltip"]').tooltip();
+  
   loadProblemAndLang();
   loadCode();
+  
   $('.prob-select').trigger('change');
+  $('.lang-select').trigger('change');
 });
