@@ -71,7 +71,7 @@
   reference:
     name: bigloko.py
     lang: PYTHON35
-  input:
+  tests:
   - id: BIGLOKO1_1
     timeout: 0.1
   - id: BIGLOKO1_2
@@ -93,7 +93,7 @@
     name: schedule.py
     lang: PYTHON35
   problem_size_description: 'Number of subjects = n_vtx.'
-  input:
+  tests:
   - id: SCHEDULE_1
     timeout: 0.1
   - problem_size: 100
