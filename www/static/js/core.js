@@ -24,6 +24,18 @@ var Automatest = (function() {
   socket.on('reconnect', (attemptNumber) => {
     console.log('reconnect' + attemptNumber);
   });
+  socket.on('reconnecting', (attemptNumber) => {
+    console.log('reconnecting' + attemptNumber);
+  });
+  socket.on('disconnect', (reason) => {
+    console.log('disconnect');
+    console.log(reason);
+    if (reason === 'io server disconnect') {
+      // the disconnection was initiated by the server, you need to reconnect manually
+      socket.connect();
+    }
+    // else the socket will automatically try to reconnect
+  });
 
   socket.on('debug', function(event) {
     logData(event);
