@@ -21,6 +21,10 @@ var Automatest = (function() {
     console.log('connected');
   });
 
+  socket.on('reconnect', (attemptNumber) => {
+    console.log('reconnect' + attemptNumber);
+  });
+
   socket.on('debug', function(event) {
     logData(event);
   });
