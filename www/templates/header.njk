@@ -41,6 +41,14 @@
         {% endif %}
 
         {% if user.is_admin() %}
+          <a class="dropdown-item" href="{{ url_for('print_log') }}" target="_blank">
+            <i class="fas fa-eye"></i>
+            <strong>View</strong> log
+          </a>
+          <a class="dropdown-item" href="{{ url_for('clear_log') }}" target="_blank">
+            <i class="fas fa-times"></i>
+            <strong>CLEAR</strong> log
+          </a>
           <a class="dropdown-item" href="{{ url_for('admin_switch_role', role='student') }}">
             <i class="fas fa-user-tag"></i>
             Switch to role <strong>student</strong>
