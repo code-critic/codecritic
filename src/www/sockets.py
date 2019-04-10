@@ -19,7 +19,7 @@ from www.emittor import Emittor
 
 namespace = None
 queue = list()
-thread_lock_max = 1
+thread_lock_max = 10
 thread_lock = Semaphore(value=thread_lock_max)
 mongo = Mongo()
 
@@ -56,6 +56,11 @@ def broadcast_queue_pop(item):
 def emit_market_data():
     print('connected')
     Emittor.debug('ok, connected')
+
+
+@socketio.on('debug')
+def socket_debug(data):
+    Emittor.debug('ok, connected' + str(data))
 
 
 @socketio.on('student-solution-submit', namespace=namespace)
