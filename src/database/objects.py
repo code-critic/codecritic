@@ -277,7 +277,7 @@ class ProblemCase(ADB):
         super().__init__()
         self.id = item['id']
         self.size = item.get('size')
-        self.timeout = item.get('timeout', 5.0)
+        self.timeout = item.get('timeout')
         self.problem = problem
         random = item.get('random')
 

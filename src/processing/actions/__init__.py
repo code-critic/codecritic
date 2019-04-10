@@ -6,6 +6,7 @@ import typing
 
 from loguru import logger
 
+from env import Env
 from database.objects import Script
 from processing.comparator import Comparator
 from processing.executors.local import LocalExecutor
@@ -100,7 +101,8 @@ class AbstractAction(object):
             )
 
             with executor.set_streams(stdin=inn, stdout=out, stderr=err) as ex:
-                result = ex.run(cmd).register(id)
+                timeout = subcase.timeout or Env.case_timeout
+                result = ex.run(cmd, soft_limit=timeout).register(id)
 
             # if ok we compare
             if result.status in (ExecutorStatus.OK, ExecutorStatus.SOFT_TIMEOUT):
