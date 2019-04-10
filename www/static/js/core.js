@@ -4,7 +4,9 @@ var Automatest = (function() {
   var root = '';
   var $target = '';
   var callback = null;
-  var URL = location.protocol + '//' + document.domain + ':' + location.port + namespace
+  var URL = location.protocol + '//' + document.domain + ':' + location.port + namespace;
+  io.set('heartbeat timeout', 60000);
+  io.set('heartbeat interval', 25000);
   // https://socket.io/docs/client-api/
   var socket = io.connect(URL, {reconnection: false, upgrade: false, transports: ['websocket']});
   var env = nunjucks.configure(URL, {
