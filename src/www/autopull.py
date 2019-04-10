@@ -23,9 +23,9 @@ def webhook():
     if Glob.process:
         Glob.process.kill()
 
-    subprocess.Popen('git pull'.split(), cwd=str(Env.root)).wait()
+    result = subprocess.Popen('git pull'.split(), cwd=str(Env.root)).wait()
     Glob.process = subprocess.Popen(cmd, cwd=str(src))
-    return 'ok'
+    return 'ok, pull result = {}'.format(result)
 
 
 # http://hybs.nti.tul.cz:5001/webhook
