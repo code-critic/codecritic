@@ -72,17 +72,17 @@
     name: bigloko.py
     lang: PY-367
   tests:
-  - id: BIGLOKO1_1
+  - id: BIGLOKO1_1.s
     timeout: 0.1
-  - id: BIGLOKO1_2
+  - id: BIGLOKO1_2.s
     timeout: 0.1
-  - id: BIGLOKO1_100
+  - id: BIGLOKO1_100.s
     timeout: 0.1
-  - id: BIGLOKO1_1000
+  - id: BIGLOKO1_1000.s
     timeout: 0.1
-  - id: BIGLOKO1_10k
+  - id: BIGLOKO1_10k.s
     timeout: 0.3
-  - id: BIGLOKO1_100k
+  - id: BIGLOKO1_100k.s
     timeout: 3
 
     
@@ -146,21 +146,21 @@
     name: segment.py
     lang: PY-276
   input:
-  - id: SEGMENT_1
+  - id: SEGMENT_1.s
     timeout: 0.02
-  - id: SEGMENT_2
+  - id: SEGMENT_2.s
     timeout: 0.5
   - id: SEGMENT_3
-    problem_size: 16
+    size: 16
     timeout: 0.02
   - id: SEGMENT_4
-    problem_size: 64
+    size: 64
     timeout: 0.04
   - id: SEGMENT_5
-    problem_size: 256
+    size: 256
     timeout: 0.5
   - id: SEGMENT_6
-    problem_size: 1024
+    size: 1024
     timeout: 10
 
     
@@ -178,20 +178,20 @@
   - id: DELIVERY_03.s    
     timeout: 0.02
   - id: DELIVERY_05.s
-    problem_size: 64
+    size: 64
     
     
   - id: DELIVERY_06
-    problem_size: 10
+    size: 10
     timeout: 3          # 1.5s
   - id: DELIVERY_07
-    problem_size: 30
+    size: 30
     timeout: 5          # 2.5s
   - id: DELIVERY_08
-    problem_size: 70
+    size: 70
     timeout: 12          # 7.5s
   - id: DELIVERY_09     
-    problem_size: 100
+    size: 100
     timeout: 18          # 10s
   #- id: DELIVERY_10
     #problem_size: 200
