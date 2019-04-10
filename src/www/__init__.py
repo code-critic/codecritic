@@ -78,4 +78,4 @@ app.config['SECRET_KEY'] = 'secret!'
 app.root_path = Env.www
 app.json_encoder = CustomJSONEncoder
 cors = CORS(app)
-socketio = SocketIO(app, json=flask.json, async_mode=async_mode)
+socketio = SocketIO(app, json=flask.json, async_mode=async_mode, ping_interval=10*1000)
