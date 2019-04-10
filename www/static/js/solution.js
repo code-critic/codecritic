@@ -23,6 +23,7 @@ $(document).ready(function() {
   var cs = courseStorage(courseID);
   var saveTimeout = null;
   var srcStatus = $('.src-status');
+  var $target = $('.solution-result');
 
   editor.setTheme("ace/theme/github");
   editor.setOptions({
@@ -144,8 +145,6 @@ $(document).ready(function() {
 
     var $form = $(this);
     $form.addClass('disabled');
-    var $target = $('.solution-result');
-    Automatest.setTarget($target);
     $('#solution-result').collapse('show');
     $('#solution-result-heading .btn-link').removeClass('disabled');
 
@@ -175,4 +174,5 @@ $(document).ready(function() {
   
   $('.prob-select').trigger('change');
   $('.lang-select').trigger('change');
+  Automatest.setTarget($target);
 });
