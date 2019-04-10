@@ -4,8 +4,9 @@ var Automatest = (function() {
   var root = '';
   var $target = '';
   var callback = null;
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-  var env = nunjucks.configure('http://localhost:5000', {
+  var URL = location.protocol + '//' + document.domain + ':' + location.port + namespace
+  var socket = io.connect(URL);
+  var env = nunjucks.configure(URL, {
     autoescape: true
   });
   env.addGlobal('inArray', function(value, arr) {
