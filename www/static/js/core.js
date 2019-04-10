@@ -5,7 +5,8 @@ var Automatest = (function() {
   var $target = '';
   var callback = null;
   var URL = location.protocol + '//' + document.domain + ':' + location.port + namespace
-  var socket = io.connect(URL);
+  // https://socket.io/docs/client-api/
+  var socket = io.connect(URL {reconnection: false, upgrade: false, transports: ['websocket']});
   var env = nunjucks.configure(URL, {
     autoescape: true
   });
