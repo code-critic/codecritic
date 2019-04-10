@@ -132,5 +132,5 @@ class Emittor(object):
     @classmethod
     def emit(cls, *args, **kwargs):
         emit(*args, **kwargs)
-        time.sleep(0.1)
+        time.sleep(0.01)
 
