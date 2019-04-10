@@ -96,10 +96,8 @@ class Course(ADB):
         self.teachers = item.get('teachers', list())
         self.students = item.get('students', list())
 
-        if self.year:
-            self.yaml_file = pathlib.Path(Env.cfg).joinpath(str(self.year).lower(), self.name.lower() + '.yaml')
-        else:
-            self.yaml_file = pathlib.Path(Env.cfg).joinpath(self.name.lower() + '.yaml')
+        self.yaml_file = Env.problems.joinpath(self.id, self.name.lower() + '.yaml')
+        self.yaml_file.parent.mkdir(parents=True, exist_ok=True)
 
     def peek(self):
         return self._peek('id', 'name', 'desc', 'year', 'enabled')
