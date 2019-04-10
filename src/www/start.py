@@ -7,7 +7,7 @@ from env import Env
 
 logger.configure(handlers=[
     dict(sink=sys.stdout),
-    dict(sink=Env.log_file)
+    dict(sink=Env.log_file, colorize=True)
 ])
 
 

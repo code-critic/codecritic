@@ -1,7 +1,7 @@
 #!/bin/python3
 # author: Jan Hybs
 
-import html, sys
+import sys
 from flask import redirect, url_for, send_file
 from env import Env
 from www import app, login_required
@@ -21,21 +21,22 @@ def index():
 @app.route('/log')
 def print_log():
     log = Env.log_file.read_text()
+    import ansi2html
 
-    return '''
-    <h1>Automate log</h1>
-    <pre>%s</pre>
-    '''.strip() % html.escape(log)
+    converter = ansi2html.Ansi2HTMLConverter()
+    html = converter.convert(log)
+    return '<h1>Automate log</h1>' + html
 
 
 @app.route('/log/clear')
+@login_required
 def clear_log():
     Env.log_file.unlink()
     Env.log_file.touch()
 
     logger.configure(handlers=[
         dict(sink=sys.stdout),
-        dict(sink=Env.log_file)
+        dict(sink=Env.log_file, colorize=True)
     ])
 
     logger.info('--- log file cleared ---')
