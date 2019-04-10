@@ -170,7 +170,7 @@
   reference:
     name: delivery.py
     lang: PYTHON35
-  input:
+  tests:
   - id: DELIVERY_01.s
     timeout: 0.02
   - id: DELIVERY_02.s
@@ -204,7 +204,7 @@
   reference:
     name: minspill.py
     lang: PYTHON35
-  input:
+  tests:
   - id: MINSPILL_01.s
     timeout: 0.02
   - id: MINSPILL_02.s
