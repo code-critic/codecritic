@@ -17,12 +17,11 @@ HALF_DAY = 60*60*12
 
 
 class ProcessRequestSolve(AbstractAction):
-    def __init__(self, request: ProcessRequest, result_dir: pathlib.Path):
-        super().__init__(request, result_dir)
+    def __init__(self, request: ProcessRequest, result_dir: pathlib.Path, problem_dir: pathlib.Path):
+        super().__init__(request, result_dir, problem_dir)
 
         self.uuid = uuid4().hex
         self.rand = '%s-%s' % (self.request.user.id, self.uuid)
-        self.problem_dir = pathlib.Path(Env.problems, self.request.course.id, self.request.problem.id)
         self.solution_file = self.result_dir.joinpath('main.%s' % self.request.lang.extension)
 
         self.delete_old_dirs(self.result_dir.parent)

@@ -12,7 +12,7 @@ from uuid import uuid4
 
 from loguru import logger
 
-from database.objects import Course, Languages, Problem, User
+from database.objects import Course, Courses, Languages, Problem, User
 from env import Env
 from processing import ExecutorStatus, ProcessRequestType
 from processing.result import ExecutorResult
@@ -43,7 +43,7 @@ class ProcessRequest(object):
     """
 
     def __init__(self, user, lang, type, solution, course, problem, cases=None, docker=True, **kwargs):
-        self.course = Course.db()[course]
+        self.course = Courses()[course]
         self.problem = self.course.problem_db[problem]
         self.lang = Languages.db().get(lang)
         self.case_ids = cases or self.problem.test_ids
@@ -74,10 +74,10 @@ class ProcessRequest(object):
         self.docker = docker
         self.action_executor = None
 
-        self.problem_dir = pathlib.Path(Env.problems, self.course.id, self.problem.id)
-        self.result_dir = pathlib.Path(Env.tmp, self.course.id, self.problem.id, self.rand)
+        self.problem_dir = pathlib.Path(self.course.problems_dir, self.problem.id)
+        self.result_dir = pathlib.Path(Env.tmp, self.rand)
 
-        # create dirs, but it SHOULD ALREADY EXISTS
+        # create dirs, but they SHOULD ALREADY EXISTS
         self.problem_dir.mkdir(parents=True, exist_ok=True)
         self.problem_dir.joinpath('output').mkdir(parents=True, exist_ok=True)
         self.problem_dir.joinpath('input').mkdir(parents=True, exist_ok=True)
@@ -124,15 +124,15 @@ class ProcessRequest(object):
         # emit event
         if self.type is ProcessRequestType.GENERATE_INPUT:
             from processing.actions.generate_input import ProcessRequestGenerateInput
-            self.action_executor = ProcessRequestGenerateInput(self, self.problem_dir)
+            self.action_executor = ProcessRequestGenerateInput(self, self.problem_dir, self.problem_dir)
 
         elif self.type is ProcessRequestType.GENERATE_OUTPUT:
             from processing.actions.generate_output import ProcessRequestGenerateOutput
-            self.action_executor = ProcessRequestGenerateOutput(self, self.problem_dir)
+            self.action_executor = ProcessRequestGenerateOutput(self, self.problem_dir, self.problem_dir)
 
         elif self.type is ProcessRequestType.SOLVE:
             from processing.actions.solve import ProcessRequestSolve
-            self.action_executor = ProcessRequestSolve(self, self.result_dir)
+            self.action_executor = ProcessRequestSolve(self, self.result_dir, self.problem_dir)
         else:
             raise FatalException('Unsupported action {}'.format(self.type))
 

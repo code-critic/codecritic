@@ -34,6 +34,7 @@ class Env(object):
     log_file = _root / '.automate.log'
 
     problems = _root / 'problems'
+    courses = _root / 'courses'
     results = _root / 'results'
 
     fonts = _root / 'www' / 'fonts'

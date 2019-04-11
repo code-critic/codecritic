@@ -3,11 +3,14 @@
 import pathlib
 
 import typing
+import yaml
+import copy
 import datetime as dt
 import os
 
 from database import parse_dt
 from database.yamldb import ADB, YamlDB
+from exceptions import FatalException
 
 from utils import strings
 from env import Env
@@ -17,6 +20,7 @@ from loguru import logger
 
 class InvalidConfiguration(Exception):
     pass
+
 
 class User(ADB):
     """
@@ -96,8 +100,16 @@ class Course(ADB):
         self.teachers = item.get('teachers', list())
         self.students = item.get('students', list())
 
-        self.yaml_file = Env.problems.joinpath(self.id, self.name.lower() + '.yaml')
-        self.yaml_file.parent.mkdir(parents=True, exist_ok=True)
+        if 'config' in item:
+            self.yaml_file = pathlib.Path(item['config'])
+            self.yaml_file.parent.mkdir(parents=True, exist_ok=True)
+        else:
+            self.yaml_file = Env.problems.joinpath(self.id, self.name.lower() + '.yaml')
+            self.yaml_file.parent.mkdir(parents=True, exist_ok=True)
+
+        self.root_dir = self.yaml_file.parent
+        self.problems_dir = self.root_dir / 'problems'
+        self.results_dir = self.root_dir / 'results'
 
     def peek(self):
         return self._peek('id', 'name', 'desc', 'year', 'enabled')
@@ -110,9 +122,64 @@ class Course(ADB):
         if self.id not in self._problems:
             db = YamlDB(self.yaml_file)
             db.set_conversion(Problem)
-            db.bind(course_id=self.id)
+            db.bind(course=self)
             self._problems[self.id] = db
         return self._problems[self.id]
+
+
+class Courses(object):
+    """
+    :type courses: typing.List[Course]
+    """
+    def __init__(self):
+        self.courses = list()
+        for course, config in self._iter_courses():
+            for subcourse, subcourse_yaml in self._iter_subcourses(course):
+                base = copy.deepcopy(config)
+                base['id'] = '{}-{}'.format(config['name'], subcourse.name)
+                base['config'] = subcourse_yaml
+                base['year'] = subcourse.name
+
+                course_instance = Course(base)
+                self.courses.append(course_instance)
+
+    def _iter_courses(self, root=Env.courses):
+        for course in root.glob('*'):
+            course_yaml = course / 'config.yaml'
+            if course.is_dir() and course_yaml.exists() and course_yaml.is_file():
+                config = yaml.load(course_yaml.read_text())
+                yield course, config
+
+    def _iter_subcourses(self, root):
+        for subcourse in root.glob('*'):
+            subcourse_yaml = subcourse / 'config.yaml'
+            if subcourse.is_dir() and subcourse_yaml.exists() and subcourse_yaml.is_file():
+                yield subcourse, subcourse_yaml
+
+    def __iter__(self):
+        return iter(self.courses)
+
+    def __getitem__(self, id):
+        for course in self:
+            if course.id == id:
+                return course
+
+        raise FatalException('Could not find course %s' % id)
+
+
+    def find(self, name=None, year=None, only_active=True):
+        for course in self:
+            if name and name != course.name:
+                continue
+            if year and year != course.year:
+                continue
+            if only_active and course.disabled:
+                continue
+            yield course
+
+    def find_one(self, name=None, year=None, only_active=True):
+        for course in self.find(name, year, only_active):
+            return course
 
 
 class Languages(ADB):
@@ -195,6 +262,7 @@ class Problem(ADB):
     :type id: str
     :type id: str
     :type desc: str
+    :type course: Course
     :type tests: list[ProblemCase]
     :type reference: Script
     """
@@ -207,7 +275,7 @@ class Problem(ADB):
         self.reference = Script(item.get('reference')) if item.get('reference') else None
         self.disabled = item.get('disabled', False)
         self.avail = parse_dt(item.get('avail'))
-        self.course_id = item.get('course_id')
+        self.course = item.get('course')
         self.timeout = item.get('timeout')
         self.tests = list()
 
@@ -218,21 +286,18 @@ class Problem(ADB):
         return self._peek('id', 'name', 'disabled', 'timeout')
 
     @property
-    def course(self):
-        if self.course_id:
-            return Course.db().get(self.course_id)
-
-    @property
     def description(self):
         if self.desc:
             return self.desc
 
         try:
-            readme = os.path.join(Env.problems, self.course_id, self.id, 'README.md')
+            readme = self.course.problems_dir.joinpath(self.id, 'README.md')
             with open(readme, 'r') as fp:
                 import markdown
-                return markdown.markdown(fp.read())
-        except:
+
+                return markdown.markdown(fp.read(), extensions=['fenced_code'])
+        except Exception as e:
+            print(e)
             pass
 
     @property

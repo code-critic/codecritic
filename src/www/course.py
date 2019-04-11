@@ -2,7 +2,7 @@
 # author: Jan Hybs
 
 from flask import session, url_for
-from database.objects import Course, Languages, User
+from database.objects import Course, Courses, Languages, User
 from www import app, login_required, admin_required, dump_error, render_template_ext
 from www.utils_www import Link
 
@@ -12,7 +12,7 @@ from www.utils_www import Link
 @dump_error
 def view_course(course_name, course_year):
     user = User(session['user'])
-    course = Course.db().find_one(name=course_name, year=course_year)
+    course = Courses().find_one(name=course_name, year=course_year, only_active=False)
     problems = list(course.problem_db.find(disabled=(None, False)))
     languages = Languages.db().find(disabled=(None, False))
 
@@ -35,7 +35,7 @@ def view_course(course_name, course_year):
 @dump_error
 def admin_problem(course_name, course_year, problem_id):
     user = User(session['user'])
-    course = Course.db().find_one(name=course_name, year=course_year)
+    course = Courses().find_one(name=course_name, year=course_year, only_active=False)
     problem = course.problem_db[problem_id]
     languages = Languages.db().find(disabled=(None, False))
 
@@ -57,8 +57,10 @@ def admin_problem(course_name, course_year, problem_id):
 @dump_error
 def view_courses():
     user = User(session['user'])
-    filters = dict() if user.is_admin() else dict(disabled=(None, False))
-    courses = [course for course in Course.db().find(**filters) if user.in_course(course)]
+
+    courses = list(Courses().find(
+        only_active=not user.is_admin()
+    ))
 
     return render_template_ext(
         'courses.njk',

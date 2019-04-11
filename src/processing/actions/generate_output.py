@@ -13,12 +13,11 @@ from utils.timer import Timer
 
 
 class ProcessRequestGenerateOutput(AbstractAction):
-    def __init__(self, request: ProcessRequest, result_dir: pathlib.Path):
-        super().__init__(request, result_dir)
+    def __init__(self, request: ProcessRequest, result_dir: pathlib.Path, problem_dir: pathlib.Path):
+        super().__init__(request, result_dir, problem_dir)
 
         self.uuid = uuid4().hex
         self.rand = '%s-%s' % (self.request.user.id, self.uuid)
-        self.problem_dir = pathlib.Path(Env.problems, self.request.course.id, self.request.problem.id)
         self._check_reference(self.request.problem.reference)
 
         if self.request.docker:

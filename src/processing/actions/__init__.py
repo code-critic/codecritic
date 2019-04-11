@@ -21,9 +21,10 @@ class AbstractAction(object):
     """
     :type executor: processing.executors.local.LocalExecutor or processing.executors.docker.DockerExecutor
     """
-    def __init__(self, request: ProcessRequest, result_dir: pathlib.Path):
+    def __init__(self, request: ProcessRequest, result_dir: pathlib.Path, problem_dir: pathlib.Path):
         self.request = request
         self.result_dir = pathlib.Path(result_dir)
+        self.problem_dir = pathlib.Path(problem_dir)
         self.executor = None
         self.duration = 0.0
 
