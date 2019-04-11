@@ -1,3 +1,6 @@
 [submodule "courses/course-template"]
 	path = courses/course-template
 	url = https://github.com/code-critic/course-template.git
+[submodule "courses/TGH"]
+	path = courses/TGH
+	url = https://github.com/code-critic/TGH.git
