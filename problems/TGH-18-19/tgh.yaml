@@ -28,6 +28,7 @@
       #random: 5
       #size: 15
 
+# OK, checked: 11.4.2019     
 - id: MINSPILL
   name: Přelévání nádob
   avail: 2020-03-30 00:00:00
@@ -55,7 +56,8 @@
 #  - id: MINSPILL_1e6.s         # reach global timeout in docker
 #    timeout: 26         # 27s
 
-      
+
+# OK, checked: 11.4.2019
 - id: WEBISL
   name: Web islands
   avail: 2020-03-30 00:00:00  
@@ -93,6 +95,8 @@
       size: 500000
       timeout: 8                 # 5 s
 
+
+# OK, checked: 11.4.2019      
 - id: BIGLOKO1
   name: Zeleznice
   avail: 2020-03-30 00:00:00
@@ -105,13 +109,13 @@
   - id: BIGLOKO1_2.s
     timeout: 0.1
   - id: BIGLOKO1_100.s
-    timeout: 0.2
+    timeout: 0.1
   - id: BIGLOKO1_1000.s
-    timeout: 0.2
+    timeout: 0.1
   - id: BIGLOKO1_10k.s
-    timeout: 1.5
+    timeout: 0.5
   - id: BIGLOKO1_100k.s
-    timeout: 15
+    timeout: 5
 
     
 - id: SCHEDULE
@@ -122,7 +126,7 @@
     lang: PY-367
   problem_size_description: 'Number of subjects = n_vtx.'
   tests:
-  - id: SCHEDULE_1
+  - id: SCHEDULE_1.s
     timeout: 0.1
   - id: SCHEDULE_2
     size: 100
