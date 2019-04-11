@@ -1,2 +1,2 @@
-# automate
-Automated testing framework
+# Code Critic
+Automated code testing & evaluation
