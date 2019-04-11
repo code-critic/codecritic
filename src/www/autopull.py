@@ -63,7 +63,6 @@ def webhook():
     return 'ok, pull result = {}'.format(result)
 
 
-app = Flask(__name__)
 @app.route('/webhook/full', methods=['POST', 'GET'])
 def webhook():
     if Glob.process:
