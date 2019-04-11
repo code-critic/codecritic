@@ -76,7 +76,7 @@ def render_template_base(**kwargs):
     def render(template, **kw):
         kw2 = kwargs.copy()
         kw2.update(kw)
-        return render_template(template, kw2)
+        return render_template(template, **kw2)
 
 
 
