@@ -117,7 +117,7 @@
   - id: BIGLOKO1_100k.s
     timeout: 5
 
-    
+# OK, checked: 11.4.2019        
 - id: SCHEDULE
   name: Rozvrh
   avail: 2020-03-30 00:00:00
@@ -125,6 +125,7 @@
     name: schedule_no_numpy.py
     lang: PY-367
   problem_size_description: 'Number of subjects = n_vtx.'
+  timeout: 70
   tests:
   - id: SCHEDULE_1.s
     timeout: 0.1
@@ -142,10 +143,10 @@
     timeout: 0.1                
   - id: SCHEDULE_51
     size: 290
-    timeout: 1               
+    timeout: 3               
   - id: SCHEDULE_6
     size: 300
-    timeout: 10                 
+    timeout: 19                 
   #- id: SCHEDULE_7
     #size: 312
     #timeout: 8               
@@ -173,7 +174,7 @@
     
     
     
-
+# OK, checked: 11.4.2019        
 - id: SEGMENT
   name: Segmentace obrazu
   avail: 2020-03-30 00:00:00
@@ -184,7 +185,7 @@
   - id: SEGMENT_1.s
     timeout: 0.1
   - id: SEGMENT_2.s
-    timeout: 1.5
+    timeout: 0.7
   - id: SEGMENT_3
     size: 16
     timeout: 0.1
@@ -193,12 +194,12 @@
     timeout: 0.2
   - id: SEGMENT_5
     size: 256
-    timeout: 2.5
+    timeout: 0.7
   - id: SEGMENT_6
     size: 1024
-    timeout: 30
+    timeout: 12
 
-    
+# OK, checked: 11.4.2019            
 - id: DELIVERY
   name: Dodávky elektřiny
   avail: 2020-03-30 00:00:00
@@ -207,28 +208,28 @@
     lang: PY-367
   tests:
   - id: DELIVERY_01.s
-    timeout: 0.02
+    timeout: 0.1
   - id: DELIVERY_02.s
-    timeout: 0.5
+    timeout: 0.1
   - id: DELIVERY_03.s    
-    timeout: 0.02
+    timeout: 0.1
   - id: DELIVERY_05.s
     timeout: 0.1
   - id: DELIVERY_06
     size: 10
-    timeout: 3          # 1.5s
+    timeout: 0.1        # 1.5s
   - id: DELIVERY_07
     size: 30
-    timeout: 5          # 2.5s
+    timeout: 0.25       # 2.5s
   - id: DELIVERY_08
     size: 70
-    timeout: 12          # 7.5s
+    timeout: 1          # 7.5s
   - id: DELIVERY_09     
     size: 100
-    timeout: 18          # 10s
+    timeout: 1.2          # 10s
   - id: DELIVERY_10
     size: 200
-    timeout: 60         # 35s
+    timeout: 4         # 35s
 
     
 
