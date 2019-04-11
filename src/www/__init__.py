@@ -7,7 +7,7 @@ monkey.patch_all()
 import enum
 import pathlib
 
-from flask import Flask, redirect, session
+from flask import Flask, redirect, session, render_template
 import flask.json
 from flask_cors import CORS
 from flask_socketio import SocketIO
@@ -71,6 +71,17 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+def render_template_base(**kwargs):
+    def render(template, **kw):
+        kw2 = kwargs.copy()
+        kw2.update(kw)
+        return render_template(template, **kw2)
+    return render
+
+
+
+render_template_ext = render_template_base(Env=Env)
 
 async_mode = 'gevent'  # eventlet, gevent_uwsgi, gevent, threading
 app = Flask(__name__)

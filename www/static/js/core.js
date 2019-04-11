@@ -67,7 +67,7 @@ var Automatest = (function() {
     logData(event);
     socket.emit('debug', {ok: 'ok'});
 
-    $target.find('ul').append(
+    $target.find('.queue-status ul').append(
       nunjucks.render(root + 'static/templates/list-queue-item.njk', event.data)
     );
     var item = document.getElementById('queue-' + event.data.id);
