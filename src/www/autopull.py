@@ -21,6 +21,7 @@ def restart_server():
     if Glob.process:
         Glob.process.kill()
 
+    logger.info('starting server')
     Glob.process = subprocess.Popen(cmd, cwd=str(src))
 
 
