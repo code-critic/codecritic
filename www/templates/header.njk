@@ -41,7 +41,7 @@
         {% endif %}
 
         {% if user.is_admin() %}
-          <div class="mx-2 my-1">
+          <div class="mx-2 my-1 text-muted smaller">
             <strong>{{ Env.HEAD }}</strong>
           </div>
           <a class="dropdown-item" href="{{ url_for('print_log') }}" target="_blank">
