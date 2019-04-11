@@ -64,7 +64,7 @@ def webhook():
 
 
 @app.route('/webhook/full', methods=['POST', 'GET'])
-def webhook():
+def webhook_full():
     if Glob.process:
         Glob.process.kill()
 
