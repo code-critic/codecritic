@@ -2,7 +2,9 @@
 # author: Jan Hybs
 
 import pathlib
+import subprocess
 _root = pathlib.Path(pathlib.Path(__file__).parent.parent)
+_head_command = ['git', 'log', '-1', '--date=relative', '--pretty=%h %ad %ae %s']
 
 
 _result_txt_test_format = '[{test.status.name:^20s}] problem {test.id:<40s} {test.duration:6.3f} sec'
@@ -51,6 +53,7 @@ class Env(object):
     url_slave = 'http://flowdb.nti.tul.cz:5000'
     url_login = 'https://flowdb.nti.tul.cz/secure'
     url_logout = 'https://flowdb.nti.tul.cz/Shibboleth.sso/Logout'
+    HEAD = subprocess.check_output(_head_command).decode()
 
     # -------------------------------------------------------------------------
 

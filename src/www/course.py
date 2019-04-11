@@ -1,9 +1,9 @@
 #!/bin/python3
 # author: Jan Hybs
 
-from flask import render_template, session, url_for
+from flask import session, url_for
 from database.objects import Course, Languages, User
-from www import app, login_required, admin_required, dump_error
+from www import app, login_required, admin_required, dump_error, render_template_ext
 from www.utils_www import Link
 
 
@@ -16,7 +16,7 @@ def view_course(course_name, course_year):
     problems = list(course.problem_db.find(disabled=(None, False)))
     languages = Languages.db().find(disabled=(None, False))
 
-    return render_template(
+    return render_template_ext(
         'socket.njk',
         user=user,
         course=course,
@@ -39,7 +39,7 @@ def admin_problem(course_name, course_year, problem_id):
     problem = course.problem_db[problem_id]
     languages = Languages.db().find(disabled=(None, False))
 
-    return render_template(
+    return render_template_ext(
         'problem.njk',
         user=user,
         course=course,
@@ -60,7 +60,7 @@ def view_courses():
     filters = dict() if user.is_admin() else dict(disabled=(None, False))
     courses = [course for course in Course.db().find(**filters) if user.in_course(course)]
 
-    return render_template(
+    return render_template_ext(
         'courses.njk',
         title='Course list',
         user=user,
