@@ -154,7 +154,7 @@ if options.size is not None:
     tick  = time.clock()
     solve(input_stream, output_stream)
     tock = time.clock()
-    sys.stderr.write("time: {}\n".format(tock - tick))
+    #sys.stderr.write("time: {}\n".format(tock - tick))
     sys.stdout.write(input_stream.getvalue())
 
 else :
