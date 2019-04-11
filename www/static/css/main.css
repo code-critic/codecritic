@@ -53,14 +53,14 @@ body {
 .prob-desc p {
   font-size: 85%;
 }
-.prob-desc .fmt code {
+.prob-desc pre code {
   white-space: pre;
   width: 100%;
   display: block;
   background: rgba(228, 242, 251, 0.5);
   border: 1px solid #9abbc7;
   color: #555;
-  font-size: 80%;
+  font-size: 90%;
   padding: 0.5rem;
   border-radius: 0.25rem;
 }
