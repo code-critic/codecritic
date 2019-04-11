@@ -13,7 +13,7 @@ from www import app, login_required, admin_required
 
 
 Link = collections.namedtuple('Link', ['url', 'text'])
-ai = AutoIndex(app, browse_root=Env.problems, add_url_rules=False)
+ai = AutoIndex(app, browse_root=Env.courses, add_url_rules=False)
 
 
 def serve_pil_image(pil_img):
@@ -49,7 +49,7 @@ def placeholder(name, year):
 
 
 @app.route('/browse/<path:path>')
-@app.route('/browse')
+@app.route('/browse/')
 @login_required
 @admin_required
 def autoindex(path='.'):

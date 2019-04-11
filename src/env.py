@@ -22,8 +22,6 @@ Final evaluation {status.name}
 '''.strip()
 
 
-
-
 class Env(object):
     version = '0.1.0'
     root = _root
@@ -33,7 +31,6 @@ class Env(object):
     tmp = _root / '.tmp'
     log_file = _root / '.automate.log'
 
-    problems = _root / 'problems'
     courses = _root / 'courses'
     results = _root / 'results'
 

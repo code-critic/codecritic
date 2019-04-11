@@ -17,6 +17,7 @@ from env import Env
 from processing import ExecutorStatus, ProcessRequestType
 from processing.result import ExecutorResult
 from utils.events import MultiEvent
+from utils.io import delete_old_files
 
 
 def hook_warn_empty_input(id, result: ExecutorResult):
@@ -82,6 +83,9 @@ class ProcessRequest(object):
         self.problem_dir.joinpath('output').mkdir(parents=True, exist_ok=True)
         self.problem_dir.joinpath('input').mkdir(parents=True, exist_ok=True)
         self.problem_dir.joinpath('.error').mkdir(parents=True, exist_ok=True)
+
+        logger.info('removing old dirs from {}', Env.tmp)
+        delete_old_files(Env.tmp)
 
     def __repr__(self):
         return ('Request(\n'

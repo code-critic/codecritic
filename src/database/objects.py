@@ -10,7 +10,7 @@ import os
 
 from database import parse_dt
 from database.yamldb import ADB, YamlDB
-from exceptions import FatalException
+from exceptions import FatalException, ConfigurationException
 
 from utils import strings
 from env import Env
@@ -104,9 +104,14 @@ class Course(ADB):
             self.yaml_file = pathlib.Path(item['config'])
             self.yaml_file.parent.mkdir(parents=True, exist_ok=True)
         else:
-            self.yaml_file = Env.problems.joinpath(self.id, self.name.lower() + '.yaml')
-            self.yaml_file.parent.mkdir(parents=True, exist_ok=True)
+            raise ConfigurationException('Missing yaml file location for course %s' % self)
+        #     self.yaml_file = Env.problems.joinpath(self.id, self.name.lower() + '.yaml')
+        #     self.yaml_file.parent.mkdir(parents=True, exist_ok=True)
 
+        try:
+            self.full_path = '{}/{}'.format(*self.yaml_file.parent.parts[-2:])
+        except:
+            self.full_path = '.'
         self.root_dir = self.yaml_file.parent
         self.problems_dir = self.root_dir / 'problems'
         self.results_dir = self.root_dir / 'results'
@@ -165,7 +170,6 @@ class Courses(object):
                 return course
 
         raise FatalException('Could not find course %s' % id)
-
 
     def find(self, name=None, year=None, only_active=True):
         for course in self:

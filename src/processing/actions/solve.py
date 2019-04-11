@@ -24,8 +24,6 @@ class ProcessRequestSolve(AbstractAction):
         self.rand = '%s-%s' % (self.request.user.id, self.uuid)
         self.solution_file = self.result_dir.joinpath('main.%s' % self.request.lang.extension)
 
-        self.delete_old_dirs(self.result_dir.parent)
-
         if self.request.docker:
             self.executor = DockerExecutor(request.problem.timeout or Env.problem_timeout, cwd=self.result_dir,
                                            rand=self.rand, filename='main.%s' % self.request.lang.extension)
@@ -33,18 +31,6 @@ class ProcessRequestSolve(AbstractAction):
         else:
             self.executor = LocalExecutor(request.problem.timeout or Env.problem_timeout, cwd=self.result_dir)
             self.executor.delete_dir = self.result_dir
-
-    def delete_old_dirs(self, tmp_dir: pathlib.Path, seconds=HALF_DAY):
-        ts = int(time.time())
-
-        for d in tmp_dir.glob('*'):
-            print(d)
-            if d.is_dir():
-                modif = int(os.path.getmtime(d))
-                if (ts - modif) > seconds:
-                    print('will delete dir ', d)
-                print(ts - modif, modif, ts)
-            print()
 
     def run(self):
         with Timer() as timer:

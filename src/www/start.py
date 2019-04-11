@@ -5,6 +5,8 @@ import sys
 
 from loguru import logger
 from env import Env
+from utils.io import delete_old_files
+
 
 logger.configure(handlers=[
     dict(sink=sys.stdout),
@@ -61,6 +63,9 @@ def wsgi(*args, **kwargs):
 
 
 if __name__ == '__main__':
+    logger.info('removing old files from {}', Env.tmp)
+    delete_old_files(Env.tmp)
+
     app = create_app()
     from geventwebsocket import WebSocketServer
 

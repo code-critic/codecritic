@@ -56,10 +56,18 @@
             <i class="btn-fa-icon fas fa-user-tag"></i>
             Switch to role <strong>student</strong>
           </a>
-          <a class="dropdown-item" href="{{ url_for('autoindex') }}" target="_blank">
-            <i class="btn-fa-icon fas fa-folder-open"></i>
-            Browse files
-          </a>
+          {% if course %}
+            <a class="dropdown-item" href="{{ url_for('autoindex', path=course.full_path) }}" target="_blank">
+              <i class="btn-fa-icon fas fa-folder-open"></i>
+              Browse course files
+            </a>
+          {% else %}
+            <a class="dropdown-item" href="{{ url_for('autoindex') }}" target="_blank">
+              <i class="btn-fa-icon fas fa-folder-open"></i>
+              Browse files
+            </a>
+          {% endif %}
+
         {% endif %}
 
         <div class="dropdown-divider"></div>
