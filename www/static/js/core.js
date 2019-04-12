@@ -7,7 +7,7 @@ var Automatest = (function() {
   var URL = location.protocol + '//' + document.domain + ':' + location.port + namespace;
   // https://socket.io/docs/client-api/
   var socket = io.connect(URL, {
-      timeout: 100*1000,
+    timeout: 100 * 1000,
   });
   var env = nunjucks.configure(URL, {
     autoescape: true
@@ -46,9 +46,12 @@ var Automatest = (function() {
   });
 
   var oldOnevent = socket.onevent;
-  socket.onevent = function (packet) {
+  socket.onevent = function(packet) {
     if (packet.data) {
-      console.log('>>>', {name: packet.data[0], payload: packet.data[1]})
+      console.log('>>>', {
+        name: packet.data[0],
+        payload: packet.data[1]
+      })
     }
     oldOnevent.apply(socket, arguments)
   }
@@ -75,7 +78,7 @@ var Automatest = (function() {
 
   socket.on('queue-pop', function(event) {
     logData(event);
-    
+
     var item = document.getElementById('queue-' + event.data.id);
     $(item).hide();
   });
@@ -193,7 +196,7 @@ var storageGet = function(idx, def) {
 
 var courseStorage = function(courseID) {
   var course = toArray(courseID);
-  
+
   return {
     storageGet: function(idx, def) {
       return storageGet(course.concat(toArray(idx)), def);
@@ -202,6 +205,70 @@ var courseStorage = function(courseID) {
       return storagePut(course.concat(toArray(idx)), value);
     }
   }
+};
+
+var registerDnD = function(holder, success) {
+  if (!window.FileReader) {
+    return false;
+  }
+  
+  // max size of 2 MB
+  var MAX_SIZE = 1024 * 1024 * 2;
+  var $holder = $(holder);
+  $holder.addClass('draggable');
+  holder = $holder.get(0);
+
+  holder.ondragover = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $holder.addClass('hover');
+    return false;
+  };
+  holder.ondragenter = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $holder.addClass('hover');
+    return false;
+  };
+
+  holder.ondragleave = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $holder.removeClass('hover');
+    return false;
+  };
+  holder.ondragend = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $holder.removeClass('hover');
+    return false;
+  };
+
+  holder.ondrop = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $holder.removeClass('hover');
+
+    try {
+      var file = e.dataTransfer.files[0];
+      var reader = new FileReader();
+      if (file.size > MAX_SIZE) {
+        alert('The file is too big');
+        return false;
+      }
+
+      reader.onload = function(event) {
+        success(file, event.target.result);
+      };
+
+      reader.readAsText(file);
+    } catch (e) {
+      console.log(e);
+    }
+
+
+    return false;
+  };
 };
 
 

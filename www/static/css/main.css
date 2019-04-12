@@ -34,35 +34,30 @@ body {
   transition: height .2s ease !important;
 }
 
-.prob-desc {
-  /* background: #d8e5ef; */
-  padding: 0.5rem;
+.prob-desc .card-body h1 {
+  font-size: 1.8em;
 }
-.prob-desc > h1 {
-  font-size: 1.4em;
+.prob-desc .card-body h2 {
+  font-size: 1.6em;
 }
-.prob-desc > h2 {
-  font-size: 1.2em;
-}
-.prob-desc > h3 {
+.prob-desc .card-body h3 {
   font-size: 1.0em;
 }
-.prob-desc > h4 {
+.prob-desc .card-body h4 {
   font-size: 0.8em;
 }
-.prob-desc p {
+.prob-desc .card-body {
   font-size: 85%;
 }
-.prob-desc pre code {
+.prob-desc .card-body pre code {
   white-space: pre;
   width: 100%;
   display: block;
-  background: rgba(228, 242, 251, 0.5);
-  border: 1px solid #9abbc7;
-  color: #555;
-  font-size: 90%;
+  background: rgb(245, 245, 245);
+  border: 1px solid #cfcfcf;
+  color: #333;
   padding: 0.5rem;
-  border-radius: 0.25rem;
+  border-radius: 0.125rem;
 }
 /* .prob-desc p code.ignore {
   white-space: inherit;
@@ -344,7 +339,9 @@ form .input-use-docker:checked ~ .use-docker-info {
 .btn.fullscreen:hover {
   background: rgba(0, 0, 0, 0.15);
 }
+
 .btn.fullscreen {
+  background: rgba(255, 255, 255, 0.15);
   position: absolute;
   top: 0.25rem;
   right: 1rem;
@@ -373,4 +370,35 @@ form .input-use-docker:checked ~ .use-docker-info {
 
 .btn-fa-icon {
   min-width: 24px;
+}
+
+.form-group {
+  position: relative;
+}
+
+.draggable.hover {
+  border: 5px dashed #6cb7ff;
+  border-radius: 0.25rem;
+}
+
+.draggable.hover::after {
+  content: 'Attach files by dragging & dropping, selecting or pasting them.';
+  text-align: center;
+  display: block;
+  position: absolute;
+  padding: 2rem;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: #000;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 11;
+}
+.drag-available {
+  display: none;
+}
+
+.draggable .drag-available {
+  display: block;
 }

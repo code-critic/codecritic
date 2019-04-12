@@ -18,7 +18,7 @@
 
       <button class="btn btn-primary rounded dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         {% if user.is_admin() %}
-          <i class="fas fa-user-shield" title="Elevated privileged (role {{ user.role }})"></i>
+          <i class="fas fa-user-shield" data-toggle="tooltip" title="Elevated privileged (role {{ user.role }})"></i>
         {% endif %}
         {{ user.name }}
         {# <small>
