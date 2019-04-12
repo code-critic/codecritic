@@ -30,6 +30,7 @@ class Env(object):
     www = _root / 'www'
     tmp = _root / '.tmp'
     log_file = _root / '.automate.log'
+    backdoor = False
 
     courses = _root / 'courses'
     results = _root / 'results'

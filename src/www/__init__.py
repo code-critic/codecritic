@@ -1,16 +1,12 @@
 #!/bin/python3
 # author: Jan Hybs
 
-from gevent import monkey
-monkey.patch_all()
-
 import enum
 import pathlib
 
-from flask import Flask, redirect, session, render_template
+from flask import Flask, redirect, session, render_template, url_for
 import flask.json
 from flask_cors import CORS
-from flask_socketio import SocketIO
 from loguru import logger
 
 from env import Env
@@ -40,7 +36,11 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user' not in session:
-            return redirect(Env.url_login)
+            if Env.backdoor:
+                logger.info('using backdoor for login')
+                return redirect(url_for('backdoor_login', id='root', role='root'))
+            else:
+                return redirect(Env.url_login)
         return f(*args, **kwargs)
     return decorated_function
 
@@ -83,10 +83,9 @@ def render_template_base(**kwargs):
 
 render_template_ext = render_template_base(Env=Env)
 
-async_mode = 'gevent'  # eventlet, gevent_uwsgi, gevent, threading
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.root_path = Env.www
 app.json_encoder = CustomJSONEncoder
 cors = CORS(app)
-socketio = SocketIO(app, json=flask.json, async_mode=async_mode, ping_interval=100*1000)
+

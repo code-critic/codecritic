@@ -274,7 +274,7 @@ class Problem(ADB):
     def __init__(self, item: dict):
         super().__init__()
         self.id = item['id']
-        self.name = item.get('name')
+        self.name = item.get('name', self.id)
         self.desc = item.get('desc')
         self.reference = Script(item.get('reference')) if item.get('reference') else None
         self.disabled = item.get('disabled', False)

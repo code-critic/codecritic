@@ -9,7 +9,7 @@ from env import Env
 import sys
 
 src = Env.root / 'src'
-cmd = [sys.executable, 'www/start.py']
+cmd = [sys.executable, 'www/start.py', '--host', '0.0.0.0']
 app = Flask(__name__)
 
 
