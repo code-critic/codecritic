@@ -1,0 +1,11 @@
+<h{{ h or 1 }} class="mb-{{ mb or 4 }}">
+  {% if back %}
+    <a href="{{ back.url }}" class="btn text-dark back-btn waves-effect z-depth-0" data-toggle="tooltip" title="Go back to {{ back.text }}">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+  {% endif %}
+  {{ title }}
+  {% if subtitle %}
+    &middot;{{ subtitle }}
+  {% endif %}
+</h{{ h or 1 }}>

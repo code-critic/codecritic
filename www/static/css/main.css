@@ -209,8 +209,8 @@ body {
 }
 
 .card-danger {
-  background-color: #ffe4e6;
-  border: 1px solid #ff3547 !important;
+  background-color: #ffcece;
+  border: 1px dashed #ff3547;
 }
 
 .card-warning {
@@ -223,12 +223,22 @@ body {
 }
 #editor.fullscreen {
   position: fixed;
+  top: 2rem;
+  bottom: 2rem;
+  left: 2rem;
+  right: 2rem;
+  width: calc( 100% - 4rem );
+  height: calc( 100% - 4rem );
+  z-index: 1039;
+}
+#editor.fullscreen::before {
+  position: fixed;
+  content: ' ';
+  background: rgba(115, 115, 115, 0.55);
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 100%;
-  z-index: 9;
 }
 
 .code {
@@ -267,7 +277,7 @@ a.back-btn:hover, a.back-btn:focus {
   color: #fff;
   border-radius: .25rem .25rem 0 0;
 }
-.md-tabs {
+.admin-zone .md-tabs {
     border: 0;
     padding: .75rem;
     margin-bottom: -20px;
@@ -277,7 +287,7 @@ a.back-btn:hover, a.back-btn:focus {
     border-radius: 0 0 .25rem .25rem;
 }
 
-.md-tabs .nav-link {
+.admin-zone  .md-tabs .nav-link {
     -webkit-transition: all .4s;
     -o-transition: all .4s;
     transition: all .4s;
@@ -288,7 +298,8 @@ a.back-btn:hover, a.back-btn:focus {
         border-left-color: currentcolor;
     color: #fff;
 }
-.md-tabs .nav-item.open .nav-link, .md-tabs .nav-link.active {
+.admin-zone .md-tabs .nav-item.open .nav-link,
+.admin-zone .md-tabs .nav-link.active {
     background-color: rgba(0,0,0,.2);
     color: #fff;
     -webkit-transition: all 1s;

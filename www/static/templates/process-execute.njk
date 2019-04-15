@@ -1,14 +1,19 @@
 <div class="execution status-section">
-  <div class="evaluation" style="display: none;">
+  <div class="execution-entry evaluation" style="display: none;">
     <div class="evaluation-result">
     </div>
     <hr />
   </div>
-  <div class="compilation">
+  
+  <div class="execution-entry compilation">
   </div>
+  
   {% for id, item in results %}
     {# create template for test #}
-    <div class="execution-test" id="e-{{ item.uuid }}">
+    <div class="execution-entry execution-test" id="e-{{ item.uuid }}">
+      {% set status = item.status %}
+      {% set uuid = item.uuid %}
+      {% include "static/templates/test-result.njk" %}
     </div>
   {% endfor %}
 </div>

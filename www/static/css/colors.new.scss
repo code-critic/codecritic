@@ -1,0 +1,44 @@
+.student {
+  nav.navbar {
+    .navbar-back {
+      background: #c6e7ff;
+    }
+
+    .container {
+      background: #0a5bb0;
+    }
+  }
+  footer {
+    background: #c6e7ff;
+
+    > .container {
+      background: #0a5bb0;
+    }
+  }
+}
+
+.admin {
+  nav.navbar {
+    .navbar-back {
+      background: #ffebc6;
+    }
+
+    .container {
+      background: #d4630d;
+    }
+  }
+
+  footer {
+    background: #ffebc6;
+
+    > .container {
+      background: #d4630d;
+    }
+  }
+}
+
+main {
+  > .container {
+    background: #ebebeb;
+  }
+}

@@ -1,52 +1,60 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
   <head>
     {% include "core/head.njk" %}
-  </style>
-</head>
-<body class="{{ 'admin' if user.is_admin() else 'student' }}">
-  <div class="container-fluid">
-    <div class="row flex-xl-nowrap">
-      <div class="bd-content w-100">
-        <div class="row">
-          <div class="col-xs-12 col-sm-11 col-lg-10 m-auto">
-            <div class="card grey lighten-3">
+  </head>
 
-              {% include "header.njk" %}
+  <body class="{{ 'admin' if user.is_admin() else 'student' }}">
+    <header>
+      {% include "core/header.njk" %}
+    </header>
 
-              <div class="card-body row">
-                {% if courses %}
-                  {% for course in courses %}
-                    <div class="col-sm-3">
-                      <div class="card" {% if course.disabled %} style="opacity: 0.35;" {% endif %}>
-                        <img class="card-img-top" src="{{ url_for('placeholder', name=course.name, year=course.year) }}" alt="Card image cap">
-                        <div class="card-body">
-                          <h5 class="card-title">{{ course.name }}</h5>
-                          <h6 class="card-subtitle mb-2 text-muted">{{ course.year }}</h6>
-                          <p class="card-text">{{ course.desc }}</p>
-                          <a href="{{ url_for('view_course', course_name=course.name, course_year=course.year) }}" class="btn btn-primary">Go to course</a>
-                        </div>
-                      </div>
+    <main>
+      <div class="container z-depth-1 py-4">
+        <article>
+          {% include "core/article-head.njk" %}
+
+          <div class="courses d-flex flex-column align-items-stretch">
+            {% if courses %}
+              {% for course in courses %}
+                <section class="course" {% if course.disabled %} style="opacity: 0.35;" {% endif %}>
+                  <a href="{{ url_for('view_course', course_name=course.name, course_year=course.year) }}" class="d-flex justify-content-between align-items-center waves-effect">
+                    <img class="course-img" src="{{ url_for('placeholder', name=course.name, year=course.year, scale=50) }}">
+                    <div class="flex-grow-1">
+                      <h2>{{ course.name }}
+                        -
+                        {{ course.desc }}</h2>
+                      <p class="text-muted">
+                        click to access course
+                        {{ course.name }}
+                        ({{ course.year }})
+                      </p>
                     </div>
-                  {% endfor %}
-                {% else %}
-                  <div class="col-sm-3">
-                    <div class="card">
-                      <img class="card-img-top" src="{{ url_for('placeholder', name='E-mail', year='your teacher') }}" alt="Card image cap">
-                      <div class="card-body">
-                        <h5 class="card-title">You don't have access to any courses</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">If you think this is a mistake, contact appropriate teacher via e-mail</h6>
-                      </div>
-                    </div>
+                  </a>
+                </section>
+              {% endfor %}
+            {% else %}
+              <section class="course">
+                <a href="#" class="d-flex justify-content-between align-items-center">
+                  <img class="course-img" src="{{ url_for('placeholder', name='E-mail', year='your teacher', scale=50) }}">
+                  <div class="flex-grow-1">
+                    <h2>aaa-{{ item }}</h2>
+                    <p class="text-muted">
+                      vsvsdfjh khsdfgsdkfh
+                    </p>
                   </div>
-                {% endif %}
-              </div>
-
-            </div>
+                </a>
+              </section>
+            {% endif %}
           </div>
-        </div>
+        </article>
       </div>
-    </div>
-  </div>
-</body>
+    </main>
+
+    <footer class="page-footer font-small fixed-bottom">
+      {% include "core/footer.njk" %}
+    </footer>
+  </body>
+
 </html>

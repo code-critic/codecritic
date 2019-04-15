@@ -85,19 +85,22 @@ var Automatest = (function() {
 
   socket.on('process-start-me', function(event) {
     logData(event);
+    
     $target.html(
       nunjucks.render(root + 'static/templates/process-execute.njk', event)
     );
-    for (id in event.results) {
-      var item = event.results[id];
-      $('#e-' + item.uuid).html(
-        nunjucks.render(root + 'static/templates/test-result.njk', item)
-      )
-    }
+    // for (id in event.results) {
+    //   var item = event.results[id];
+    //   $('#e-' + item.uuid).html(
+    //     nunjucks.render(root + 'static/templates/test-result.njk', item)
+    //   )
+    // }
+    $('.execution > .execution-entry').hide().show('fast');
   });
 
   socket.on('process-end-me', function(event) {
     logData(event);
+    
     $target.find('.evaluation').show().find('.evaluation-result').html(
       nunjucks.render(root + 'static/templates/test-result.njk', event.data.evaluation)
     )
@@ -110,6 +113,7 @@ var Automatest = (function() {
 
   socket.on('execute-test-start-me', function(event) {
     logData(event);
+    
     $('#e-' + event.test.uuid).html(
       nunjucks.render(root + 'static/templates/test-result.njk', event.test)
     );
@@ -117,6 +121,7 @@ var Automatest = (function() {
 
   socket.on('execute-test-end-me', function(event) {
     logData(event);
+    
     console.log(event);
     $('#e-' + event.test.uuid).html(
       nunjucks.render(root + 'static/templates/test-result.njk', event.test)

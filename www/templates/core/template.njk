@@ -11,13 +11,9 @@
     </header>
 
     <main>
-      <div class="container z-depth-1 p-4">
+      <div class="container z-depth-1 py-4">
         <article>
-          {% with h=3, mb=1 %}
-            {% include "core/article-head.njk" %}
-          {% endwith %}
-          
-          {% include "admin-settings.njk" %}
+          {% include "core/article-head.njk" %}
         </article>
       </div>
     </main>
@@ -25,7 +21,6 @@
     <footer class="page-footer font-small fixed-bottom">
       {% include "core/footer.njk" %}
     </footer>
-    
-    <script type="text/javascript" src="/static/js/manage-problem.js" charset="utf-8"></script>
   </body>
+
 </html>
