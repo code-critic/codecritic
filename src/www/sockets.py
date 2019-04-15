@@ -134,8 +134,12 @@ def register_routes(app, socketio):
                 logger.exception('process error:')
                 Emittor.exception(e)
             finally:
-                mongo.save_result(request.get_result_dict())
-                request.save_result()
+                output_dir, attempt = request.save_result()
+                mongo.save_result(
+                    request.get_result_dict(),
+                    output_dir=output_dir,
+                    attempt=attempt,
+                )
                 request.destroy()
 
         queue.remove(request)

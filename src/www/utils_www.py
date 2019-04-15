@@ -4,6 +4,8 @@
 import os
 import io
 import collections
+import pathlib
+
 from env import Env
 
 from flask import send_file
@@ -68,3 +70,14 @@ def register_routes(app, socketio):
     @admin_required
     def autoindex(path='.'):
         return ai.render_autoindex(path)
+
+
+    @app.route('/results/<path:path>')
+    @login_required
+    @admin_required
+    def view_results_from_dir(path='.'):
+        path = Env.root.joinpath(path) / 'result.txt'
+        try:
+            return send_file(str(path), mimetype='text/plain', attachment_filename='result.txt')
+        except:
+            return 'no such file'

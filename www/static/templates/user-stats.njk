@@ -1,0 +1,28 @@
+<div class="stat-results row">
+  {% for user in items %}
+    <div class="col-6 p-3 rounded">
+      <h3>{{ user._id }}</h3>
+
+      <div class="row m-3 stat-result-all">
+        {% for result in user.results %}
+          <div class="col-12 stat-result">
+            <code>({{ loop.index }}) [{{ result.duration | toFixed(2) }}&nbsp;sec]</code>
+            <span class="text-monospace">{{ result.status }}</span>
+            
+            {% if result.output_dir %}
+              <a class="d-block" href="/results/{{ result.output_dir }}">
+                {{ result.message }}
+                ({{ result.language }})
+              </a>
+            {% else %}
+              <div class="d-block">
+                {{ result.message }}
+                ({{ result.language }})
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</div>

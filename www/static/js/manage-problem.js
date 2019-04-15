@@ -19,7 +19,8 @@ $(document).ready(function() {
     var actionType = 'generate-input';
     var useDocker = $form.find('.input-use-docker').is(':checked');
     Automatest.submitSolution(
-      courseID, problemID, languageID, sourceCode, actionType, useDocker, function(event) {
+      courseID, problemID, languageID, sourceCode, actionType, useDocker,
+      function(event) {
         $form.removeClass('disabled');
       }
     );
@@ -35,7 +36,8 @@ $(document).ready(function() {
     var actionType = 'generate-output';
     var useDocker = $form.find('.input-use-docker').is(':checked');
     Automatest.submitSolution(
-      courseID, problemID, languageID, sourceCode, actionType, useDocker, function(event) {
+      courseID, problemID, languageID, sourceCode, actionType, useDocker,
+      function(event) {
         $form.removeClass('disabled');
       }
     );
@@ -43,15 +45,38 @@ $(document).ready(function() {
   });
 
   var $referenceNav = $('#reference-nav');
+  var $referenceTab = $('#reference-tab');
   $referenceNav.html(
     nunjucks.render('static/templates/process-execute.njk', _showcase)
   );
-  for (id in _showcase.results) {
-    var item = _showcase.results[id];
-    $('#e-' + item.uuid).html(
-      nunjucks.render('static/templates/test-result.njk', item)
-    )
-  }
+  
+  
+  var $lastResultsNav = $('#last-results-nav');
+  var $lastResultsTab = $('#last-results-tab');
+  
+  $lastResultsTab.on('show.bs.tab', function(e) {
+    $.ajax({
+      dataType: "json",
+      url: '/stats',
+      data: {
+        courseID: courseID,
+        problemID: problemID
+      },
+      success: function(data) {
+        $lastResultsNav.html(
+          nunjucks.render('static/templates/user-stats.njk', {items: data})
+        );
+      }
+    });
+  });
+  // $('#reference-tab').tab('show');
+
+  // for (id in _showcase.results) {
+  //   var item = _showcase.results[id];
+  //   $('#e-' + item.uuid).html(
+  //     nunjucks.render('static/templates/test-result.njk', item)
+  //   )
+  // }
   // $('#reference-tab').click();
   // for (id in event.results) {
   //   var item = event.results[id];

@@ -51,12 +51,14 @@ def register_routes(app, socketio):
     from www import index
     from www import course
     from www import sockets
+    from www import stats
     from www import utils_www
 
     auth.register_routes(app, socketio)
     index.register_routes(app, socketio)
     course.register_routes(app, socketio)
     sockets.register_routes(app, socketio)
+    stats.register_routes(app, socketio)
     utils_www.register_routes(app, socketio)
 
 

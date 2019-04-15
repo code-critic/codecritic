@@ -13,7 +13,11 @@
         <i class="fas fa-share" aria-hidden="true"></i>
         Generate output
       </a>
-      <a class="nav-item nav-link" id="reference-tab" data-toggle="tab" href="#reference-nav" role="tab" aria-controls="reference-nav" aria-selected="false">
+      <a class="nav-item nav-link" id="last-results-tab" data-toggle="tab" href="#last-results-nav" role="tab" aria-controls="last-results-nav" aria-selected="false">
+        <i class="fas fa-poll" aria-hidden="true"></i>
+        Last recieved results
+      </a>
+      <a class="disabled o-50 nav-item nav-link" id="reference-tab" data-toggle="tab" href="#reference-nav" role="tab" aria-controls="reference-nav" aria-selected="false">
         <i class="fas fa-code" aria-hidden="true"></i>
         Reference solution
       </a>
@@ -80,6 +84,14 @@
 
     <div class="tab-pane fade result" id="reference-nav" role="tabpanel" aria-labelledby="reference-tab">
     </div>
+    
+    {# ---------------------------------------------------------------------- #}
+
+    <div class="tab-pane fade result" id="last-results-nav" role="tabpanel" aria-labelledby="last-results-tab">
+      Fetching data...
+    </div>
+    
+    
   </div>
 
   <div class="solution-result" style="display: none;">

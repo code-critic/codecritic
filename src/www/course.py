@@ -2,6 +2,8 @@
 # author: Jan Hybs
 
 from flask import session, url_for
+
+from database.mongo import Mongo
 from database.objects import Course, Courses, Languages, User
 from www import app, login_required, admin_required, dump_error, render_template_ext
 from www.utils_www import Link

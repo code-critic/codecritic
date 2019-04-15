@@ -17,6 +17,9 @@ def ensure_iterable(it) -> typing.List[typing.Any]:
         return []
 
     if isinstance(it, list):
+        return it
+
+    if isinstance(it, tuple):
         return list(it)
 
     return [it]

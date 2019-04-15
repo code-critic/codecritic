@@ -219,7 +219,7 @@ class ProcessRequest(object):
         if self.type is not ProcessRequestType.SOLVE:
             logger.warning('No need to save action type {} ', self.type)
             logger.warning('It is already saved in a problem directory: {}', self.problem_dir)
-            return
+            return None, None
 
         format_dict = dict(
             problem=self.problem,
@@ -234,7 +234,7 @@ class ProcessRequest(object):
         student_base_dir.mkdir(parents=True, exist_ok=True)
         results = list(student_base_dir.glob('*'))
         total_attempts = len(results)
-        format_dict['attempt'] = total_attempts + 1
+        format_dict['attempt'] = attempt = total_attempts + 1
 
         # ---------------------------------------------------------------------
 
@@ -259,6 +259,7 @@ class ProcessRequest(object):
         result_txt = Env.student_result_txt_format.format(**format_dict)
         student_full_dir.joinpath('result.txt').write_text(result_txt)
         logger.info('saving result.txt: \n{}', result_txt)
+        return str(student_full_dir.relative_to(Env.root)), attempt
 
     def get_log_dict(self):
         doc = dict(

@@ -22,29 +22,12 @@ $statuses: (
       .status-badge, .btn-block-anim {
         color: darken($color, 30) !important;
         background: lighten($color, 30);
+        -webkit-transition: all .2s ease-in-out;
+        -o-transition: all .2s ease-in-out;
+        transition: all .2s ease-in-out;
       }
       .attachment-btns .attachment-btn {
         color: darken($color, 30) !important;
       }
     }
 }
-// .in-queue {
-//   .status-badge, .btn-block-anim {
-//     color: darken($in-queue, 40) !important;
-//     background: lighten($in-queue, 40);
-//   }
-// }
-//
-// .running {
-//   .status-badge, .btn-block-anim {
-//     color: darken($ignore, 40) !important;
-//     background: lighten($ignore, 40);
-//   }
-// }
-//
-// .ignore {
-//   .status-badge, .btn-block-anim {
-//     color: darken($ignore, 40) !important;
-//     background: lighten($ignore, 40);
-//   }
-// }
