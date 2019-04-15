@@ -74,19 +74,20 @@
       {% endif %}
     </a>
   </div>
-  
+
   <div class="result-details stdout-stderr collapse" id="eo-{{ uuid }}">
-    
+
     {% if attachments | length %}
       <div class="d-flex mb-2 attachments">
-        <div class="pr-2 empty-padding">
-        </div>
+        <div class="pr-2 empty-padding"></div>
         <div class="attachment-btns">
-            {% for att in attachments %}<a class="attachment-btn px-1 py-1 m-0" href="/file/{{ att.url }}/{{ att.name }}" target="_blank">{{ att.name }}</a>{% endfor %}
+          {% for att in attachments %}
+            <a class="attachment-btn px-1 py-1 m-0" href="/file/{{ att.path }}/{{ att.name }}" target="_blank">{{ att.name }}</a>
+          {% endfor %}
         </div>
       </div>
     {% endif %}
-    
+
     {% if message_details | length %}
       {% for line in message_details %}
         <p>{{ line }}</p>

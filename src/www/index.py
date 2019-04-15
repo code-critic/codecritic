@@ -1,6 +1,6 @@
 #!/bin/python3
 # author: Jan Hybs
-
+import pathlib
 import sys
 from flask import redirect, url_for, send_file
 
@@ -62,15 +62,33 @@ def register_routes(app, socketio):
         logger.info('--- log file cleared ---')
         return redirect('/log')
 
-    @app.route('/file/<string:data>/<string:as_name>')
-    def serve_file(data: str, as_name: str):
-        result = b64decode(data)
-        local = Env.root.joinpath(*result['url'])
-        assert local.parts[-2] in ('input', 'output', '.error')
-        if local.exists():
-            if local.stat().st_size > max_file_view_limit:
-                return send_file(str(local), mimetype='text/plain', as_attachment=True, attachment_filename=as_name)
-            else:
-                return send_file(str(local), mimetype='text/plain', attachment_filename=as_name)
-        return 'File not found'
-        # return send_file(str(local), mimetype='text/plain', as_attachment=True, attachment_filename=as_name)
+    @app.route('/file/<path:path>/<string:as_name>')
+    @login_required
+    def serve_file(path: str, as_name: str):
+        path = pathlib.Path(path)
+        abs_path = Env.root.joinpath(path)
+        main_dir = path.parts[0]
+        abs_main_dir = Env.root.joinpath(main_dir)
+
+
+        def serve_file(local, as_name):
+            assert local.parts[-2] in ('input', 'output', '.error')
+            if local.exists():
+                if local.stat().st_size > max_file_view_limit:
+                    return send_file(str(local), mimetype='text/plain', as_attachment=True, attachment_filename=as_name)
+                else:
+                    return send_file(str(local), mimetype='text/plain', attachment_filename=as_name)
+
+        if abs_main_dir == Env.tmp:
+            if not abs_path.exists() or abs_path.is_dir():
+                return 'File not found (files in tmp dir are deleted every 12 hours)'
+            return serve_file(abs_path, as_name)
+
+        elif abs_main_dir == Env.courses:
+            if not abs_path.exists() or abs_path.is_dir():
+                return 'File not found'
+
+            return serve_file(abs_path, as_name)
+
+        else:
+            return 'Access denied'

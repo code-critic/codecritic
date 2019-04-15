@@ -118,10 +118,12 @@ class AbstractAction(object):
 
             request[id] = result
             request[id] = add_cmd_to_result(id, request[id])
-            request._register_attachment(id=id, name='input', path=inn)
-            request._register_attachment(id=id, name='output', path=out)
-            request._register_attachment(id=id, name='error', path=err)
-            request._register_attachment(id=id, name='reference', path=ref)
+            if not teacher:
+                request._register_attachment(id=id, name='input', path=inn)
+                request._register_attachment(id=id, name='output', path=out)
+                request._register_attachment(id=id, name='error', path=err)
+                request._register_attachment(id=id, name='reference', path=ref)
+
             # request[id].add_attachment(
             #     dict(path=inn, name='input'),
             #     dict(path=out, name='output'),

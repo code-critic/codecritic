@@ -294,15 +294,8 @@ class ProcessRequest(object):
         return base
 
     def _register_attachment(self, id, name, path: pathlib.Path):
-        in_ref = path.parent.parent == self.problem_dir
-
-        if in_ref:
-            url = path.parts[-5:]
-        else:
-            url = path.parts[-6:]
-
-        parts64 = b64encode(dict(url=url))
-        self[id].add_attachment(dict(name=name+'.txt', url=parts64))
+        rel_path = str(path.relative_to(Env.root))
+        self[id].add_attachment(dict(name=name+'.txt', path=rel_path))
 
 
 def _configure_cmd(cmd, file):
