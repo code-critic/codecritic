@@ -17,8 +17,10 @@ def register_routes(app, socketio):
         problems = list(course.problem_db.find(disabled=(None, False)))
         languages = Languages.db().find(disabled=(None, False))
 
+        print(course.results_dir)
+
         return render_template_ext(
-            'socket.njk',
+            'submit.njk',
             user=user,
             course=course,
             languages=languages,

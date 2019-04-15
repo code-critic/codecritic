@@ -229,8 +229,8 @@ class ProcessRequest(object):
             status=self._evaluation.status,
             datetime=self.datetime,
         )
-        student_base_dir = Env.results.joinpath(Env.student_dir_format.format(**format_dict))
 
+        student_base_dir = Env.results.joinpath(Env.student_dir_format.format(**format_dict))
         student_base_dir.mkdir(parents=True, exist_ok=True)
         results = list(student_base_dir.glob('*'))
         total_attempts = len(results)

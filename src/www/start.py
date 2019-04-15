@@ -5,9 +5,6 @@ import sys
 
 from loguru import logger
 from env import Env
-from utils.io import delete_old_files
-from flask_socketio import SocketIO
-import flask
 
 
 logger.configure(handlers=[
@@ -33,7 +30,7 @@ def parse_args():
     flask_server.add_argument('-p', '--port', type=int, default=5000)
     flask_server.add_argument('-h', '--host', type=str, default='127.0.0.1')
     flask_server.add_argument('-d', '--debug', action='store_true')
-    flask_server.add_argument('-v', '--verbose', action='store_false')
+    flask_server.add_argument('-v', '--verbose', action='store_true')
     flask_server.add_argument('--backdoor', action='store_true')
     args = parser.parse_args()
 
@@ -42,7 +39,7 @@ def parse_args():
         pass
     else:
         import logging
-
+        logger.info('supressing flask warnings')
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
 
@@ -68,11 +65,8 @@ def main():
     async_mode = 'gevent'  # eventlet, gevent_uwsgi, gevent, threading
 
     logger.info('Running automate version {}', Env.version)
+    from utils.io import delete_old_files
     delete_old_files(Env.tmp)
-
-    # -------------------------------------------------------------------------
-
-    from www import app
 
     # -------------------------------------------------------------------------
 
@@ -81,6 +75,12 @@ def main():
     else:
         from gevent import monkey
         monkey.patch_all()
+
+    # -------------------------------------------------------------------------
+
+    from flask_socketio import SocketIO
+    import flask
+    from www import app
 
     # -------------------------------------------------------------------------
 
@@ -108,7 +108,6 @@ def main():
         from geventwebsocket import WebSocketServer
         http_server = WebSocketServer((args.host, args.port), app)
         http_server.serve_forever()
-
 
     return app, args
 

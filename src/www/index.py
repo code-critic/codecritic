@@ -3,12 +3,17 @@
 
 import sys
 from flask import redirect, url_for, send_file
+
+from database.objects import User, Courses
 from env import Env
-from www import app, login_required
+from www import login_required, render_template_ext, session
 from loguru import logger
 from utils.crypto import b64decode
+from www.utils_www import Link
+
 
 max_file_view_limit = 1024*1024
+
 
 def register_routes(app, socketio):
     @app.route('/')
@@ -16,6 +21,23 @@ def register_routes(app, socketio):
     @login_required
     def index():
         return redirect(url_for('view_courses'))
+
+    @app.route('/index2')
+    @login_required
+    def index2():
+        user = User(session['user'])
+
+        courses = list(Courses().find(
+            only_active=not user.is_admin()
+        ))
+
+        return render_template_ext(
+            'new.njk',
+            title='Courses',
+            courses=courses,
+            user=user,
+            back=Link(url_for('view_courses'), 'course selection'),
+        )
 
     @app.route('/log')
     def print_log():

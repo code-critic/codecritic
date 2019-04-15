@@ -16,6 +16,7 @@ class LocalExecutor(object):
     :type stdin: utils.io.FileEx
     :type stdout: utils.io.FileEx
     :type stderr: utils.io.FileEx
+    :type cwd: pathlib.Path
     """
     stream_map = [
         ('stdin', 'stdin_fp', 'stdin_path', 'r'),
@@ -25,6 +26,7 @@ class LocalExecutor(object):
 
     def __init__(self, global_limit, **kwargs):
         self.kwargs = kwargs
+        self.cwd = kwargs['cwd']
         self.global_limit = global_limit
         self._time_left = self.global_limit
 
@@ -33,6 +35,8 @@ class LocalExecutor(object):
         self.stdout_fp = self.stdin_fp = self.stderr_fp = None
         self.message = None
         self.delete_dir =None
+        self._handle_streams = True
+        self.cwd.mkdir(parents=True, exist_ok=True)
 
     def set_streams(self, **kwargs):
         for stream, stream_fp, stream_path, m in self.stream_map:
@@ -45,6 +49,10 @@ class LocalExecutor(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         return False
+
+    def _info(self):
+        for s, s_fp, s_path, _ in self.stream_map:
+            logger.info('{}: {} {} {}', s, getattr(self, s), getattr(self, s_fp), getattr(self, s_path))
 
     def _open_streams(self):
         for stream, stream_fp, stream_path, m in self.stream_map:
@@ -84,9 +92,13 @@ class LocalExecutor(object):
             return result
 
         self.message = None
-        self._open_streams()
+        if self._handle_streams:
+            self._open_streams()
+
         result = self._run(cmd, soft_limit, *args, **kwargs)
-        self._close_streams(result)
+
+        if self._handle_streams:
+            self._close_streams(result)
         result.message = self.message
         return result
 

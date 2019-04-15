@@ -56,7 +56,7 @@ class Env(object):
 
     # -------------------------------------------------------------------------
 
-    student_dir_format = '{course.year}/{course.name}/{user.di}/{problem.id}'
+    student_dir_format = '{course.results_dir}/{user.di}/{problem.id}'
     student_version_format = '{attempt:02d}-{status.value:03d}-{status.abbr}-{status.str}'
     student_result_txt_format = _result_txt_format
     student_result_test_txt_format = _result_txt_test_format
