@@ -54,7 +54,7 @@
   extension: cs
   style: csharp
   run: [mono, main]
-  compile: [mcs, <filename>, -out:main]
+  compile: [mcs, <filename>, '-out:main']
 
 # ---------------------------------------------------------
 # ------------------------------------ DISABLED FOR NOW ---
