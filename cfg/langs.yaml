@@ -46,6 +46,20 @@
   style: python
   run: [python2.7, <filename>]
 
+- id: CS
+  name: 'C#'
+  scale: 2
+  image: automatest/cs
+  version: Mono 3.0.7
+  extension: cs
+  style: csharp
+  run: [mono, main]
+  compile: [mcs, <filename>, -out:main]
+
+# ---------------------------------------------------------
+# ------------------------------------ DISABLED FOR NOW ---
+# ---------------------------------------------------------
+
 - id: PASCAL
   name: Pascal
   scale: 2.6
@@ -55,15 +69,4 @@
   style: pascal
   compile: [fpc, <filename>]
   run: [./main]
-  disabled: true
-
-- id: CS
-  name: C#
-  scale: 2
-  image: automatest/cs
-  version: Mono 3.0.7
-  extension: cs
-  style: csharp
-  run: [mono, <filename>]
-  compile: [gmcs, main]
   disabled: true
