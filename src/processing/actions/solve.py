@@ -5,11 +5,18 @@ import pathlib
 import time
 from uuid import uuid4
 
+from loguru import logger
+
 from env import Env
+from processing import ExecutorStatus
 from processing.actions import AbstractAction
+from processing.comparator import Comparator
 from processing.executors.docker import DockerExecutor
 from processing.executors.local import LocalExecutor
-from processing.request import ProcessRequest, _configure_cmd
+from processing.executors.multilocal import MultiLocalExecutor
+from processing.executors.multidocker import MultiDockerExecutor
+from processing.request import ProcessRequest, _configure_cmd, Subcase, extract_console
+from processing.result import ExecutorResult
 from utils.timer import Timer
 
 ONE_DAY = 60*60*24
@@ -25,44 +32,73 @@ class ProcessRequestSolve(AbstractAction):
         self.solution_file = self.result_dir.joinpath('main.%s' % self.request.lang.extension)
 
         if self.request.docker:
-            self.executor = DockerExecutor(request.problem.timeout or Env.problem_timeout, cwd=self.result_dir,
-                                           rand=self.rand, filename='main.%s' % self.request.lang.extension)
-            self.executor.delete_dir = self.result_dir
+            self.executor = MultiDockerExecutor(request.problem.timeout or Env.problem_timeout, cwd=self.temp_dir)
         else:
-            self.executor = LocalExecutor(request.problem.timeout or Env.problem_timeout, cwd=self.result_dir)
-            self.executor.delete_dir = self.result_dir
+            self.executor = MultiLocalExecutor(request.problem.timeout or Env.problem_timeout, cwd=self.temp_dir)
 
     def run(self):
         with Timer() as timer:
-            self.solution_file.parent.mkdir(parents=True, exist_ok=True)
             self.solution_file.write_text(self.request.solution)
-
+            self.executor.prepare_files(self.request)
             self._compile()
             self._run()
 
         self.duration = timer.duration
 
-    def _compile(self):
-        return self._compile_raw(
-            self.request,
-            _configure_cmd(
-                self.request.lang.compile,
-                'main.%s' % self.request.lang.extension
-            ),
-            self.executor,
-            self.result_dir
+    def compare_files(self, subcase:Subcase, result: ExecutorResult):
+        compare_result = Comparator.compare_files(
+            f1=subcase.problem_stdout,
+            f2=subcase.temp_stdout
         )
+        return self._evaluate_result(result, compare_result, subcase)
 
     def _run(self):
-        self._solve_raw(
-            self.request,
-            _configure_cmd(
-                self.request.lang.run,
-                'main.%s' % self.request.lang.extension
-            ),
-            self.executor,
-            self.problem_dir.joinpath('input'),
-            self.result_dir.joinpath('output'),
-            self.result_dir.joinpath('.error'),
-            self.problem_dir.joinpath('output'),
-        )
+        request = self.request
+        executor = self.executor
+        cmd = self._run_cmd
+
+        for subcase in request.iter_subcases():
+            id = subcase.id
+
+            if self._check_stdin_exists(subcase):
+                logger.opt(ansi=True).info(
+                    '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id}',
+                    case=subcase, problem=request.problem, course=request.course
+                )
+            else:
+                request[id].status = ExecutorStatus.SKIPPED
+                request[id].message = 'skipped'
+                request[id].console = 'Input file does not exists'.splitlines()
+                request.event_execute_test.close_event.trigger(
+                    request, request[id]
+                )
+                continue
+
+            # actually execute the code
+
+            request[id].status = ExecutorStatus.RUNNING
+            request.event_execute_test.open_event.trigger(
+                request, request[id]
+            )
+
+            with executor.set_streams(stdin=subcase.temp_stdin, stdout=subcase.temp_stdout, stderr=subcase.temp_stderr) as ex:
+                timeout = (subcase.timeout or Env.case_timeout) * request.lang.scale
+                result = ex.run(cmd, soft_limit=timeout).register(id)
+
+            # if ok we compare
+            if result.status in (ExecutorStatus.OK, ExecutorStatus.SOFT_TIMEOUT):
+                result = self.compare_files(subcase, result)
+
+            # otherwise we try to extract errors
+            else:
+                result = extract_console(result)
+
+            request[id] = result
+            request._register_attachment(id=id, name='input', path=subcase.temp_stdin)
+            request._register_attachment(id=id, name='output', path=subcase.temp_stdout)
+            request._register_attachment(id=id, name='error', path=subcase.temp_stderr)
+            request._register_attachment(id=id, name='reference', path=subcase.problem_stdout)
+
+            request.event_execute_test.close_event.trigger(
+                request, request[id]
+            )

@@ -2,13 +2,17 @@
 # author: Jan Hybs
 
 import pathlib
+import shutil
 from uuid import uuid4
 
+from loguru import logger
+
 from env import Env
+from processing import ExecutorStatus
 from processing.actions import AbstractAction
-from processing.executors.docker import DockerExecutor
-from processing.executors.local import LocalExecutor
-from processing.request import ProcessRequest, _configure_cmd
+from processing.executors.multilocal import MultiLocalExecutor
+from processing.executors.multidocker import MultiDockerExecutor
+from processing.request import ProcessRequest, _configure_cmd, add_cmd_to_result, extract_console
 from utils.timer import Timer
 
 
@@ -21,40 +25,70 @@ class ProcessRequestGenerateOutput(AbstractAction):
         self._check_reference(self.request.problem.reference)
 
         if self.request.docker:
-            self.executor = DockerExecutor(Env.teacher_timeout, cwd=self.problem_dir,
-                                           rand=self.rand, filename=self.request.problem.reference.name)
+            self.executor = MultiDockerExecutor(Env.teacher_timeout, cwd=self.temp_dir)
         else:
-            self.executor = LocalExecutor(Env.teacher_timeout, cwd=self.problem_dir)
+            self.executor = MultiLocalExecutor(Env.teacher_timeout, cwd=self.temp_dir)
 
     def run(self):
         with Timer() as timer:
+            solution_name = self.request.problem.reference.name
+            self.temp_dir.joinpath(solution_name).write_text(
+                self.problem_dir.joinpath(solution_name).read_text()
+            )
+            self.executor.prepare_files(self.request)
             self._compile()
             self._run()
 
         self.duration = timer.duration
 
-    def _compile(self):
-        return self._compile_raw(
-            self.request,
-            _configure_cmd(
-                self.request.problem.reference.lang_ref.compile,
-                self.request.problem.reference.name
-            ),
-            self.executor,
-            self.problem_dir
-        )
-
     def _run(self):
-        self._solve_raw(
-            self.request,
-            _configure_cmd(
-                self.request.problem.reference.lang_ref.run or ['main'],
-                self.request.problem.reference.name
-            ),
-            self.executor,
-            self.problem_dir.joinpath('input'),
-            self.problem_dir.joinpath('output'),
-            self.problem_dir.joinpath('.error'),
-            self.problem_dir.joinpath('output'),
-            teacher=True
-        )
+        request = self.request
+        executor = self.executor
+        cmd = self._run_cmd
+
+        for subcase in request.iter_subcases():
+            id = subcase.id
+
+            if self._check_stdin_exists(subcase):
+                logger.opt(ansi=True).info(
+                    '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id}',
+                    case=subcase, problem=request.problem, course=request.course
+                )
+            else:
+                request[id].status = ExecutorStatus.SKIPPED
+                request[id].message = 'skipped'
+                request[id].console = 'Input file does not exists'.splitlines()
+                request.event_execute_test.close_event.trigger(
+                    request, request[id]
+                )
+                continue
+
+            # actually execute the code
+
+            request[id].status = ExecutorStatus.RUNNING
+            request.event_execute_test.open_event.trigger(
+                request, request[id]
+            )
+
+            with executor.set_streams(stdin=subcase.temp_stdin, stdout=subcase.temp_stdout, stderr=subcase.temp_stderr) as ex:
+                result = ex.run(cmd).register(id)
+
+            # if ok we compare
+            if result.status is ExecutorStatus.OK:
+                result = add_cmd_to_result(id, result)
+
+                # copy files
+                shutil.copy(
+                    subcase.temp_stdout,
+                    subcase.problem_stdout
+                )
+
+            # otherwise we try to extract errors
+            else:
+                result = extract_console(result)
+
+            request[id] = result
+
+            request.event_execute_test.close_event.trigger(
+                request, request[id]
+            )

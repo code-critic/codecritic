@@ -9,21 +9,20 @@ from loguru import logger
 from env import Env
 from database.objects import Script
 from processing.comparator import Comparator
-from processing.executors.local import LocalExecutor
-from processing.executors.docker import DockerExecutor
 from processing.result import ExecutorResult
-from processing import ExecutorStatus
-from processing.request import ProcessRequest, add_cmd_to_result
+from processing import ExecutorStatus, ProcessRequestType
+from processing.request import ProcessRequest, add_cmd_to_result, _configure_cmd, Subcase
 from exceptions import FatalException, CompileException
 
 
 class AbstractAction(object):
     """
-    :type executor: processing.executors.local.LocalExecutor or processing.executors.docker.DockerExecutor
+    :type executor: processing.executors.multilocal.MultiLocalExecutor or processing.executors.multidocker.MultiLocalExecutor
     """
     def __init__(self, request: ProcessRequest, result_dir: pathlib.Path, problem_dir: pathlib.Path):
         self.request = request
         self.result_dir = pathlib.Path(result_dir)
+        self.temp_dir = pathlib.Path(result_dir)
         self.problem_dir = pathlib.Path(problem_dir)
         self.executor = None
         self.duration = 0.0
@@ -35,105 +34,90 @@ class AbstractAction(object):
     def run(self):
         pass
 
-    @classmethod
-    def _compile_raw(cls, request: ProcessRequest, pipeline: list, executor: LocalExecutor, out_dir: typing.Union[str, pathlib.Path]):
-        if not pipeline:
+    def _compile(self):
+        cmd = self._compile_cmd
+        if not cmd:
             return
 
         result_id = 'compilation'
-        request._compile_result = ExecutorResult.empty_result(result_id, ExecutorStatus.RUNNING)
-        request.event_compile.open_event.trigger(request, request._compile_result)
+        self.request._compile_result = ExecutorResult.empty_result(result_id, ExecutorStatus.RUNNING)
+        self.request.event_compile.open_event.trigger(self.request, self.request._compile_result)
 
-        inn = None
-        out = pathlib.Path(out_dir).joinpath('.compile.log')
-        err = subprocess.STDOUT
-        cmd = pipeline
-
+        out = self.temp_dir / '.compile.log'
         logger.opt(ansi=True).info('<red>{}</red>: {}', 'COMPILING', cmd)
-        with executor.set_streams(stdin=inn, stdout=out, stderr=err) as ex:
-            result = ex.run(cmd)
+        with self.executor.set_streams(stdin=None, stdout=out, stderr=out) as ex:
+            result = ex.run(cmd, Env.compile_timeout)
 
-        request._compile_result = add_cmd_to_result(result_id, result).register(result_id)
+        self.request._compile_result = add_cmd_to_result(result_id, result).register(result_id)
 
         if result.failed():
             if result.status is ExecutorStatus.GLOBAL_TIMEOUT:
-                raise CompileException('Compilation was interrupted (did not finish in time)', details=result.stdout)
+                raise CompileException('Compilation was interrupted (did not finish in time)', details=result.read_stdout())
             else:
                 result.status = ExecutorStatus.COMPILATION_FAILED
-                raise CompileException('Compilation failed', details=result.stdout)
+                raise CompileException('Compilation failed', details=result.read_stdout())
 
-        request.event_compile.close_event.trigger(request, request._compile_result)
+        self.request.event_compile.close_event.trigger(self.request, self.request._compile_result)
 
         return result
 
-    @classmethod
-    def _solve_raw(cls, request: ProcessRequest, pipeline: list, executor: LocalExecutor, in_dir, out_dir, err_dir, ref_out, teacher=False):
-        cmd = pipeline
-        logger.opt(ansi=True).info('<red>{}</red> - {}', 'RUNNING', cmd)
+    def _check_stdin_exists(self, subcase: Subcase):
+        if not subcase.temp_stdin.exists():
+            logger.opt(ansi=True).warning(
+                '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id} - '
+                'input file does not exists, test will be skipped',
+                case=subcase.subcase, problem=self.request.problem, course=self.request.course
+            )
+            return False
+        return True
 
-        for id, case, subcase in request:
-            inn = pathlib.Path(in_dir).joinpath(subcase.id)
-            out = pathlib.Path(out_dir).joinpath(subcase.id)
-            err = pathlib.Path(err_dir).joinpath(subcase.id)
-            ref = pathlib.Path(ref_out).joinpath(subcase.id)
+    @property
+    def _compile_cmd(self):
+        if self.request.type is ProcessRequestType.SOLVE:
+            pipeline = self.request.lang.compile
+            name = 'main.%s' % self.request.lang.extension
 
-            if inn.exists():
-                logger.opt(ansi=True).info(
-                    '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id}',
-                    case=subcase, problem=request.problem, course=request.course
-                )
+        elif self.request.type in (ProcessRequestType.GENERATE_INPUT, ProcessRequestType.GENERATE_OUTPUT):
+            if self.request.problem.reference:
+                pipeline = self.request.problem.reference.lang_ref.compile
+                name = self.request.problem.reference.name
             else:
-                logger.opt(ansi=True).warning(
-                    '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id} - '
-                    'input file does not exists, test will be skipped',
-                    case=subcase, problem=request.problem, course=request.course
-                )
-                request[id].status = ExecutorStatus.SKIPPED
-                request[id].message = 'skipped'
-                request[id].console = 'Input file does not exists'.splitlines()
-                request.event_execute_test.close_event.trigger(
-                    request, request[id]
-                )
-                continue
+                pipeline, name = None, None
+        else:
+            logger.error('Invalid action type')
+            raise FatalException('Invalid action type {}', self.request.type)
 
-            request[id].status = ExecutorStatus.RUNNING
-            request.event_execute_test.open_event.trigger(
-                request, request[id]
-            )
+        if not pipeline:
+            return None
 
-            with executor.set_streams(stdin=inn, stdout=out, stderr=err) as ex:
-                if teacher:
-                    result = ex.run(cmd).register(id)
-                else:
-                    timeout = (subcase.timeout or Env.case_timeout) * request.lang.scale
-                    result = ex.run(cmd, soft_limit=timeout).register(id)
+        return _configure_cmd(
+            pipeline,
+            name
+        )
 
-            # if ok we compare
-            if result.status in (ExecutorStatus.OK, ExecutorStatus.SOFT_TIMEOUT):
-                compare_result = Comparator.compare_files(
-                    f1=ref,
-                    f2=out
-                )
-                result = cls._evaluate_result(result, compare_result, subcase)
+    @property
+    def _run_cmd(self):
+        if self.request.type is ProcessRequestType.SOLVE:
+            pipeline = self.request.lang.run
+            name = 'main.%s' % self.request.lang.extension
 
-            request[id] = result
-            request[id] = add_cmd_to_result(id, request[id])
-            if not teacher:
-                request._register_attachment(id=id, name='input', path=inn)
-                request._register_attachment(id=id, name='output', path=out)
-                request._register_attachment(id=id, name='error', path=err)
-                request._register_attachment(id=id, name='reference', path=ref)
+        elif self.request.type in (ProcessRequestType.GENERATE_INPUT, ProcessRequestType.GENERATE_OUTPUT):
+            if self.request.problem.reference:
+                pipeline = self.request.problem.reference.lang_ref.run
+                name = self.request.problem.reference.name
+            else:
+                pipeline, name = None, None
+        else:
+            logger.error('Invalid action type')
+            raise FatalException('Invalid action type {}', self.request.type)
 
-            # request[id].add_attachment(
-            #     dict(path=inn, name='input'),
-            #     dict(path=out, name='output'),
-            #     dict(path=err, name='error'),
-            #     dict(path=ref, name='reference'),
-            # )
+        if not pipeline:
+            return None
 
-            request.event_execute_test.close_event.trigger(
-                request, request[id]
-            )
+        return _configure_cmd(
+            pipeline,
+            name
+        )
 
     @classmethod
     def _check_reference(cls, reference: Script):

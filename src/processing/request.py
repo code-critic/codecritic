@@ -4,15 +4,19 @@ import datetime
 import os
 import pathlib
 import shutil
+import typing
+
+OptionalPath = typing.Optional[pathlib.Path]
+
 
 from exceptions import FatalException, CompileException, ConfigurationException
 from utils.crypto import b64encode
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from uuid import uuid4
 
 from loguru import logger
 
-from database.objects import Course, Courses, Languages, Problem, User
+from database.objects import Course, Courses, Languages, Problem, User, ProblemCase
 from env import Env
 from processing import ExecutorStatus, ProcessRequestType
 from processing.result import ExecutorResult
@@ -21,15 +25,45 @@ from utils.io import delete_old_files
 
 
 def hook_warn_empty_input(id, result: ExecutorResult):
-    if not result.stdinn:
+    if not result.stdin:
         raise FatalException('Input file is empty', ['please double check your input files for test', id])
     return result
-
 
 def add_cmd_to_result(id, result: ExecutorResult):
     if not result.console:
         result.console = ' '.join(result.cmd)
     return result
+
+
+def extract_console(result: ExecutorResult):
+    if result.failed():
+        stderr = result.read_stderr()
+        if stderr:
+            result.console = stderr
+        else:
+            stdout = result.read_stdout()
+            result.console = stdout
+
+    return result
+
+
+class Subcase(object):
+    def __init__(self, id: str, case: ProblemCase, subcase: ProblemCase, temp_dir: pathlib.Path, problem_dir: pathlib.Path, needs_input=True):
+        self.id = id
+        self.case = case
+        self.subcase = subcase
+        self.temp_dir = temp_dir
+        self.problem_dir = problem_dir
+        self.timeout = self.subcase.timeout
+        self.needs_input = needs_input
+
+        self.temp_stdin = self.temp_dir / 'input' / subcase.id
+        self.temp_stdout = self.temp_dir / 'output' / subcase.id
+        self.temp_stderr = self.temp_dir / '.error' / subcase.id
+
+        self.problem_stdin = self.problem_dir / 'input' / subcase.id
+        self.problem_stdout = self.problem_dir / 'output' / subcase.id
+        self.problem_stderr = self.problem_dir / '.error' / subcase.id
 
 
 class ProcessRequest(object):
@@ -63,6 +97,7 @@ class ProcessRequest(object):
         self._evaluation = ExecutorResult.empty_result(id='evaluation')
         self._run_results = OrderedDict()
         self.rest = kwargs
+        self._subcases = None
 
         self.event_process = MultiEvent('on-process')
 
@@ -77,15 +112,21 @@ class ProcessRequest(object):
 
         self.problem_dir = pathlib.Path(self.course.problems_dir, self.problem.id)
         self.result_dir = pathlib.Path(Env.tmp, self.rand)
+        self.temp_dir = pathlib.Path(Env.tmp, self.rand)
+
+        self.problem_input_dir = self.problem_dir.joinpath('input')
+        self.problem_output_dir = self.problem_dir.joinpath('output')
+        self.problem_error_dir = self.problem_dir.joinpath('.error')
+        self.problem_dirs = (self.problem_output_dir, self.problem_input_dir, self.problem_error_dir)
+
+        self.temp_input_dir = self.temp_dir.joinpath('input')
+        self.temp_output_dir = self.temp_dir.joinpath('output')
+        self.temp_error_dir = self.temp_dir.joinpath('.error')
+        self.temp_dirs = (self.temp_input_dir, self.temp_output_dir, self.temp_error_dir)
 
         # create dirs, but they SHOULD ALREADY EXISTS
-        self.problem_dir.mkdir(parents=True, exist_ok=True)
-        self.problem_dir.joinpath('output').mkdir(parents=True, exist_ok=True)
-        self.problem_dir.joinpath('input').mkdir(parents=True, exist_ok=True)
-        self.problem_dir.joinpath('.error').mkdir(parents=True, exist_ok=True)
-
-        logger.info('removing old dirs from {}', Env.tmp)
-        delete_old_files(Env.tmp)
+        for d in (self.problem_dirs + self.temp_dirs):
+            d.mkdir(parents=True, exist_ok=True)
 
     def __repr__(self):
         return ('Request(\n'
@@ -128,11 +169,11 @@ class ProcessRequest(object):
         # emit event
         if self.type is ProcessRequestType.GENERATE_INPUT:
             from processing.actions.generate_input import ProcessRequestGenerateInput
-            self.action_executor = ProcessRequestGenerateInput(self, self.problem_dir, self.problem_dir)
+            self.action_executor = ProcessRequestGenerateInput(self, self.result_dir, self.problem_dir)
 
         elif self.type is ProcessRequestType.GENERATE_OUTPUT:
             from processing.actions.generate_output import ProcessRequestGenerateOutput
-            self.action_executor = ProcessRequestGenerateOutput(self, self.problem_dir, self.problem_dir)
+            self.action_executor = ProcessRequestGenerateOutput(self, self.result_dir, self.problem_dir)
 
         elif self.type is ProcessRequestType.SOLVE:
             from processing.actions.solve import ProcessRequestSolve
@@ -140,14 +181,15 @@ class ProcessRequest(object):
         else:
             raise FatalException('Unsupported action {}'.format(self.type))
 
+        self.event_process.open_event.trigger(self, self._run_results)
         try:
-            self.event_process.open_event.trigger(self, self._run_results)
             self.action_executor.run()
             self.evaluate_solution()
             self.event_process.close_event.trigger(self, self._run_results)
         except CompileException as ex:
             logger.info('compilation failed')
             self.evaluate_solution()
+            self.event_process.close_event.trigger(self, self._run_results)
             raise ex
 
         return self._run_results
@@ -165,6 +207,18 @@ class ProcessRequest(object):
 
     def __iter__(self):
         return iter(self._walk_cases())
+
+    def iter_subcases(self):
+        if self._subcases:
+            for sc in self._subcases:
+                yield sc
+        else:
+            self._subcases = list()
+            for case in self.cases:
+                for subcase in case.cases():
+                    sc = Subcase(subcase.id, case, subcase, self.temp_dir, self.problem_dir)
+                    self._subcases.append(sc)
+                    yield sc
 
     def destroy(self):
         try:
@@ -197,6 +251,19 @@ class ProcessRequest(object):
 
         if self.action_executor:
             self._evaluation.duration = self.action_executor.duration
+            print(statuses)
+            ok_score = statuses.count(ExecutorStatus.ANSWER_CORRECT)
+            at_score = statuses.count(ExecutorStatus.ANSWER_CORRECT_TIMEOUT)
+            wr_score = statuses.count(ExecutorStatus.ANSWER_WRONG)
+            rest_statuses = (ExecutorStatus.ANSWER_CORRECT, ExecutorStatus.ANSWER_CORRECT_TIMEOUT, ExecutorStatus.ANSWER_WRONG)
+            rest = [x for x in statuses if x not in rest_statuses]
+
+            self._evaluation.score = (
+                (10**4) * ok_score +
+                (10**2) * at_score +
+                (10**0) * wr_score
+            )
+            self._evaluation.scores = [ok_score, at_score, wr_score]
 
         status = self._evaluation.status
         action = self.type
