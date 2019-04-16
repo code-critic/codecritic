@@ -45,6 +45,7 @@ class Env(object):
     problem_timeout = 60.0
     case_timeout = 5.0
     teacher_timeout = 60.0 * 10
+    compile_timeout = 30.0
 
     # -------------------------------------------------------------------------
 
