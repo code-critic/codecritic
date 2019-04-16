@@ -11,3 +11,4 @@ RUN apk update && apk add \
  && adduser -S -D worker worker
 
 COPY list-versions /bin/
+COPY run.py /bin/

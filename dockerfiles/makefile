@@ -25,3 +25,13 @@ push:
 	docker push automatest/python2
 	docker push automatest/python3
 	docker push automatest/all
+
+main:
+	docker rmi -f automatest/base
+	docker rmi -f automatest/all
+
+	docker build -t automatest/base base
+	docker build -t automatest/all all
+
+	docker push automatest/base
+	docker push automatest/all
