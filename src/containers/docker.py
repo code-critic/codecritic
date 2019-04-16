@@ -11,11 +11,11 @@ class ContainerAPI(object):
     def __init__(self, container:docker.models.containers.Container):
         self.container = container
 
-    def exec(self, cmds) -> str:
+    def exec(self, cmds, user='') -> str:
         if self.container.status == 'exited':
             self.container.start()
 
-        return self.container.exec_run(cmds).output.decode()
+        return self.container.exec_run(cmds, user=user).output.decode()
 
     def _cp(self, src, dest, timeout=10):
         cmd = 'docker cp {src} {dest}'
@@ -30,13 +30,13 @@ class ContainerAPI(object):
     def copy_from_container(self, src, dest, timeout=10):
         return self._cp(
             src='{name}:{src}'.format(name=self.container.name, src=src),
-            dest=dest,
+            dest=str(dest),
             timeout=timeout
         )
 
     def copy_to_container(self, src, dest, timeout=10):
         return self._cp(
-            src=src,
+            src=str(src),
             dest='{name}:{dest}'.format(name=self.container.name, dest=dest),
             timeout=timeout
         )
