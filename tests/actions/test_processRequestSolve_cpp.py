@@ -29,15 +29,8 @@ solution_cpp_timeout = files / 'problem-2-timeout.cpp'
 solution_cpp_fatal = files / 'problem-2-fatal.cpp'
 solution_cpp_fatal_compile = files / 'problem-1-correct.py'
 
-request_base = dict(
-    user=user_root,
-    lang='PY-367',
-    type=ProcessRequestType.SOLVE,
-    course='TST-2019',
-    problem='problem-1',
-)
 
-request_base_cpp = dict(
+request_base = dict(
     user=user_root,
     lang='CPP',
     type=ProcessRequestType.SOLVE,
@@ -67,7 +60,7 @@ def test_correct_cpp(use_docker):
     request = ProcessRequest(
         solution=solution_cpp_correct.read_text(),
         docker=use_docker,
-        **request_base_cpp
+        **request_base
     )
     request.process()
 
@@ -87,7 +80,7 @@ def test_wrong_cpp(use_docker):
     request = ProcessRequest(
         solution=solution_cpp_wrong.read_text(),
         docker=use_docker,
-        **request_base_cpp
+        **request_base
     )
     request.process()
 
@@ -107,7 +100,7 @@ def test_timeout_cpp(use_docker):
     request = ProcessRequest(
         solution=solution_cpp_timeout.read_text(),
         docker=use_docker,
-        **request_base_cpp
+        **request_base
     )
     request.process()
 
@@ -127,7 +120,7 @@ def test_fatal_cpp(use_docker):
     request = ProcessRequest(
         solution=solution_cpp_fatal.read_text(),
         docker=use_docker,
-        **request_base_cpp
+        **request_base
     )
     request.process()
 
@@ -147,7 +140,7 @@ def test_fatal_compile_cpp(use_docker):
     request = ProcessRequest(
         solution=solution_cpp_fatal_compile.read_text(),
         docker=use_docker,
-        **request_base_cpp
+        **request_base
     )
 
     with case.assertRaises(CompileException):
