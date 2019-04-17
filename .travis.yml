@@ -6,27 +6,16 @@ cache:    pip
 notifications:
   email: false
 
-jobs:  
-  include:
-    # testing
-    - stage: test
-      name:  Test Solve
-      install:
-        - pip install -r requirements.txt
-        - pip install --upgrade pytest pytest-pep8 pytest-cov coveralls
-      script: pytest -m no_docker --cov=src tests/actions/test_processRequestSolve.py
-    
-    - name:  Test Input
-      install:
-        - pip install -r requirements.txt
-        - pip install --upgrade pytest pytest-pep8 pytest-cov coveralls
-      script: pytest -m no_docker --cov=src tests/actions/test_processRequestGenerateInput.py
-    
-    - name:  Test Output
-      install:
-        - pip install -r requirements.txt
-        - pip install --upgrade pytest pytest-pep8 pytest-cov coveralls
-      script: pytest -m no_docker --cov=src tests/actions/test_processRequestOutput.py
+# install the project
+install:
+  - pip install -r requirements.txt
+  - pip install --upgrade pytest pytest-pep8 pytest-cov coveralls
+
+# run the tests
+script:
+  - pytest -m no_docker --cov=src tests/actions/test_processRequestGenerateInput.py
+  - pytest -m no_docker --cov=src tests/actions/test_processRequestGenerateOutput.py
+  - pytest -m no_docker --cov=src tests/actions/test_processRequestSolve.py
 
 # if (and when) we succeed coveralls will be published
 after_success:
