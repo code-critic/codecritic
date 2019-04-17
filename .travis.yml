@@ -13,19 +13,19 @@ jobs:
       name:  Test Solve
       install:
         - pip install -r requirements.txt
-        - pip install pytest pytest-pep8 pytest-cov coveralls
+        - pip install --upgrade pytest pytest-pep8 pytest-cov coveralls
       script: pytest -m no_docker --cov=src tests/actions/test_processRequestSolve.py
     
     - name:  Test Input
       install:
         - pip install -r requirements.txt
-        - pip install pytest pytest-pep8 pytest-cov coveralls
+        - pip install --upgrade pytest pytest-pep8 pytest-cov coveralls
       script: pytest -m no_docker --cov=src tests/actions/test_processRequestGenerateInput.py
     
     - name:  Test Output
       install:
         - pip install -r requirements.txt
-        - pip install pytest pytest-pep8 pytest-cov coveralls
+        - pip install --upgrade pytest pytest-pep8 pytest-cov coveralls
       script: pytest -m no_docker --cov=src tests/actions/test_processRequestOutput.py
 
 # if (and when) we succeed coveralls will be published
