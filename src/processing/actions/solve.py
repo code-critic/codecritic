@@ -1,8 +1,7 @@
 #!/bin/python3
 # author: Jan Hybs
-import os
+
 import pathlib
-import time
 from uuid import uuid4
 
 from loguru import logger
@@ -11,16 +10,15 @@ from env import Env
 from processing import ExecutorStatus, ProcessRequestType
 from processing.actions import AbstractAction
 from processing.comparator import Comparator
-from processing.executors.docker import DockerExecutor
-from processing.executors.local import LocalExecutor
-from processing.executors.multilocal import MultiLocalExecutor
 from processing.executors.multidocker import MultiDockerExecutor
-from processing.request import ProcessRequest, _configure_cmd, Subcase, extract_console
+from processing.executors.multilocal import MultiLocalExecutor
+from processing.request import ProcessRequest, Subcase, extract_console
 from processing.result import ExecutorResult
 from utils.timer import Timer
 
-ONE_DAY = 60*60*24
-HALF_DAY = 60*60*12
+
+ONE_DAY = 60 * 60 * 24
+HALF_DAY = 60 * 60 * 12
 
 
 class ProcessRequestSolve(AbstractAction):
@@ -47,10 +45,10 @@ class ProcessRequestSolve(AbstractAction):
 
         self.duration = timer.duration
 
-    def compare_files(self, subcase:Subcase, result: ExecutorResult):
+    def compare_files(self, subcase: Subcase, result: ExecutorResult):
         compare_result = Comparator.compare_files(
-            f1=subcase.problem_stdout,
-            f2=subcase.temp_stdout
+            f1=subcase.problem.output,
+            f2=subcase.temp.output
         )
         return self._evaluate_result(result, compare_result, subcase)
 
@@ -95,10 +93,10 @@ class ProcessRequestSolve(AbstractAction):
                 result = extract_console(result)
 
             request[id] = result
-            request._register_attachment(id=id, name='input', path=subcase.temp_stdin)
-            request._register_attachment(id=id, name='output', path=subcase.temp_stdout)
-            request._register_attachment(id=id, name='error', path=subcase.temp_stderr)
-            request._register_attachment(id=id, name='reference', path=subcase.problem_stdout)
+            request._register_attachment(id=id, name='input', path=subcase.temp.input)
+            request._register_attachment(id=id, name='output', path=subcase.temp.output)
+            request._register_attachment(id=id, name='error', path=subcase.temp.error)
+            request._register_attachment(id=id, name='reference', path=subcase.problem.output)
 
             request.event_execute_test.close_event.trigger(
                 request, request[id]

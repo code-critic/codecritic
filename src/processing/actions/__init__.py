@@ -62,7 +62,7 @@ class AbstractAction(object):
         return result
 
     def _check_stdin_exists(self, subcase: Subcase):
-        if not subcase.temp_stdin.exists():
+        if not subcase.temp.input.exists():
             logger.opt(ansi=True).warning(
                 '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id} - '
                 'input file does not exists, test will be skipped',

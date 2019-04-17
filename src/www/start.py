@@ -116,4 +116,22 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # import difflib
+    # from pathlib import Path
+    #
+    # p = '4.1'
+    # # p = '5.0'
+    # a = Path('/home/jan-hybs/projects/cc/codecritic/.tmp/a.%s' % p).read_text().splitlines()
+    # b = Path('/home/jan-hybs/projects/cc/codecritic/.tmp/b.%s' % p).read_text().splitlines()
+    #
+    # def j(x):
+    #     print('!', x)
+    #     return x in "\nx"
+    #
+    # diff = difflib.SequenceMatcher(j, a, b).ratio()
+    # diff = difflib.HtmlDiff(charjunk=j)
+    # f = diff.make_file(a, b)
+    #
+    # Path('foo.html').write_text(f)
+
 

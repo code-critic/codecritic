@@ -8,11 +8,11 @@ from uuid import uuid4
 from loguru import logger
 
 from env import Env
-from processing.actions import AbstractAction
-from processing.executors.multilocal import MultiLocalExecutor
-from processing.executors.multidocker import MultiDockerExecutor
 from processing import ExecutorStatus, ProcessRequestType
-from processing.request import ProcessRequest, _configure_cmd, add_cmd_to_result, extract_console
+from processing.actions import AbstractAction
+from processing.executors.multidocker import MultiDockerExecutor
+from processing.executors.multilocal import MultiLocalExecutor
+from processing.request import ProcessRequest, add_cmd_to_result, extract_console
 from utils.timer import Timer
 
 
@@ -85,8 +85,8 @@ class ProcessRequestGenerateInput(AbstractAction):
 
                 # copy files
                 shutil.copy(
-                    subcase.temp_stdin,
-                    subcase.problem_stdin
+                    subcase.temp.input,
+                    subcase.problem.input,
                 )
             else:
                 result = extract_console(result)

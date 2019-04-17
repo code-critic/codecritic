@@ -48,8 +48,8 @@ class MultiLocalExecutor(object):
         """
         for subcase in request.iter_subcases():
             if subcase.needs_input:
-                if subcase.problem_stdin.exists():
-                    shutil.copyfile(subcase.problem_stdin, subcase.temp_stdin)
+                if subcase.problem.input.exists():
+                    shutil.copyfile(subcase.problem.input, subcase.temp.input)
 
     def set_streams(self, stdin: OptionalPath =None, stdout: OptionalPath=None, stderr: OptionalPath=None):
         self.stdin_fp, self.stdout_fp, self.stderr_fp = None, None, None

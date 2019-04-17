@@ -10,9 +10,9 @@ from loguru import logger
 from env import Env
 from processing import ExecutorStatus, ProcessRequestType
 from processing.actions import AbstractAction
-from processing.executors.multilocal import MultiLocalExecutor
 from processing.executors.multidocker import MultiDockerExecutor
-from processing.request import ProcessRequest, _configure_cmd, add_cmd_to_result, extract_console
+from processing.executors.multilocal import MultiLocalExecutor
+from processing.request import ProcessRequest, add_cmd_to_result, extract_console
 from utils.timer import Timer
 
 
@@ -66,7 +66,6 @@ class ProcessRequestGenerateOutput(AbstractAction):
                 continue
 
             # actually execute the code
-
             request[id].status = ExecutorStatus.RUNNING
             request.event_execute_test.open_event.trigger(
                 request, request[id]
@@ -81,8 +80,8 @@ class ProcessRequestGenerateOutput(AbstractAction):
 
                 # copy files
                 shutil.copy(
-                    subcase.temp_stdout,
-                    subcase.problem_stdout
+                    subcase.temp.output,
+                    subcase.problem.output,
                 )
 
             # otherwise we try to extract errors

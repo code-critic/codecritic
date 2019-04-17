@@ -62,26 +62,18 @@ class Subcase(object):
         self.temp = IOEPaths(temp_dir).ioe_files(id)
         self.problem = IOEPaths(problem_dir).ioe_files(id)
 
-        self.temp_stdin = self.temp_dir / 'input' / subcase.id
-        self.temp_stdout = self.temp_dir / 'output' / subcase.id
-        self.temp_stderr = self.temp_dir / '.error' / subcase.id
-
-        self.problem_stdin = self.problem_dir / 'input' / subcase.id
-        self.problem_stdout = self.problem_dir / 'output' / subcase.id
-        self.problem_stderr = self.problem_dir / '.error' / subcase.id
-
     def temp_files(self, type: ProcessRequestType=ProcessRequestType.SOLVE):
         if type in (ProcessRequestType.SOLVE, ProcessRequestType.GENERATE_OUTPUT):
             return dict(
-                stdin=self.temp_stdin,
-                stdout=self.temp_stdout,
-                stderr=self.temp_stderr,
+                stdin=self.temp.input,
+                stdout=self.temp.output,
+                stderr=self.temp.output,
             )
         if type is ProcessRequestType.GENERATE_INPUT:
             return dict(
                 stdin=None,
-                stdout=self.temp_stdin,
-                stderr=self.temp_stderr,
+                stdout=self.temp.input,
+                stderr=self.temp.output,
             )
 
 
@@ -96,7 +88,7 @@ class ProcessRequest(object):
     :type action_executor: processing.actions.AbstractAction
     """
 
-    def __init__(self, user, lang, type, solution, course, problem, cases=None, docker=True, **kwargs):
+    def __init__(self, user: User, lang, type, solution, course, problem, cases=None, docker=True, **kwargs):
         self.course = Courses()[course]
         self.problem = self.course.problem_db[problem]
         self.lang = Languages.db().get(lang)
@@ -110,7 +102,7 @@ class ProcessRequest(object):
 
         self.rand = '%s-%s' % (self.user.id, uuid4())
         self.uuid = uuid4().hex
-        self.rand = 'jan.hybs-c45ea043-15ae-4c3b-9c5d-352bc8cd5937'
+        # self.rand = 'jan.hybs-c45ea043-15ae-4c3b-9c5d-352bc8cd5937'
 
         self._compile_result = None
         self._evaluation = ExecutorResult.empty_result(id='evaluation')

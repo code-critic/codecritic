@@ -229,12 +229,16 @@ class Script(object):
     """
     :type name: str
     :type lang: str
+    :type path: pathlib.Path
     """
     def __init__(self, item: dict):
         super().__init__()
+        self.path = None
+
         if isinstance(item, dict):
             self.name = item['name']
             self.lang = item['lang']
+
         elif isinstance(item, str):
             self.name = item
             ext = str(self.name).split('.')[-1]
@@ -273,13 +277,18 @@ class Problem(ADB):
 
     def __init__(self, item: dict):
         super().__init__()
-        self.id = item['id']
+        self.id = str(item['id'])
         self.name = item.get('name', self.id)
         self.desc = item.get('desc')
         self.reference = Script(item.get('reference')) if item.get('reference') else None
         self.disabled = item.get('disabled', False)
         self.avail = parse_dt(item.get('avail'))
         self.course = item.get('course')
+        self.problem_dir = self.course.problems_dir / self.id
+
+        if self.reference:
+            self.reference.path = self.problem_dir / ('%s' % self.reference.name)
+
         self.timeout = item.get('timeout')
         self.tests = list()
 
