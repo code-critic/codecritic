@@ -11,12 +11,14 @@ from env import Env
 from processing.actions import AbstractAction
 from processing.executors.multilocal import MultiLocalExecutor
 from processing.executors.multidocker import MultiDockerExecutor
-from processing import ExecutorStatus
+from processing import ExecutorStatus, ProcessRequestType
 from processing.request import ProcessRequest, _configure_cmd, add_cmd_to_result, extract_console
 from utils.timer import Timer
 
 
 class ProcessRequestGenerateInput(AbstractAction):
+    type = ProcessRequestType.GENERATE_INPUT
+
     def __init__(self, request: ProcessRequest, result_dir: pathlib.Path, problem_dir: pathlib.Path):
         super().__init__(request, result_dir, problem_dir)
 
@@ -75,7 +77,7 @@ class ProcessRequestGenerateInput(AbstractAction):
             request.event_execute_test.open_event.trigger(
                 request, request[id]
             )
-            with executor.set_streams(stdin=None, stdout=subcase.temp_stdin, stderr=subcase.temp_stderr) as ex:
+            with executor.set_streams(**subcase.temp_files(self.type)) as ex:
                 result = ex.run(cmd).register(id)
 
             if result.status is ExecutorStatus.OK:

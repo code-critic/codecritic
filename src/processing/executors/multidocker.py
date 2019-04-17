@@ -88,10 +88,14 @@ class MultiDockerExecutor(MultiLocalExecutor):
         cmd_str = ' '.join([str(x) for x in docker_cmd])
 
         st = time.time()
+        logger.info('Executing docker run.py \n{}', cmd_str)
         cmd_output = self.container.exec(cmd_str).splitlines()
         duration = time.time() - st
 
-        logger.info('Executing docker run.py {}', cmd_str)
+        logger.info('output')
+        for line in cmd_output:
+            logger.debug('>>> {}', line)
+
 
         try:
             returncode, duration = int(cmd_output[0]), float(cmd_output[1])

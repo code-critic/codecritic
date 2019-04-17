@@ -22,7 +22,20 @@ Final evaluation {status.name}
 '''.strip()
 
 
+class _Env(object):
+    """
+    Internal config
+    """
+    input_dir_name = 'input'
+    output_dir_name = 'output'
+    error_dir_name = '.error'
+    compile_log_name = '.compile.log'
+
+
 class Env(object):
+    """
+    Public config
+    """
     version = '0.1.0'
     root = _root
     src = _root / 'src'

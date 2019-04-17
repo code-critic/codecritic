@@ -8,7 +8,7 @@ from uuid import uuid4
 from loguru import logger
 
 from env import Env
-from processing import ExecutorStatus
+from processing import ExecutorStatus, ProcessRequestType
 from processing.actions import AbstractAction
 from processing.executors.multilocal import MultiLocalExecutor
 from processing.executors.multidocker import MultiDockerExecutor
@@ -17,6 +17,8 @@ from utils.timer import Timer
 
 
 class ProcessRequestGenerateOutput(AbstractAction):
+    type = ProcessRequestType.GENERATE_OUTPUT
+
     def __init__(self, request: ProcessRequest, result_dir: pathlib.Path, problem_dir: pathlib.Path):
         super().__init__(request, result_dir, problem_dir)
 
@@ -70,7 +72,7 @@ class ProcessRequestGenerateOutput(AbstractAction):
                 request, request[id]
             )
 
-            with executor.set_streams(stdin=subcase.temp_stdin, stdout=subcase.temp_stdout, stderr=subcase.temp_stderr) as ex:
+            with executor.set_streams(**subcase.temp_files(self.type)) as ex:
                 result = ex.run(cmd).register(id)
 
             # if ok we compare

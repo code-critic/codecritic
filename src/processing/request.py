@@ -6,8 +6,10 @@ import pathlib
 import shutil
 import typing
 
-OptionalPath = typing.Optional[pathlib.Path]
+from utils.paths import IOEPaths
 
+
+OptionalPath = typing.Optional[pathlib.Path]
 
 from exceptions import FatalException, CompileException, ConfigurationException
 from utils.crypto import b64encode
@@ -57,6 +59,9 @@ class Subcase(object):
         self.timeout = self.subcase.timeout
         self.needs_input = needs_input
 
+        self.temp = IOEPaths(temp_dir).ioe_files(id)
+        self.problem = IOEPaths(problem_dir).ioe_files(id)
+
         self.temp_stdin = self.temp_dir / 'input' / subcase.id
         self.temp_stdout = self.temp_dir / 'output' / subcase.id
         self.temp_stderr = self.temp_dir / '.error' / subcase.id
@@ -64,6 +69,20 @@ class Subcase(object):
         self.problem_stdin = self.problem_dir / 'input' / subcase.id
         self.problem_stdout = self.problem_dir / 'output' / subcase.id
         self.problem_stderr = self.problem_dir / '.error' / subcase.id
+
+    def temp_files(self, type: ProcessRequestType=ProcessRequestType.SOLVE):
+        if type in (ProcessRequestType.SOLVE, ProcessRequestType.GENERATE_OUTPUT):
+            return dict(
+                stdin=self.temp_stdin,
+                stdout=self.temp_stdout,
+                stderr=self.temp_stderr,
+            )
+        if type is ProcessRequestType.GENERATE_INPUT:
+            return dict(
+                stdin=None,
+                stdout=self.temp_stdin,
+                stderr=self.temp_stderr,
+            )
 
 
 class ProcessRequest(object):
@@ -91,7 +110,7 @@ class ProcessRequest(object):
 
         self.rand = '%s-%s' % (self.user.id, uuid4())
         self.uuid = uuid4().hex
-        # self.rand = 'jan.hybs-c45ea043-15ae-4c3b-9c5d-352bc8cd5937'
+        self.rand = 'jan.hybs-c45ea043-15ae-4c3b-9c5d-352bc8cd5937'
 
         self._compile_result = None
         self._evaluation = ExecutorResult.empty_result(id='evaluation')
@@ -114,19 +133,8 @@ class ProcessRequest(object):
         self.result_dir = pathlib.Path(Env.tmp, self.rand)
         self.temp_dir = pathlib.Path(Env.tmp, self.rand)
 
-        self.problem_input_dir = self.problem_dir.joinpath('input')
-        self.problem_output_dir = self.problem_dir.joinpath('output')
-        self.problem_error_dir = self.problem_dir.joinpath('.error')
-        self.problem_dirs = (self.problem_output_dir, self.problem_input_dir, self.problem_error_dir)
-
-        self.temp_input_dir = self.temp_dir.joinpath('input')
-        self.temp_output_dir = self.temp_dir.joinpath('output')
-        self.temp_error_dir = self.temp_dir.joinpath('.error')
-        self.temp_dirs = (self.temp_input_dir, self.temp_output_dir, self.temp_error_dir)
-
-        # create dirs, but they SHOULD ALREADY EXISTS
-        for d in (self.problem_dirs + self.temp_dirs):
-            d.mkdir(parents=True, exist_ok=True)
+        self.problem_dirs = IOEPaths(self.problem_dir).mkdir()
+        self.temp_dirs = IOEPaths(self.temp_dir).mkdir()
 
     def __repr__(self):
         return ('Request(\n'
@@ -208,7 +216,7 @@ class ProcessRequest(object):
     def __iter__(self):
         return iter(self._walk_cases())
 
-    def iter_subcases(self):
+    def iter_subcases(self) -> typing.List[Subcase]:
         if self._subcases:
             for sc in self._subcases:
                 yield sc

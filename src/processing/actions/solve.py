@@ -8,7 +8,7 @@ from uuid import uuid4
 from loguru import logger
 
 from env import Env
-from processing import ExecutorStatus
+from processing import ExecutorStatus, ProcessRequestType
 from processing.actions import AbstractAction
 from processing.comparator import Comparator
 from processing.executors.docker import DockerExecutor
@@ -24,6 +24,8 @@ HALF_DAY = 60*60*12
 
 
 class ProcessRequestSolve(AbstractAction):
+    type = ProcessRequestType.SOLVE
+
     def __init__(self, request: ProcessRequest, result_dir: pathlib.Path, problem_dir: pathlib.Path):
         super().__init__(request, result_dir, problem_dir)
 
@@ -80,8 +82,7 @@ class ProcessRequestSolve(AbstractAction):
             request.event_execute_test.open_event.trigger(
                 request, request[id]
             )
-
-            with executor.set_streams(stdin=subcase.temp_stdin, stdout=subcase.temp_stdout, stderr=subcase.temp_stderr) as ex:
+            with executor.set_streams(**subcase.temp_files(self.type)) as ex:
                 timeout = (subcase.timeout or Env.case_timeout) * request.lang.scale
                 result = ex.run(cmd, soft_limit=timeout).register(id)
 
