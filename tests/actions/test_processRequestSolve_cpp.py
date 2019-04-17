@@ -40,7 +40,6 @@ request_base = dict(
 
 use_docker_args = [
     pytest.param(True, marks=pytest.mark.docker),
-    pytest.param(False, marks=pytest.mark.no_docker),
 ]
 
 
