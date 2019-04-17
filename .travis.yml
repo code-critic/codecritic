@@ -6,6 +6,13 @@ cache:    pip
 notifications:
   email: false
 
+# use docker
+services:
+  - docker
+
+before_install:
+  - docker pull automatest/all
+
 # install the project
 install:
   - pip install -r requirements.txt
@@ -13,9 +20,10 @@ install:
 
 # run the tests
 script:
-  - pytest -m no_docker --cov=src tests/actions/test_processRequestGenerateInput.py
-  - pytest -m no_docker --cov=src tests/actions/test_processRequestGenerateOutput.py
-  - pytest -m no_docker --cov=src tests/actions/test_processRequestSolve.py
+  - pytest --cov=src tests
+  # - pytest --cov=src tests/actions/test_processRequestGenerateInput.py
+  # - pytest --cov=src tests/actions/test_processRequestGenerateOutput.py
+  # - pytest --cov=src tests/actions/test_processRequestSolve.py
 
 # if (and when) we succeed coveralls will be published
 after_success:
