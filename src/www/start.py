@@ -21,7 +21,7 @@ logger.configure(handlers=[
 # http_server.serve_forever()
 
 
-def parse_args():
+def parse_args(cargs=None):
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--help', action='help', default=argparse.SUPPRESS,
                         help=argparse._('show this help message and exit'))
@@ -32,7 +32,7 @@ def parse_args():
     flask_server.add_argument('-d', '--debug', action='store_true')
     flask_server.add_argument('-v', '--verbose', action='store_true')
     flask_server.add_argument('--backdoor', action='store_true')
-    args = parser.parse_args()
+    args = parser.parse_args(cargs)
 
     if args.verbose:
         # do not filter logger
