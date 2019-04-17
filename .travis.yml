@@ -2,7 +2,6 @@ language: python
 
 python:
   - '3.6'
-  - '3.7'
 
 install:
   - pip install -r requirements.txt
@@ -11,15 +10,17 @@ install:
 
 jobs:  
   include:
-    
+    - stage: install
+      install:
+        - pip install -r requirements.txt
+        - pip install pytest pytest-pep8 pytest-cov coveralls
+      
     - stage: test
       name:  Test Solve
       script: pytest -m no_docker --cov=src tests/actions/test_processRequestSolve.py
     
-    - stage: test
-      name:  Test Input
+    - name:  Test Input
       script: pytest -m no_docker --cov=src tests/actions/test_processRequestGenerateInput.py
     
-    - stage: test
-      name:  Test Output
+    - name:  Test Output
       script: pytest -m no_docker --cov=src tests/actions/test_processRequestOutput.py
