@@ -6,9 +6,10 @@ import unittest
 
 import pytest
 
-from database.objects import User, Courses
+from database.objects import Courses, User
 from processing import ExecutorStatus, ProcessRequestType
 from processing.request import ProcessRequest
+
 
 case = unittest.TestCase('__init__')
 root = pathlib.Path(__file__).resolve()
@@ -31,7 +32,6 @@ request_base = dict(
     problem='problem-1',
     cases=None,
 )
-
 
 use_docker_args = [
     pytest.param(True, marks=pytest.mark.docker),

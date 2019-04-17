@@ -2,9 +2,9 @@
 # author: Jan Hybs
 
 import pathlib
+import unittest
 
 import pytest
-import unittest
 
 from database.objects import User
 from processing import ExecutorStatus, ProcessRequestType
@@ -13,17 +13,17 @@ from processing.request import ProcessRequest
 
 case = unittest.TestCase('__init__')
 root = pathlib.Path(__file__).resolve()
+files = root.parent / 'files'
 
 user_root = User(dict(
     id='root',
     role='test',
 ))
 
-
-solution_py_correct = (root.parent / 'files' / 'problem-1-correct.py')
-solution_py_wrong = (root.parent / 'files' / 'problem-1-wrong.py')
-solution_py_timeout = (root.parent / 'files' / 'problem-1-timeout.py')
-solution_py_fatal = (root.parent / 'files' / 'problem-1-fatal.py')
+solution_py_correct = files / 'problem-1-correct.py'
+solution_py_wrong = files / 'problem-1-wrong.py'
+solution_py_timeout = files / 'problem-1-timeout.py'
+solution_py_fatal = files / 'problem-1-fatal.py'
 
 request_base = dict(
     user=user_root,
@@ -31,7 +31,14 @@ request_base = dict(
     type=ProcessRequestType.SOLVE,
     course='TST-2019',
     problem='problem-1',
-    cases=None,
+)
+
+request_base_cpp = dict(
+    user=user_root,
+    lang='CPP',
+    type=ProcessRequestType.SOLVE,
+    course='TGH-2019',
+    problem='WEBISL',
 )
 
 use_docker_args = [

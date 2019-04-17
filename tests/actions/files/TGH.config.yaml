@@ -1,0 +1,31 @@
+# OK, checked: 11.4.2019
+- id: WEBISL
+  name: Web islands
+  avail: 2020-03-30 00:00:00  
+  reference:
+    name: webisl.cpp
+    lang: CPP
+  tests:
+    - id: WEBISL_case_1
+      size: 4
+      timeout: 0.1
+    - id: WEBISL_case_2
+      size: 6
+      timeout: 0.1
+    - id: WEBISL_case_3
+      size: 8
+      timeout: 0.1
+    - id: WEBISL_case_4
+      size: 10
+      timeout: 0.1
+      random: 2
+    - id: WEBISL_case_5
+      size: 100
+      timeout: 0.1
+      random: 2
+    - id: WEBISL_case_6
+      size: 1000
+      timeout: 0.1
+    - id: WEBISL_case_7
+      size: 10000
+      timeout: 0.2
