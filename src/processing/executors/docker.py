@@ -108,12 +108,14 @@ class DockerExecutor(LocalExecutor):
 
         # always copy stdout
         if isinstance(self.stdout_path, pathlib.Path):
-            utils.io.write_file(self.stdout_path, '')
+            self.stdout_path.parent.mkdir(parents=True, exist_ok=True)
+            self.stdout_path.touch()
             self.container.copy_from_container('%s/out' % tmp_dir, self.stdout_path)
 
         # copy stderr on error only to save some time
         if returncode != 0 and isinstance(self.stderr_path, pathlib.Path):
-            utils.io.write_file(self.stderr_path, '')
+            self.stderr_path.parent.mkdir(parents=True, exist_ok=True)
+            self.stderr_path.touch()
             self.container.copy_from_container('%s/err' % tmp_dir, self.stderr_path)
 
         if os.path.exists(cwd_sh):

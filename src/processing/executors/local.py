@@ -13,9 +13,6 @@ from utils import timer
 
 class LocalExecutor(object):
     """
-    :type stdin: utils.io.FileEx
-    :type stdout: utils.io.FileEx
-    :type stderr: utils.io.FileEx
     :type cwd: pathlib.Path
     """
     stream_map = [

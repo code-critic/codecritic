@@ -1,8 +1,8 @@
 #!/bin/python3
 # author: Jan Hybs
+import pathlib
 
 from processing import ExecutorStatus
-import utils.io as io
 
 
 class Comparator(object):
@@ -19,12 +19,19 @@ class Comparator(object):
         if f1 == f2:
             return Comparator(ExecutorStatus.ANSWER_CORRECT, list())
 
+        p1 = pathlib.Path(f1)
+        p2 = pathlib.Path(f2)
+        lines1, lines2 = [], []
+
         error = list()
         output = list()
         result = True
 
-        lines1 = io.read_file(f1).splitlines()
-        lines2 = io.read_file(f2).splitlines()
+        if p1.exists():
+            lines1 = p1.read_text().splitlines()
+
+        if p2.exists():
+            lines2 = p2.read_text().splitlines()
 
         lenl1 = len(lines1)
         lenl2 = len(lines2)
