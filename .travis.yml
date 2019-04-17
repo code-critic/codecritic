@@ -1,20 +1,21 @@
 language: python
+python:   '3.6'
+cache:    pip
 
-python:
-  - '3.6'
-
-install:
-  - pip install -r requirements.txt
-  - pip install pytest pytest-pep8 pytest-cov coveralls
-
+# do not bother anyone 
+notifications:
+  email: false
 
 jobs:  
   include:
+    # installation
     - stage: install
       install:
         - pip install -r requirements.txt
         - pip install pytest pytest-pep8 pytest-cov coveralls
-      
+      script: pip freeze
+        
+    # testing
     - stage: test
       name:  Test Solve
       script: pytest -m no_docker --cov=src tests/actions/test_processRequestSolve.py
@@ -24,3 +25,7 @@ jobs:
     
     - name:  Test Output
       script: pytest -m no_docker --cov=src tests/actions/test_processRequestOutput.py
+
+# if (and when) we succeed coveralls will be published
+after_success:
+  - coveralls
