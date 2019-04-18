@@ -19,6 +19,9 @@ def test_parser():
 
 @pytest.mark.www
 def test_server():
+    from env import Env
+    Env.use_database = False
+
     from www import app
     from flask_socketio import SocketIO
     import flask
@@ -26,4 +29,3 @@ def test_server():
     async_mode = 'threading'
     socketio = SocketIO(app, json=flask.json, async_mode=async_mode, ping_interval=100 * 1000)
     start.register_routes(app, socketio)
-    

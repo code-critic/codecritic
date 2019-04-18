@@ -44,6 +44,7 @@ class Env(object):
     tmp = _root / '.tmp'
     log_file = _root / '.automate.log'
     backdoor = False
+    use_database = True
 
     courses = _root / 'courses'
     results = _root / 'results'

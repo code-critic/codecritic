@@ -11,6 +11,7 @@ from loguru import logger
 import processing.request
 from database.mongo import Mongo
 from database.objects import User
+from env import Env
 from exceptions import ConfigurationException
 from processing import ProcessRequestType
 from www.emittor import Emittor
@@ -20,12 +21,6 @@ namespace = None
 queue = list()
 thread_lock_max = 10
 thread_lock = Semaphore(value=thread_lock_max)
-mongo = Mongo()
-
-
-def get_datetime(value=None):
-    # return 'aaa'
-    return (value if value else dt.datetime.now()).strftime('%y%m%d_%H%M%S')
 
 
 def queue_status():
@@ -106,7 +101,8 @@ def register_routes(app, socketio):
             docker=False if (skip_docker and user.is_admin()) else True,
         )
 
-        mongo.save_log(request.get_log_dict())
+        if Env.use_database:
+            Mongo().save_log(request.get_log_dict())
 
         # ignore problems which are past due
         if request.problem.time_left < 0:
@@ -135,11 +131,12 @@ def register_routes(app, socketio):
                 Emittor.exception(e)
             finally:
                 output_dir, attempt = request.save_result()
-                mongo.save_result(
-                    request.get_result_dict(),
-                    output_dir=output_dir,
-                    attempt=attempt,
-                )
+                if Env.use_database:
+                    Mongo().save_result(
+                        request.get_result_dict(),
+                        output_dir=output_dir,
+                        attempt=attempt,
+                    )
                 request.destroy()
 
         queue.remove(request)
