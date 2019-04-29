@@ -9,17 +9,27 @@ $(document).ready(function() {
   var problemID = $adminZone.data('problem');
   var sourceCode = null;
   var languageID = null;
+  Globals.initEnv();
+  Templates.loadTemplates();
+  
+  
+  var cc = new CC($target);
+  cc.connect(function(){
+    console.log('ok, connected');
+  });
 
   $inputForm.submit(function() {
-    Automatest.setTarget($target);
     $adminZone.find('.solution-result').show();
     var $form = $(this);
     $form.addClass('disabled');
 
     var actionType = 'generate-input';
     var useDocker = $form.find('.input-use-docker').is(':checked');
-    Automatest.submitSolution(
+    cc.submitSolution(
       courseID, problemID, languageID, sourceCode, actionType, useDocker,
+      function(event) {
+        $form.removeClass('disabled');
+      },
       function(event) {
         $form.removeClass('disabled');
       }
@@ -28,14 +38,13 @@ $(document).ready(function() {
   });
 
   $outputForm.submit(function() {
-    Automatest.setTarget($target);
     $adminZone.find('.solution-result').show();
     var $form = $(this);
     $form.addClass('disabled');
 
     var actionType = 'generate-output';
     var useDocker = $form.find('.input-use-docker').is(':checked');
-    Automatest.submitSolution(
+    cc.submitSolution(
       courseID, problemID, languageID, sourceCode, actionType, useDocker,
       function(event) {
         $form.removeClass('disabled');
@@ -44,11 +53,11 @@ $(document).ready(function() {
     return false;
   });
 
-  var $referenceNav = $('#reference-nav');
-  var $referenceTab = $('#reference-tab');
-  $referenceNav.html(
-    nunjucks.render('static/templates/process-execute.njk', _showcase)
-  );
+  // var $referenceNav = $('#reference-nav');
+  // var $referenceTab = $('#reference-tab');
+  // $referenceNav.html(
+  //   nunjucks.render('static/templates/process-execute.njk', _showcase)
+  // );
   
   
   var $lastResultsNav = $('#last-results-nav');
@@ -69,20 +78,4 @@ $(document).ready(function() {
       }
     });
   });
-  // $('#reference-tab').tab('show');
-
-  // for (id in _showcase.results) {
-  //   var item = _showcase.results[id];
-  //   $('#e-' + item.uuid).html(
-  //     nunjucks.render('static/templates/test-result.njk', item)
-  //   )
-  // }
-  // $('#reference-tab').click();
-  // for (id in event.results) {
-  //   var item = event.results[id];
-  //   $('#e-' + item.uuid).html(
-  //     nunjucks.render(root + 'static/templates/test-result.njk', item)
-  //   )
-  // }
-
 });

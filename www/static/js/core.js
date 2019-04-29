@@ -4,11 +4,8 @@ var Automatest = (function() {
   var root = '';
   var $target = '';
   var callback = null;
+  var socket = null;
   var URL = location.protocol + '//' + document.domain + ':' + location.port + namespace;
-  // https://socket.io/docs/client-api/
-  var socket = io.connect(URL, {
-    timeout: 100 * 1000,
-  });
   var env = nunjucks.configure(URL, {
     autoescape: true
   });
@@ -19,145 +16,179 @@ var Automatest = (function() {
     return parseFloat(num).toFixed(digits)
   });
 
-  socket.on('connect', function() {
-    console.log('connected');
-  });
-  socket.on('connect_timeout', function() {
-    console.log('connect_timeout');
-  });
-  socket.on('connect_error', function() {
-    console.log('connect_error');
-  });
+  var registerSocket = function(_callback) {
+    var called = false;
+    console.log(Automatest.socket, socket);
+    socket = io.connect(URL, {
+      reconnection: false,
+      timeout: 100 * 1000,
+    });
+    console.log(Automatest.socket, socket);
+    socket.on('connect', function() {
+      console.log('connected');
+      
+      if (!called && _callback) {
+        _callback(socket);
+        called = true;
+      }
+    });
+    socket.on('connect_timeout', function() {
+      console.log('connect_timeout');
+    });
+    socket.on('connect_error', function() {
+      console.log('connect_error');
+    });
 
-  socket.on('reconnect', (attemptNumber) => {
-    console.log('reconnect' + attemptNumber);
-  });
-  socket.on('reconnecting', (attemptNumber) => {
-    console.log('reconnecting' + attemptNumber);
-  });
-  socket.on('disconnect', (reason) => {
-    console.log('disconnect');
-    console.log(reason);
-    if (reason === 'io server disconnect') {
-      // the disconnection was initiated by the server, you need to reconnect manually
-      socket.connect();
-    }
-    // else the socket will automatically try to reconnect
-  });
+    socket.on('reconnect', (attemptNumber) => {
+      console.log('reconnect ' + attemptNumber);
+    });
+    socket.on('reconnecting', (attemptNumber) => {
+      console.log('reconnecting ' + attemptNumber);
+    });
+    socket.on('disconnect', (reason) => {
+      console.log('disconnect');
+      console.log(reason);
+      if (reason === 'io server disconnect') {
+        // the disconnection was initiated by the server, you need to reconnect manually
+        socket.connect();
+      }
+      // else the socket will automatically try to reconnect
+    });
 
-  var oldOnevent = socket.onevent;
-  socket.onevent = function(packet) {
-    if (packet.data) {
-      console.log('>>>', {
-        name: packet.data[0],
-        payload: packet.data[1]
-      })
-    }
-    oldOnevent.apply(socket, arguments)
+    // var oldOnevent = socket.onevent;
+    // socket.onevent = function(packet) {
+    //   if (packet.data) {
+    //     console.log('>>>', {
+    //       name: packet.data[0],
+    //       payload: packet.data[1]
+    //     })
+    //   }
+    //   oldOnevent.apply(socket, arguments)
+    // }
+
+    socket.on('debug', function(event) {
+      logData(event);
+    });
+
+    socket.on('queue-status', function(event) {
+      $target.html(
+        nunjucks.render(root + 'static/templates/list-queue-items.njk', event.data)
+      );
+    });
+
+    socket.on('queue-push', function(event) {
+      logData(event);
+
+      $target.find('.queue-status ul').append(
+        nunjucks.render(root + 'static/templates/list-queue-item.njk', event.data)
+      );
+      var item = document.getElementById('queue-' + event.data.id);
+      $(item).css('display', 'none').show('fast');
+    });
+
+    socket.on('queue-pop', function(event) {
+      logData(event);
+
+      var item = document.getElementById('queue-' + event.data.id);
+      $(item).hide();
+    });
+
+    socket.on('process-start-me', function(event) {
+      logData(event);
+
+      $target.html(
+        nunjucks.render(root + 'static/templates/process-execute.njk', event)
+      );
+      // for (id in event.results) {
+      //   var item = event.results[id];
+      //   $('#e-' + item.uuid).html(
+      //     nunjucks.render(root + 'static/templates/test-result.njk', item)
+      //   )
+      // }
+      $('.execution > .execution-entry').hide().show('fast');
+    });
+
+    socket.on('process-end-me', function(event) {
+      logData(event);
+
+      $target.find('.evaluation').addClass(event.data.evaluation.status).show().find('.evaluation-result').html(
+        nunjucks.render(root + 'static/templates/test-result2.njk', event.data.evaluation)
+      )
+      $target.find('.collapse').collapse('show');
+      if (callback) {
+        callback(event);
+      }
+    });
+
+    socket.on('execute-test-start-me', function(event) {
+      logData(event);
+
+      var $testDiv = $(document.getElementById('e-' + event.test.uuid));
+      $testDiv.find('.execution-test').attr('class', 'execution-test ' + event.test.status);
+      $testDiv.find('.test-icon').html(
+        nunjucks.render(root + 'static/templates/test-icon.njk', {
+          status: event.test.status
+        })
+      );
+    });
+
+    socket.on('execute-test-end-me', function(event) {
+      logData(event);
+
+      var $testDiv = $(document.getElementById('e-' + event.test.uuid));
+      $testDiv.find('.execution-test').attr('class', 'execution-test ' + event.test.status);
+      $testDiv.find('.test-icon').html(
+        nunjucks.render(root + 'static/templates/test-icon.njk', {
+          status: event.test.status
+        })
+      );
+      $testDiv.find('.test-title').html(
+        nunjucks.render(root + 'static/templates/test-title.njk', event.test)
+      );
+      $testDiv.find('.test-details').html(
+        nunjucks.render(root + 'static/templates/test-details.njk', event.test)
+      );
+      $testDiv.find('.test-attachments').show().html(
+        nunjucks.render(root + 'static/templates/test-attachments.njk', event.test)
+      );
+
+      $testDiv.find('[data-toggle="tooltip"]').tooltip();
+    });
+
+    socket.on('fatal-error', function(event) {
+      logData(event);
+      $target.html(
+        nunjucks.render(root + 'static/templates/fatal-error.njk', event)
+      );
+
+      if (callback) {
+        callback(event);
+      }
+    });
+
+    socket.on('compile-start-me', function(event) {
+      logData(event);
+      $target.find('.compilation').html(
+        nunjucks.render(root + 'static/templates/test-result.njk', event.result)
+      )
+    });
+    socket.on('compile-end-me', function(event) {
+      logData(event);
+      $target.find('.compilation').html(
+        nunjucks.render(root + 'static/templates/test-result.njk', event.result)
+      )
+    });
   }
 
-  socket.on('debug', function(event) {
-    logData(event);
-  });
-
-  socket.on('queue-status', function(event) {
-    $target.html(
-      nunjucks.render(root + 'static/templates/list-queue-items.njk', event.data)
-    );
-  });
-
-  socket.on('queue-push', function(event) {
-    logData(event);
-
-    $target.find('.queue-status ul').append(
-      nunjucks.render(root + 'static/templates/list-queue-item.njk', event.data)
-    );
-    var item = document.getElementById('queue-' + event.data.id);
-    $(item).css('display', 'none').show('fast');
-  });
-
-  socket.on('queue-pop', function(event) {
-    logData(event);
-
-    var item = document.getElementById('queue-' + event.data.id);
-    $(item).hide();
-  });
-
-  socket.on('process-start-me', function(event) {
-    logData(event);
-    
-    $target.html(
-      nunjucks.render(root + 'static/templates/process-execute.njk', event)
-    );
-    // for (id in event.results) {
-    //   var item = event.results[id];
-    //   $('#e-' + item.uuid).html(
-    //     nunjucks.render(root + 'static/templates/test-result.njk', item)
-    //   )
-    // }
-    $('.execution > .execution-entry').hide().show('fast');
-  });
-
-  socket.on('process-end-me', function(event) {
-    logData(event);
-    
-    $target.find('.evaluation').show().find('.evaluation-result').html(
-      nunjucks.render(root + 'static/templates/test-result.njk', event.data.evaluation)
-    )
-    $target.find('.answer-correct,.ok').find('.collapse').addClass('show');
-    $target.find('.collapse').collapse();
-    if (callback) {
-      callback(event);
-    }
-  });
-
-  socket.on('execute-test-start-me', function(event) {
-    logData(event);
-    
-    $('#e-' + event.test.uuid).html(
-      nunjucks.render(root + 'static/templates/test-result.njk', event.test)
-    );
-  });
-
-  socket.on('execute-test-end-me', function(event) {
-    logData(event);
-    
-    console.log(event);
-    $('#e-' + event.test.uuid).html(
-      nunjucks.render(root + 'static/templates/test-result.njk', event.test)
-    );
-  });
-
-  socket.on('fatal-error', function(event) {
-    logData(event);
-    $target.html(
-      nunjucks.render(root + 'static/templates/fatal-error.njk', event)
-    );
-
-    if (callback) {
-      callback(event);
-    }
-  });
-
-  socket.on('compile-start-me', function(event) {
-    logData(event);
-    $target.find('.compilation').html(
-      nunjucks.render(root + 'static/templates/test-result.njk', event.result)
-    )
-  });
-  socket.on('compile-end-me', function(event) {
-    logData(event);
-    $target.find('.compilation').html(
-      nunjucks.render(root + 'static/templates/test-result.njk', event.result)
-    )
-  });
-
   return {
-    socket: socket,
+    socket: this.socket,
+    openSocket: function(_callback) {
+      return registerSocket(_callback);
+    },
     setTarget(target) {
       $target = $(target);
     },
-    submitSolution: function(courseID, problemID, languageID, sourceCode, actionType, useDocker, _callback) {
+    submitSolution: function(socket, courseID, problemID, languageID, sourceCode, actionType, useDocker, _callback) {
       callback = _callback;
       socket.emit('student-solution-submit', {
         type: actionType,
@@ -166,6 +197,12 @@ var Automatest = (function() {
         lang: languageID,
         src: sourceCode,
         docker: useDocker,
+      });
+    },
+    processSolution: function(socket, uuid, _callback) {
+      callback = _callback;
+      socket.emit('student-process-solution', {
+        uuid: uuid,
       });
     },
   }
@@ -216,7 +253,7 @@ var registerDnD = function(holder, success) {
   if (!window.FileReader) {
     return false;
   }
-  
+
   // max size of 2 MB
   var MAX_SIZE = 1024 * 1024 * 2;
   var $holder = $(holder);

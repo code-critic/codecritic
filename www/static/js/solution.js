@@ -54,6 +54,7 @@ $(document).ready(function() {
     }
     srcStatus.html('(saving)');
     saveTimeout = setTimeout(saveCode, 1000);
+    $('#srcTA').val(editor.getValue());
   });
   $('#editor').append('<span class="btn btn-link fullscreen" data-toggle="tooltip" title="Toggle fullscreen"><i class="fas fa-expand"></i></span>');
   $('#editor .btn.fullscreen').click(function() {
@@ -159,31 +160,31 @@ $(document).ready(function() {
     loadCode();
   });
 
-  $('form').submit(function(e) {
-
-    var $form = $(this);
-    $form.addClass('disabled');
-    $('#solution-result').collapse('show');
-    $('#solution-result-heading .btn-link').removeClass('disabled');
-
-    var courseID = $('.prob-select').data('course');
-    var problemID = $('.prob-select').val();
-    var sourceCode = editor.getValue();
-    var languageID = $('.lang-select').val();
-    var useDocker = $('.input-use-docker').is(':checked');
-    var actionType = 'solve';
-
-    saveProblemAndLang();
-    saveCode();
-
-    Automatest.submitSolution(
-      courseID, problemID, languageID, sourceCode, actionType, useDocker,
-      function(event) {
-        $form.removeClass('disabled');
-      }
-    );
-    return false;
-  });
+  // $('form').submit(function(e) {
+  // 
+  //   var $form = $(this);
+  //   $form.addClass('disabled');
+  //   $('#solution-result').collapse('show');
+  //   $('#solution-result-heading .btn-link').removeClass('disabled');
+  // 
+  //   var courseID = $('.prob-select').data('course');
+  //   var problemID = $('.prob-select').val();
+  //   var sourceCode = editor.getValue();
+  //   var languageID = $('.lang-select').val();
+  //   var useDocker = $('.input-use-docker').is(':checked');
+  //   var actionType = 'solve';
+  // 
+  //   saveProblemAndLang();
+  //   saveCode();
+  // 
+  //   Automatest.submitSolution(
+  //     courseID, problemID, languageID, sourceCode, actionType, useDocker,
+  //     function(event) {
+  //       $form.removeClass('disabled');
+  //     }
+  //   );
+  //   return false;
+  // });
 
   $('[data-toggle="tooltip"]').tooltip();
 
