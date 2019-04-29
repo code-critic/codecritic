@@ -12,8 +12,6 @@ from utils.paths import IOEPaths
 OptionalPath = typing.Optional[pathlib.Path]
 
 from exceptions import FatalException, CompileException, ConfigurationException
-from utils.crypto import b64encode
-from collections import OrderedDict, namedtuple
 from uuid import uuid4
 
 from loguru import logger
@@ -21,9 +19,8 @@ from loguru import logger
 from database.objects import Course, Courses, Languages, Problem, User, ProblemCase
 from env import Env
 from processing import ExecutorStatus, ProcessRequestType
-from processing.result import ExecutorResult
+from processing.result import ExecutorResult, RequestResult
 from utils.events import MultiEvent
-from utils.io import delete_old_files
 
 
 def hook_warn_empty_input(id, result: ExecutorResult):
@@ -31,7 +28,8 @@ def hook_warn_empty_input(id, result: ExecutorResult):
         raise FatalException('Input file is empty', ['please double check your input files for test', id])
     return result
 
-def add_cmd_to_result(id, result: ExecutorResult):
+
+def add_cmd_to_result(result: ExecutorResult):
     if not result.console:
         result.console = ' '.join(result.cmd)
     return result
@@ -79,8 +77,6 @@ class Subcase(object):
 
 class ProcessRequest(object):
     """
-    :type _compile_result: ExecutorResult
-    :type _run_results: OrderedDict[str, ExecutorResult]
     :type course: Course
     :type problem: Problem
     :type lang: Languages
@@ -88,7 +84,7 @@ class ProcessRequest(object):
     :type action_executor: processing.actions.AbstractAction
     """
 
-    def __init__(self, user: User, lang, type, solution, course, problem, cases=None, docker=True, **kwargs):
+    def __init__(self, user: User, lang, type, src, course, problem, cases=None, docker=True, **kwargs):
         self.course = Courses()[course]
         self.problem = self.course.problem_db[problem]
         self.lang = Languages.db().get(lang)
@@ -97,29 +93,24 @@ class ProcessRequest(object):
         self.datetime = datetime.datetime.now()
 
         self.user = user
-        self.solution = solution
+        self.solution = src
         self.type = ProcessRequestType(type)
+        self.docker = docker
 
-        self.rand = '%s-%s' % (self.user.id, uuid4())
         self.uuid = uuid4().hex
-        # self.rand = 'jan.hybs-c45ea043-15ae-4c3b-9c5d-352bc8cd5937'
+        self.rand = '%s-%s' % (self.user.id, self.uuid)
 
-        self._compile_result = None
-        self._evaluation = ExecutorResult.empty_result(id='evaluation')
-        self._run_results = OrderedDict()
-        self.rest = kwargs
-        self._subcases = None
+        if Env.debug_mode:
+            logger.debug('using pseudo random tmp dir in debug mode')
+            self.rand = 'jan.hybs-DEBUG'
+
+        self.action_executor = None
+        self.subcases = None
+        self.result = RequestResult(self)
 
         self.event_process = MultiEvent('on-process')
-
         self.event_compile = MultiEvent('on-compile')
-        self.event_execute = MultiEvent('on-execute')
-
-        self.event_compare_test = MultiEvent('on-compare-test')
         self.event_execute_test = MultiEvent('on-execute-test')
-        self.running = False
-        self.docker = docker
-        self.action_executor = None
 
         self.problem_dir = pathlib.Path(self.course.problems_dir, self.problem.id)
         self.result_dir = pathlib.Path(Env.tmp, self.rand)
@@ -127,6 +118,7 @@ class ProcessRequest(object):
 
         self.problem_dirs = IOEPaths(self.problem_dir).mkdir()
         self.temp_dirs = IOEPaths(self.temp_dir).mkdir()
+        self.is_running = False
 
     def __repr__(self):
         return ('Request(\n'
@@ -137,7 +129,7 @@ class ProcessRequest(object):
                 '  type={self.type}\n'
                 ')').format(self=self)
 
-    def peek(self):
+    def peek(self, ):
         return dict(
             uuid=self.uuid,
             user=self.user.id,
@@ -145,25 +137,26 @@ class ProcessRequest(object):
             lang=self.lang,
             prob=self.problem,
             action=self.type,
-            evaluation=self._evaluation,
+            evaluation=self.evalution_result,
         )
 
     @property
-    def result_list(self):
-        return self._run_results.items()
+    def evalution_result(self):
+        self.evaluate_solution()
+        return self.result.result
 
     # ------------------------------------------
 
     def process(self):
-        self._run_results = OrderedDict()
-        for id, case, subcase in self._walk_cases():
-            self[id] = ExecutorResult.empty_result(id=id)
+        self.is_running = True
+        self.result.result.message = 'Processing'
+        self.result.result.status = ExecutorStatus.RUNNING
 
         # no tests provided
-        if not self._run_results:
-            self.event_process.open_event.trigger(self, self._run_results)
+        if not self.result.subcases:
+            self.event_process.open_event.trigger(self.result)
             self.evaluate_solution()
-            self.event_process.close_event.trigger(self, self._run_results)
+            self.event_process.close_event.trigger(self.result)
             raise ConfigurationException('No tests provided in yaml config file')
 
         # emit event
@@ -181,43 +174,37 @@ class ProcessRequest(object):
         else:
             raise FatalException('Unsupported action {}'.format(self.type))
 
-        self.event_process.open_event.trigger(self, self._run_results)
+        self.event_process.open_event.trigger(self.result)
+
         try:
             self.action_executor.run()
+            self.is_running = False
             self.evaluate_solution()
-            self.event_process.close_event.trigger(self, self._run_results)
+            self.event_process.close_event.trigger(self.result)
         except CompileException as ex:
             logger.info('compilation failed')
+            self.is_running = False
             self.evaluate_solution()
-            self.event_process.close_event.trigger(self, self._run_results)
+            self.event_process.close_event.trigger(self.result)
             raise ex
 
-        return self._run_results
+        return self.result
 
     def _walk_cases(self):
         for case in self.cases:
             for subcase in case.cases():
                 yield subcase.id, case, subcase
 
-    def __getitem__(self, id):
-        return self._run_results[id]
-
-    def __setitem__(self, id, value):
-        self._run_results[id] = value
-
-    def __iter__(self):
-        return iter(self._walk_cases())
-
     def iter_subcases(self) -> typing.List[Subcase]:
-        if self._subcases:
-            for sc in self._subcases:
+        if self.subcases:
+            for sc in self.subcases:
                 yield sc
         else:
-            self._subcases = list()
+            self.subcases = list()
             for case in self.cases:
                 for subcase in case.cases():
                     sc = Subcase(subcase.id, case, subcase, self.temp_dir, self.problem_dir)
-                    self._subcases.append(sc)
+                    self.subcases.append(sc)
                     yield sc
 
     def destroy(self):
@@ -230,57 +217,63 @@ class ProcessRequest(object):
             logger.exception('could not destroy executor')
 
     def evaluate_solution(self):
-        if not self._run_results:
-            self._evaluation = ExecutorResult(status=ExecutorStatus.SKIPPED).register('FINAL RESULT')
-            self._evaluation.message = 'No tests to run'
+        if self.is_running:
+            self.result.result.message = 'Processing'
+            self.result.result.status = ExecutorStatus.RUNNING
             return
 
-        statuses = [x.status for x in self._run_results.values()]
-        if self._compile_result:
-            if self._compile_result.status in (ExecutorStatus.COMPILATION_FAILED, ExecutorStatus.GLOBAL_TIMEOUT):
-                for k, v in self._run_results.items():
-                    self._run_results[k].status = ExecutorStatus.SKIPPED
+        if not self.result.results:
+            self.result.result.status = ExecutorStatus.SKIPPED
+            self.result.result.message = 'No tests to run'
+            return
 
-            statuses = [x.status for x in self._run_results.values()]
-            statuses.append(self._compile_result.status)
+        statuses = [x.status for x in self.result.results]
+        compilation = self.result.compilation
+        if compilation and compilation.status in (ExecutorStatus.COMPILATION_FAILED, ExecutorStatus.GLOBAL_TIMEOUT):
+            for test in self.result.results:
+                if test is not compilation:
+                    test.status = ExecutorStatus.SKIPPED
+
+            statuses = [x.status for x in self.result.results]
+            statuses.append(self.result.compilation.status)
 
         unique = set(statuses)
         max_status = max(unique)
+        logger.info('statuses: {}', unique)
 
-        self._evaluation = ExecutorResult(None, max_status).register('FINAL RESULT')
+        self.result.result.status = max_status
 
         if self.action_executor:
-            self._evaluation.duration = self.action_executor.duration
-            print(statuses)
+            self.result.result.duration = self.action_executor.duration
             ok_score = statuses.count(ExecutorStatus.ANSWER_CORRECT)
             at_score = statuses.count(ExecutorStatus.ANSWER_CORRECT_TIMEOUT)
             wr_score = statuses.count(ExecutorStatus.ANSWER_WRONG)
             rest_statuses = (ExecutorStatus.ANSWER_CORRECT, ExecutorStatus.ANSWER_CORRECT_TIMEOUT, ExecutorStatus.ANSWER_WRONG)
             rest = [x for x in statuses if x not in rest_statuses]
 
-            self._evaluation.score = (
+            self.result.result.score = (
                 (10**4) * ok_score +
                 (10**2) * at_score +
                 (10**0) * wr_score
             )
-            self._evaluation.scores = [ok_score, at_score, wr_score]
+            self.result.result.scores = [ok_score, at_score, wr_score]
 
-        status = self._evaluation.status
+        status = self.result.result.status
         action = self.type
         if action is ProcessRequestType.SOLVE:
-            self._evaluation.message = status.message
+            self.result.result.message = status.message
 
         elif action is ProcessRequestType.GENERATE_INPUT:
             if status is ExecutorStatus.OK:
-                self._evaluation.message = 'Input files generated'
+                self.result.result.message = 'Input files generated'
             else:
-                self._evaluation.message = status.message
+                self.result.result.message = status.message
 
         elif action is ProcessRequestType.GENERATE_OUTPUT:
             if status is ExecutorStatus.OK:
-                self._evaluation.message = 'Output files generated'
+                self.result.result.message = 'Output files generated'
             else:
-                self._evaluation.message = status.message
+                self.result.result.message = status.message
 
     def save_result(self):
         if self.type is not ProcessRequestType.SOLVE:
@@ -293,7 +286,7 @@ class ProcessRequest(object):
             course=self.course,
             user=self.user,
             lang=self.lang,
-            status=self._evaluation.status,
+            status=self.result.result.status,
             datetime=self.datetime,
         )
 
@@ -319,7 +312,7 @@ class ProcessRequest(object):
         # ---------------------------------------------------------------------
 
         results = list()
-        for id, test in self._run_results.items():
+        for test in self.result.results:
             results.append(Env.student_result_test_txt_format.format(test=test))
 
         format_dict['results'] = '\n'.join(results)
@@ -345,25 +338,26 @@ class ProcessRequest(object):
         return doc
 
     def get_result_dict(self):
-        base = self.get_log_dict()
-        if self._evaluation:
-            base['result'] = self._evaluation.peek(full=False)
+        # base = self.get_log_dict()
+        # if self._evaluation:
+        #     base['result'] = self._evaluation.peek(full=False)
+        #
+        # if self._compile_result:
+        #     base['compilation'] = self._compile_result.peek(full=False)
+        #
+        # if self._run_results:
+        #     tests = list()
+        #     for test in self._run_results:
+        #         if test:
+        #             tests.append(test.peek(full=False))
+        #     base['tests'] = tests
 
-        if self._compile_result:
-            base['compilation'] = self._compile_result.peek(full=False)
-
-        if self._run_results:
-            tests = list()
-            for id, test in self._run_results.items():
-                if test:
-                    tests.append(test.peek(full=False))
-            base['tests'] = tests
-
-        return base
+        return self.result.peek(False)
 
     def _register_attachment(self, id, name, path: pathlib.Path):
-        rel_path = str(path.relative_to(Env.root))
-        self[id].add_attachment(dict(name=name+'.txt', path=rel_path))
+        if path.exists():
+            rel_path = str(path.relative_to(Env.root))
+            self.result[id].add_attachment(dict(name=name+'.txt', path=rel_path))
 
 
 def _configure_cmd(cmd, file):

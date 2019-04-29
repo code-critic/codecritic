@@ -10,9 +10,10 @@ from loguru import logger
 
 ONE_DAY = 60*60*24
 HALF_DAY = 60*60*12
+THREE_DAYS = ONE_DAY * 3
 
 
-def delete_old_files(root: pathlib.Path, seconds=HALF_DAY):
+def delete_old_files(root: pathlib.Path, seconds=THREE_DAYS):
     if root.name not in ('tmp', '.tmp'):
         logger.warning('Aborting deletion of old dirs: folder {} not named tmp', root)
         return False

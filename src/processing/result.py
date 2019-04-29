@@ -3,10 +3,94 @@
 import pathlib
 import typing
 
-from processing import ExecutorStatus
+from loguru import logger
+from processing import ExecutorStatus, ProcessRequestType
 from utils.crypto import sha1
 from utils.strings import ensure_iterable
 
+
+class RequestResult(object):
+    """
+    :type solution: typing.Optional[str]
+    :type lang: typing.Optional[Languages]
+    :type result: ExecutorResult
+    :type results: typing.List[ExecutorResult]
+    """
+    def __init__(self, request):
+        """
+        :type request: processing.request.ProcessRequest
+        """
+        self.lang = request.lang
+        self.solution = request.solution if request.solution else None
+        self.docker = request.docker
+
+        self.action = request.type
+        self.user = request.user
+        self.course = request.course
+        self.problem = request.problem
+
+        self.result = ExecutorResult.empty_result(ExecutorResult.RESULT)
+        self.results = list()
+        self.subcases = list(self._walk_cases())
+
+        if self.action is ProcessRequestType.SOLVE:
+            if self.lang.compile:
+                self.results.append(ExecutorResult.empty_result(ExecutorResult.COMPILATION))
+        else:
+            p = self.problem.reference
+            if p and p.lang_ref and p.lang_ref.compile:
+                self.results.append(ExecutorResult.empty_result(ExecutorResult.COMPILATION))
+
+        for subcase in self.subcases:
+            self.results.append(ExecutorResult.empty_result(subcase.id))
+
+    def _walk_cases(self):
+        for case in self.problem.tests:
+            for subcase in case.cases():
+                yield subcase
+
+    def __getitem__(self, id):
+        for test in self.results:
+            if test.id == id:
+                return test
+
+        if id is not ExecutorResult.COMPILATION:
+            logger.warning('Could not find test {} in {}', id, self.results)
+
+    def __setitem__(self, id, value):
+        for i, test in enumerate(self.results):
+            if test.id == id:
+                self.results[i] = value
+                return
+
+        if id is not ExecutorResult.COMPILATION:
+            logger.warning('Could not find test {} in {}', id, self.results)
+
+    def __iter__(self):
+        return iter(self.subcases)
+
+    @property
+    def compilation(self):
+        return self[ExecutorResult.COMPILATION]
+
+    @compilation.setter
+    def compilation(self, value):
+        self[ExecutorResult.COMPILATION] = value
+
+    def peek(self, full=True):
+        return dict(
+            lang=self.lang.id if self.lang else None,
+            solution=self.solution,
+            docker=self.docker,
+
+            action=self.action.value,
+            user=self.user.id,
+            course=self.course.id,
+            problem=self.problem.id,
+
+            result=self.result.peek(full),
+            results=[x.peek(full) for x in self.results],
+        )
 
 
 class ExecutorResult(object):
@@ -15,6 +99,9 @@ class ExecutorResult(object):
     :type stdout: pathlib.Path
     :type stderr: pathlib.Path
     """
+    COMPILATION = 'Compilation'
+    RESULT = 'Result'
+
     def __init__(self, cmd=None, status=ExecutorStatus.IN_QUEUE, returncode=None, error=None):
         self.cmd = cmd
         self.status = status
@@ -78,10 +165,10 @@ class ExecutorResult(object):
         return self
 
     def __repr__(self):
-        return 'Result([%s] => %s (%s) in %1.3f sec)' % (
-            ' '.join(self.cmd),
-            str(self.returncode),
+        return 'Result([%s], status=%s, rc=%s, duration=%1.3f)' % (
+            self.id,
             self.status.name,
+            str(self.returncode),
             self.duration
         )
 
@@ -120,7 +207,6 @@ class ExecutorResult(object):
             if p in doc and not doc[p]:
                 doc.pop(p)
         return doc
-
 
     @classmethod
     def empty_result(cls, id, status=ExecutorStatus.IN_QUEUE):

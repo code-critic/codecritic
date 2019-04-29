@@ -19,6 +19,9 @@ class AbstractAction(object):
     """
     :type executor: processing.executors.multilocal.MultiLocalExecutor or processing.executors.multidocker.MultiLocalExecutor
     """
+
+    case_log_format = '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id}'
+
     def __init__(self, request: ProcessRequest, result_dir: pathlib.Path, problem_dir: pathlib.Path):
         self.request = request
         self.result_dir = pathlib.Path(result_dir)
@@ -39,16 +42,15 @@ class AbstractAction(object):
         if not cmd:
             return
 
-        result_id = 'compilation'
-        self.request._compile_result = ExecutorResult.empty_result(result_id, ExecutorStatus.RUNNING)
-        self.request.event_compile.open_event.trigger(self.request, self.request._compile_result)
+        self.request.result.compilation.status = ExecutorStatus.RUNNING
+        self.request.event_compile.open_event.trigger(self.request.result.compilation)
 
         out = self.temp_dir / '.compile.log'
         logger.opt(ansi=True).info('<red>{}</red>: {}', 'COMPILING', cmd)
         with self.executor.set_streams(stdin=None, stdout=out, stderr=out) as ex:
             result = ex.run(cmd, Env.compile_timeout)
 
-        self.request._compile_result = add_cmd_to_result(result_id, result).register(result_id)
+        self.request.result.compilation = add_cmd_to_result(result).register(ExecutorResult.COMPILATION)
 
         if result.failed():
             if result.status is ExecutorStatus.GLOBAL_TIMEOUT:
@@ -57,7 +59,7 @@ class AbstractAction(object):
                 result.status = ExecutorStatus.COMPILATION_FAILED
                 raise CompileException('Compilation failed', details=result.read_stdout())
 
-        self.request.event_compile.close_event.trigger(self.request, self.request._compile_result)
+        self.request.event_compile.close_event.trigger(self.request.result.compilation)
 
         return result
 
@@ -144,7 +146,7 @@ class AbstractAction(object):
             # CORRECT RESULT BUT TIMED OUT
             elif result.status is ExecutorStatus.SOFT_TIMEOUT:
                 result.message = 'Submitted solution is correct but does not meet runtime criteria'
-                result.message_details = 'Allowed time is %1.3sec but was running for %1.3f sec' % (
+                result.message_details = 'Allowed time is %1.3f sec sec but was running for %1.3f sec' % (
                     subcase.timeout, result.duration
                 )
                 result.status = ExecutorStatus.ANSWER_CORRECT_TIMEOUT
@@ -157,7 +159,7 @@ class AbstractAction(object):
             # INCORRECT RESULT AND TIMED OUT
             elif result.status is ExecutorStatus.SOFT_TIMEOUT:
                 result.message = 'Submitted solution is incorrect and does not meet runtime criteria'
-                result.message_details = 'Allowed time is %1.3sec but was running for %1.3f sec' % (
+                result.message_details = 'Allowed time is %1.3f sec but was running for %1.3f sec' % (
                     subcase.timeout, result.duration
                 )
                 result.status = ExecutorStatus.ANSWER_WRONG_TIMEOUT

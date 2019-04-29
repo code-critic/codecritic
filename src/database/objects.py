@@ -80,6 +80,7 @@ class User(ADB):
 
 class Course(ADB):
     """
+    :type id: str
     :type name: str
     :type desc: str
     :type year: str
@@ -337,9 +338,6 @@ class Problem(ADB):
                     result.append(test)
                     break
         return result
-
-    def get_reference(self):
-        return self.reference
 
 
 class ProblemCase(ADB):

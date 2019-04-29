@@ -45,38 +45,33 @@ class ProcessRequestGenerateOutput(AbstractAction):
 
     def _run(self):
         request = self.request
+        rr = self.request.result
         executor = self.executor
         cmd = self._run_cmd
 
         for subcase in request.iter_subcases():
             id = subcase.id
 
-            if self._check_stdin_exists(subcase):
-                logger.opt(ansi=True).info(
-                    '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id}',
-                    case=subcase, problem=request.problem, course=request.course
-                )
-            else:
-                request[id].status = ExecutorStatus.SKIPPED
-                request[id].message = 'skipped'
-                request[id].console = 'Input file does not exists'.splitlines()
-                request.event_execute_test.close_event.trigger(
-                    request, request[id]
-                )
+            if not self._check_stdin_exists(subcase):
+                rr[id].status = ExecutorStatus.SKIPPED
+                rr[id].message = 'skipped'
+                rr[id].console = 'Input file does not exists'.splitlines()
+                request.event_execute_test.close_event.trigger(rr[id])
                 continue
 
+            log_base = self.case_log_format.format(case=subcase.subcase, problem=request.problem, course=request.course)
+            logger.opt(ansi=True).debug('{} - {}', log_base, cmd)
+
             # actually execute the code
-            request[id].status = ExecutorStatus.RUNNING
-            request.event_execute_test.open_event.trigger(
-                request, request[id]
-            )
+            rr[id].status = ExecutorStatus.RUNNING
+            request.event_execute_test.open_event.trigger(rr[id])
 
             with executor.set_streams(**subcase.temp_files(self.type)) as ex:
                 result = ex.run(cmd).register(id)
 
             # if ok we compare
             if result.status is ExecutorStatus.OK:
-                result = add_cmd_to_result(id, result)
+                result = add_cmd_to_result(result)
 
                 # copy files
                 shutil.copy(
@@ -88,8 +83,6 @@ class ProcessRequestGenerateOutput(AbstractAction):
             else:
                 result = extract_console(result)
 
-            request[id] = result
-
-            request.event_execute_test.close_event.trigger(
-                request, request[id]
-            )
+            rr[id] = result
+            request.event_execute_test.close_event.trigger(rr[id])
+            logger.opt(ansi=True).info('{} - {}', log_base, rr[id])

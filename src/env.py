@@ -45,6 +45,7 @@ class Env(object):
     log_file = _root / '.automate.log'
     backdoor = False
     use_database = True
+    debug_mode = False
 
     courses = _root / 'courses'
     results = _root / 'results'
@@ -88,7 +89,7 @@ class Env(object):
         return yaml.load(cls.database_secret.read_text())
 
     @classmethod
-    def info(cls):
+    def info_dict(cls):
         for k, v in cls.__dict__.items():
             if str(k).startswith('_'):
                 continue
@@ -100,4 +101,10 @@ class Env(object):
                 continue
 
             yield k, v
+
+    @classmethod
+    def dump_info(cls, msg='Environment'):
+        from loguru import logger
+        info = '\n'.join(['{:>20s}: {:s}'.format(k, str(v)) for k, v in cls.info_dict()])
+        logger.info('{}:\n{}', msg, info)
 

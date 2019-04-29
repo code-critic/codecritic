@@ -46,6 +46,69 @@ def broadcast_queue_pop(item):
     emit('queue-pop', dict(status=200, item=item), broadcast=True)
 
 
+def _process_solution(user, action, skip_docker, problem_id, course_id, lang_id=None, src=None):
+    if not user.is_admin() and (
+            skip_docker or action in (ProcessRequestType.GENERATE_INPUT, ProcessRequestType.GENERATE_OUTPUT)):
+        Emittor.error(
+            'Operation not permitted',
+            [
+                'You do not have sufficient privileges to perform action:',
+                '    %s (skip docker: %s)' % (action, skip_docker),
+                '',
+                'Please contact jan.hybs@tul.cz',
+                'if you want to gain the privileges.'
+            ]
+        )
+        return
+
+    request = processing.request.ProcessRequest(
+        user=user,
+        lang=lang_id,
+        problem=problem_id,
+        course=course_id,
+        src=src,
+        type=action,
+        docker=False if (skip_docker and user.is_admin()) else True,
+    )
+
+    if Env.use_database:
+        Mongo().save_log(request.get_log_dict())
+
+    # ignore problems which are past due
+    if request.problem.time_left < 0:
+        return
+
+    Emittor.register_events(request)
+    Emittor.queue_status(queue_status())
+    queue.append(request)
+    Emittor.queue_push(request)
+
+    # put a barrier here so only certain amount fo users can process code at once
+    # while other will see queue list
+    with thread_lock:
+        try:
+            request.process()
+        except ConfigurationException as e:
+            if user.is_admin():
+                logger.exception('[visible to admin only] invalid yaml config')
+                Emittor.exception(e)
+        except Exception as e:
+            logger.exception('process error:')
+            Emittor.exception(e)
+        finally:
+            output_dir, attempt = request.save_result()
+            if Env.use_database:
+                Mongo().save_result(
+                    request.get_result_dict(),
+                    output_dir=output_dir,
+                    attempt=attempt,
+                )
+            request.destroy()
+
+    queue.remove(request)
+    Emittor.queue_pop(request)
+
+
 def register_routes(app, socketio):
     @socketio.on('connect')
     def emit_market_data():
@@ -55,6 +118,23 @@ def register_routes(app, socketio):
     @socketio.on('debug')
     def socket_debug(data):
         Emittor.debug('ok, connected' + str(data))
+
+    @socketio.on('student-process-solution', namespace=namespace)
+    def student_process_solution(data):
+        user = User(session['user'])
+        try:
+            solution = session[data['uuid']]
+            _process_solution(
+                user=user,
+                action=solution['action'],
+                skip_docker=not solution['use_docker'],
+                problem_id=solution['problem_id'],
+                course_id=solution['course_id'],
+                lang_id=solution['lang_id'],
+                src=solution['src'],
+            )
+        except:
+            logger.exception('Error while processing solution')
 
     @socketio.on('student-solution-submit', namespace=namespace)
     def student_submit_solution(data):
@@ -96,7 +176,7 @@ def register_routes(app, socketio):
             lang=data['lang'],
             problem=data['prob'],
             course=data['course'],
-            solution=data['src'],
+            src=data['src'],
             type=action,
             docker=False if (skip_docker and user.is_admin()) else True,
         )

@@ -7,7 +7,7 @@ import subprocess
 
 from loguru import logger
 
-from processing import ProcessRequestType, ExecutorStatus
+from processing import  ExecutorStatus
 from processing.request import ProcessRequest, OptionalPath
 from processing.result import ExecutorResult
 from utils import timer
@@ -82,7 +82,7 @@ class MultiLocalExecutor(object):
         return False
 
     def decrease_timepool(self, value: float):
-        logger.info('decreasing time pool by {} ({} left)', value, self._time_left)
+        logger.debug('decreasing time pool by {} ({} left)', value, self._time_left)
         self._time_left -= value
         return self
 
@@ -107,7 +107,7 @@ class MultiLocalExecutor(object):
         with timer.Timer() as t:
             # try to execute the command
             try:
-                logger.info('running cmd {}, {}, {}', cmd, args, kw)
+                logger.debug('running cmd {}, {}, {}', cmd, args, kw)
                 process = subprocess.Popen(cmd, *args, **kw)
             except FileNotFoundError as ex:
                 duration = t.duration

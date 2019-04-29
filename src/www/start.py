@@ -74,6 +74,7 @@ def main():
 
     if args.debug:
         async_mode = 'threading'
+        Env.debug_mode = True
     else:
         from gevent import monkey
         monkey.patch_all()
@@ -98,8 +99,7 @@ def main():
     # -------------------------------------------------------------------------
 
     logger.info('Listening on {host}:{port} (debug={debug})', **vars(args))
-    info = '\n'.join(['{:>20s}: {:s}'.format(k, str(v)) for k, v in Env.info()])
-    logger.info('Configuration in env.py:\n{}', info)
+    Env.dump_info('Configuration in env.py')
     logger.info('removing old files from {}', Env.tmp)
 
     # -------------------------------------------------------------------------

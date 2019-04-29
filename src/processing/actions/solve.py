@@ -3,7 +3,6 @@
 
 import pathlib
 from uuid import uuid4
-
 from loguru import logger
 
 from env import Env
@@ -38,7 +37,10 @@ class ProcessRequestSolve(AbstractAction):
 
     def run(self):
         with Timer() as timer:
-            self.solution_file.write_text(self.request.solution)
+            if self.solution_file.exists() and Env.debug_mode:
+                logger.debug('not saving cource code in debug mode')
+            else:
+                self.solution_file.write_text(self.request.solution)
             self.executor.prepare_files(self.request)
             self._compile()
             self._run()
@@ -54,32 +56,27 @@ class ProcessRequestSolve(AbstractAction):
 
     def _run(self):
         request = self.request
+        rr = self.request.result
         executor = self.executor
         cmd = self._run_cmd
 
         for subcase in request.iter_subcases():
             id = subcase.id
 
-            if self._check_stdin_exists(subcase):
-                logger.opt(ansi=True).info(
-                    '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id}',
-                    case=subcase, problem=request.problem, course=request.course
-                )
-            else:
-                request[id].status = ExecutorStatus.SKIPPED
-                request[id].message = 'skipped'
-                request[id].console = 'Input file does not exists'.splitlines()
-                request.event_execute_test.close_event.trigger(
-                    request, request[id]
-                )
+            if not self._check_stdin_exists(subcase):
+                rr[id].status = ExecutorStatus.SKIPPED
+                rr[id].message = 'skipped'
+                rr[id].console = 'Input file does not exists'.splitlines()
+                request.event_execute_test.close_event.trigger(rr[id])
                 continue
+
+            log_base = self.case_log_format.format(case=subcase.subcase, problem=request.problem, course=request.course)
+            logger.opt(ansi=True).debug('{} - {}', log_base, cmd)
 
             # actually execute the code
 
-            request[id].status = ExecutorStatus.RUNNING
-            request.event_execute_test.open_event.trigger(
-                request, request[id]
-            )
+            rr[id].status = ExecutorStatus.RUNNING
+            request.event_execute_test.open_event.trigger(rr[id])
             with executor.set_streams(**subcase.temp_files(self.type)) as ex:
                 timeout = (subcase.timeout or Env.case_timeout) * request.lang.scale
                 result = ex.run(cmd, soft_limit=timeout).register(id)
@@ -92,12 +89,10 @@ class ProcessRequestSolve(AbstractAction):
             else:
                 result = extract_console(result)
 
-            request[id] = result
+            rr[id] = result
             request._register_attachment(id=id, name='input', path=subcase.temp.input)
             request._register_attachment(id=id, name='output', path=subcase.temp.output)
             request._register_attachment(id=id, name='error', path=subcase.temp.error)
             request._register_attachment(id=id, name='reference', path=subcase.problem.output)
 
-            request.event_execute_test.close_event.trigger(
-                request, request[id]
-            )
+            request.event_execute_test.close_event.trigger(rr[id])

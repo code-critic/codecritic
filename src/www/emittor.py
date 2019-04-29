@@ -6,19 +6,20 @@ import traceback
 from flask_socketio import emit
 from loguru import logger
 from exceptions import FatalException, CompileException
+from processing.request import ProcessRequest
 
 
 class Emittor(object):
     @staticmethod
-    def register_events(instance):
+    def register_events(instance: ProcessRequest):
         instance.event_compile.on(
             Emittor.on_compile_start,
             Emittor.on_compile_end,
         )
-        instance.event_execute.on(
-            Emittor.on_execute_start,
-            Emittor.on_execute_end,
-        )
+        # instance.event_execute.on(
+        #     Emittor.on_execute_start,
+        #     Emittor.on_execute_end,
+        # )
         instance.event_execute_test.on(
             Emittor.on_execute_test_start,
             Emittor.on_execute_test_end,
@@ -45,42 +46,42 @@ class Emittor(object):
     # -----------------------------------------------------------------------------
 
     @classmethod
-    def on_compile_start(cls, request, result):
-        return cls.event('compile-start-me', request, result=result)
+    def on_compile_start(cls, result):
+        return cls.event('compile-start-me', result)
 
     @classmethod
-    def on_compile_end(cls, request, result):
-        return cls.event('compile-end-me', request, result=result)
+    def on_compile_end(cls, result):
+        return cls.event('compile-end-me', result)
 
     # -----------------------------------------------------------------------------
 
     @classmethod
-    def on_execute_test_start(cls, request, test):
-        return cls.event('execute-test-start-me', request, test=test)
+    def on_execute_test_start(cls, test):
+        return cls.event('execute-test-start-me', test)
 
     @classmethod
-    def on_execute_test_end(cls, request, test):
-        return cls.event('execute-test-end-me', request, test=test)
+    def on_execute_test_end(cls, test):
+        return cls.event('execute-test-end-me', test)
+
+    # -----------------------------------------------------------------------------
+
+    # @classmethod
+    # def on_execute_start(cls, request, result):
+    #     return cls.event('execute-start-me', request, result=result)
+    #
+    # @classmethod
+    # def on_execute_end(cls, request, result):
+    #     return cls.event('execute-end-me', request, result=result)
 
     # -----------------------------------------------------------------------------
 
     @classmethod
-    def on_execute_start(cls, request, result):
-        return cls.event('execute-start-me', request, result=result)
+    def on_process_start(cls, result):
+        return cls.event('process-start-me', result)
 
     @classmethod
-    def on_execute_end(cls, request, result):
-        return cls.event('execute-end-me', request, result=result)
-
-    # -----------------------------------------------------------------------------
-
-    @classmethod
-    def on_process_start(cls, request, results):
-        return cls.event('process-start-me', request, results=results)
-
-    @classmethod
-    def on_process_end(cls, request, results):
-        return cls.event('process-end-me', request, results=results)
+    def on_process_end(cls, result):
+        return cls.event('process-end-me', result)
 
     # -----------------------------------------------------------------------------
 
@@ -104,7 +105,7 @@ class Emittor(object):
 
     @classmethod
     def event(cls, event, data, **kwargs):
-        d = dict(status=200, data=data, **kwargs)
+        d = dict(data=data, **kwargs)
         return cls._event(event, d)
 
     @classmethod
@@ -132,5 +133,5 @@ class Emittor(object):
     @classmethod
     def emit(cls, *args, **kwargs):
         emit(*args, **kwargs)
-        time.sleep(0.2)
+        time.sleep(0.1)
 
