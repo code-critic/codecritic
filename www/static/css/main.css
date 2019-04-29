@@ -82,32 +82,13 @@ body {
 }
 
 .result-details.stdout-stderr .std-list {
-  border-radius: 0.25em;
   width: 100%;
   display: block;
   padding: 1rem 2rem;
   border: none;
-  margin-bottom: 1rem;
   padding-left: 40px;
   max-height: 250px;
   overflow-y: auto;
-}
-
-.status-badge {
-  border: none !important;
-  display: inline-block;
-  background: #fafafa;
-  border-radius: 0.25rem;
-  padding: 0;
-  margin: 0;
-  width: 50px;
-  height: 26px;
-  line-height: 26px;
-  text-align: center;
-}
-
-.running .status-badge {
-  line-height: 33px;
 }
 
 .std-list li {
@@ -144,36 +125,15 @@ ul.std-list li::before {
   content: ">";
   display: inline-block;
   width: 2em;
-  margin-left: -1em;
+  margin-left: -2em;
   opacity: 0.5;
 }
 
-.btn-block-anim {
-  text-align: left;
-  display: inline-block;
-  background: #efefef;
-  border-radius: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  font-weight: bold;
-  font-size: 0.8rem;
-  cursor: pointer;
-}
-
- .test-icon {
-   display: inline-block;
-   padding-right: 0.5rem;
- }
-
-.result-text {
-  margin-left: 60px;
-}
 .result-text .title {
   margin: 0;
   padding: 0.25rem;
   font-size: 0.8rem;
   display: block;
-  border-radius: 0.25rem 0.25rem 0 0;
-  border-bottom: 2px solid #fff;
 }
 
 .console.result-text .title,
@@ -252,10 +212,10 @@ body.admin .header-grad {
 }
 body.admin .btn-primary.dropdown-toggle:focus,
 body.admin .btn-primary.dropdown-toggle:hover {
-  background-color: #f7802a !important;
+  background-color: #f7802a;
 }
 body.admin .btn-primary.dropdown-toggle {
-    background-color: #f8771a !important;
+    background-color: #f8771a;
 }
 
 a.back-btn {
@@ -330,23 +290,6 @@ form .input-use-docker:checked ~ .use-docker-info {
 }
 
 
-.evaluation .test-icon {
-  height: 80px;
-}
-
-.evaluation .btn-block-anim {
-  height: 80px;
-  line-height: 80px;
-  font-size: 1.0rem;
-  padding-left: 1rem;
-}
-
-.evaluation .status-badge {
-  height: 80px;
-  line-height: 80px;
-  font-size: 1.0rem;
-}
-
 .btn.fullscreen:hover {
   background: rgba(0, 0, 0, 0.15);
 }
@@ -361,9 +304,8 @@ form .input-use-docker:checked ~ .use-docker-info {
   margin: 0;
   line-height: 1rem;
 }
-.attachments .empty-padding {
+.test-details .empty-padding {
   width: 58px;
-  height: 26px;
 }
 
 .attachment-btns .attachment-btn{

@@ -1,4 +1,3 @@
-
 // STATUSES
 // system results
 $statuses: (
@@ -17,17 +16,181 @@ $statuses: (
   'error-while-running': #fc4949,
 );
 
-@each $name, $color in $statuses {
-  .#{$name} {
-      .status-badge, .btn-block-anim {
-        color: darken($color, 30) !important;
-        background: lighten($color, 30);
-        -webkit-transition: all .2s ease-in-out;
-        -o-transition: all .2s ease-in-out;
-        transition: all .2s ease-in-out;
-      }
-      .attachment-btns .attachment-btn {
-        color: darken($color, 30) !important;
+.final-evaluation {
+  @each $name, $color in $statuses {
+    .execution-test.#{$name} {
+      border-bottom: 5px solid lighten($color, 15);
+
+      .cell-score .score {
+        background: darken($color, 30);
+        // border-left: 1px solid rgba(darken($color, 30), .5);
+        
+        .score-value {
+          background: rgba(#fff, 0.25);
+        }
       }
     }
+  }
+}
+@each $name, $color in $statuses {
+  .#{$name} {
+    .test-case-holder {
+      background: lighten($color, 30);
+
+      &:hover {
+        background: lighten($color, 27);
+      }
+
+      & > * {
+        color: darken($color, 30) !important;
+      }
+
+      .cell-icon {
+        .test-icon {
+          text-align: center;
+          min-width: 60px;
+          min-height: 42px;
+
+          .status-badge {
+            border-right: 1px solid rgba(darken($color, 30), .5);
+          }
+        }
+      }
+    }
+
+    .cell-attachments .btn-link i {
+      color: darken($color, 30) !important;
+    }
+
+    .result-details {
+      background: lighten($color, 35);
+    }
+
+    .result-details.stdout-stderr .std-list {
+      background: lighten($color, 35);
+      color: darken($color, 35);
+    }
+
+    .console.result-text .title {
+      background: lighten($color, 33);
+      color: darken($color, 33);
+    }
+
+    .btn-link.dropdown-toggle {
+      padding: 0.35rem;
+      margin: 0;
+      background: none !important;
+      box-shadow: none !important;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+
+      &::after {
+        display: none;
+      }
+    }
+  }
+}
+
+.final-evaluation {
+  .test-case-holder {
+    min-height: 70px;
+
+    .cell-href {
+      font-size: 1.0rem;
+    }
+
+    .cell-icon {
+      .test-icon {
+        .status-badge {
+          line-height: 40px;
+          height: 40px;
+
+          i {
+            line-height: 40px;
+            font-size: 1.25rem;
+          }
+        }
+      }
+    }
+
+    .cell-score .score {
+      min-width: 100px;
+      padding: 0.25rem;
+      border-radius: 0.25rem;
+      margin: 0 1rem;
+      color: #fff;
+      text-align: center;
+
+      .fa {
+        font-size: 0.8rem;
+      }
+
+      .score-divider::after {
+        content: '-';
+      }
+
+      .score-value {
+        font-weight: bold;
+        font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+        font-size: 0.9rem;
+        margin: 0.1rem;
+        padding: 0.1rem;
+        border-radius: 0.125rem;
+      }
+    }
+  }
+}
+
+.execution-test {
+  .cell-attachments {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .dropdown-toggle {
+    padding: 0.25rem 0.5rem;
+    margin: 0;
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+.test-case-holder {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  & > .cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    -webkit-transition: all 0.2s ease-in-out;
+    -o-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .cell-href {
+    -ms-flex: 1 1 auto !important;
+    flex: 1 1 auto !important;
+    font-weight: bold;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .cell-icon {
+    .test-icon {
+      text-align: center;
+      min-width: 60px;
+      min-height: 42px;
+
+      .status-badge {
+        margin-right: 1rem;
+        border-right: 1px solid #a9030366;
+      }
+    }
+  }
 }

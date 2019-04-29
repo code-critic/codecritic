@@ -1,0 +1,32 @@
+$statuses: (
+  'in-queue': #909090,
+  'running': #30c3f9,
+  'ignore': #909090,
+  'ok': #cc5ef2,
+  'answer-correct': #4eed3a,
+  'answer-correct-timeout': #e0c222,
+  'answer-wrong': #fc4949,
+  'answer-wrong-timeout': #fc4949,
+  'skipped': #df8220,
+  'soft-timeout': #737373,
+  'global-timeout': #fc4949,
+  'file-not-found': #fc4949,
+  'error-while-running': #fc4949,
+);
+
+.execution-test {
+  .test-icon {
+    display: none;
+  }
+}
+
+
+@each $name, $color in $statuses {
+  .#{$name}.execution-test {
+    .test-icon.#{$name} {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+}
