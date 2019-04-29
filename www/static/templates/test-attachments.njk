@@ -1,0 +1,16 @@
+{% if attachments | length %}
+  <span data-toggle="tooltip" title="View input and output files">
+    <button class="btn btn-link dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <i class="fas fa-folder-open"></i>
+    </button>
+
+    <div class="dropdown-menu">
+      {% for att in attachments %}
+        <a class="dropdown-item text-center attachment-btn px-1 py-1 m-0" href="/file/{{ att.path }}/{{ att.name }}" target="_blank">
+          <i class="fas fa-file"></i>
+          {{ att.name }}
+        </a>
+      {% endfor %}
+    </div>
+  </span>
+{% endif %}

@@ -1,19 +1,127 @@
 <div class="execution status-section">
-  <div class="evaluation" style="display: none;">
-    <div class="evaluation-result">
-    </div>
-    <hr />
+  <div class="final-evaluation">
   </div>
-  
-  <div class="execution-entry compilation">
+
+  <div class="test-cases">
+
+    {# <div class="execution-entry compilation"></div> #}
+
+    {# {% for id, item in results %}
+      <div class="execution-entry execution-test" id="e-{{ item.uuid }}">
+
+        <div class="execution-test {{ item.status }}">
+          <div class="test-title-holder d-flex justify-content-center">
+
+            <span class="test-icons">
+              <span class="test-icon running">
+                <span class="status-badge">
+                  <i class="fas fa-circle-notch animation-spin-fast"></i>
+                </span>
+              </span>
+
+              <span class="test-icon ok answer-correct">
+                <span class="status-badge">
+                  <i class="fas fa-check"></i>
+                </span>
+              </span>
+
+              <span class="test-icon answer-correct-timeout">
+                <span class="status-badge">
+                  <i class="fas fa-exclamation"></i>
+                </span>
+              </span>
+
+              <span class="test-icon error answer-wrong answer-wrong-timeout error-while-running">
+                <span class="status-badge">
+                  <i class="fas fa-times"></i>
+                </span>
+              </span>
+
+              <span class="test-icon skipped ignore">
+                <div class="status-badge">
+                  <i class="fas fa-question"></i>
+                </div>
+              </span>
+
+              <span class="test-icon global-timeout">
+                <div class="status-badge">
+                  <i class="fas fa-question"></i>
+                </div>
+              </span>
+
+              <span class="test-icon waiting in-queue">
+                <div class="status-badge">
+                  <i class="fas fa-clock"></i>
+                </div>
+              </span>
+            </span>
+
+            <a class="btn-block-anim flex-fill d-flex justify-content-between align-items-center" data-toggle="collapse" data-target="#eo-{{ item.uuid }}">
+              <span class="test-title">
+                {% if item.duration %}
+                  <span class="duration">
+                    [{{ item.duration | toFixed(2) }}&nbsp;sec]
+                  </span>
+                {% endif %}
+                {{ id }}
+                {% if item.message %}
+                  <span class="message">
+                    :&nbsp;{{ item.message }}
+                  </span>
+                {% endif %}
+              </span>
+            </a>
+
+            <span class="test-attachments" style="display: none">
+              {% if item.attachments | length %}
+                <span data-toggle="tooltip" title="View input and output files">
+                  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-folder-open"></i>
+                  </button>
+
+                  <div class="dropdown-menu">
+                    {% for att in item.attachments %}
+                      <a class="dropdown-item text-center attachment-btn px-1 py-1 m-0" href="/file/{{ att.path }}/{{ att.name }}" target="_blank">
+                        <i class="fas fa-file"></i>
+                        {{ att.name }}
+                      </a>
+                    {% endfor %}
+                  </div>
+                </span>
+              {% endif %}
+
+            </span>
+          </div>
+
+          <div class="result-details stdout-stderr collapse" id="eo-{{ item.uuid }}">
+            <div class="test-details">
+              {% if item.message_details | length %}
+                <div class="d-flex">
+                  <div class="pr-2 empty-padding"></div>
+                  <div class="small px-1">
+                    {% for line in item.message_details %}
+                      <p class="m-0">{{ line }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+
+              {% endif %}
+
+              {% if item.console | length %}
+                <div class="result-text console">
+                  <span class="title">Console:</span>
+                  <ul class="std-list">
+                    {% for line in item.console %}
+                      <li>{{ line }}</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    {% endfor %} #}
   </div>
-  
-  {% for id, item in results %}
-    {# create template for test #}
-    <div class="execution-entry execution-test" id="e-{{ item.uuid }}">
-      {% set status = item.status %}
-      {% set uuid = item.uuid %}
-      {% include "static/templates/test-result.njk" %}
-    </div>
-  {% endfor %}
 </div>

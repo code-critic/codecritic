@@ -1,0 +1,44 @@
+{% if message_details | length %}
+  <div class="d-flex">
+    <div class="pr-2 empty-padding"></div>
+    <div class="small px-1">
+      {% for line in message_details %}
+        <p class="m-0">{{ line }}</p>
+      {% endfor %}
+    </div>
+  </div>
+
+{% endif %}
+
+{% if console | length %}
+  <div class="result-text console">
+    <span class="title">Console:</span>
+    <ul class="std-list">
+      {% for line in console %}
+        <li>{{ line }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{# {% if stderr | length %}
+  <div class="result-text stderr">
+    <span class="title">Stderr:</span>
+    <ol class="std-list">
+      {% for line in stderr %}
+        <li>{{ line }}</li>
+      {% endfor %}
+    </ol>
+  </div>
+{% endif %}
+
+{% if stdout | length %}
+  <div class="result-text stdout">
+    <span class="title">Output:</span>
+    <ol class="std-list">
+      {% for line in stdout %}
+        <li>{{ line }}</li>
+      {% endfor %}
+    </ol>
+  </div>
+{% endif %} #}

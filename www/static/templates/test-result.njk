@@ -1,65 +1,51 @@
-<div class="execution-test {{ status }}" id="e-{{ uuid }}">
+<div class="execution-test {{ status }}">
   <div class="d-flex mb-2">
-    {% if status == 'running' %}
-      <span class="test-icon">
-        <div class="spinner loader status-badge">
-          <div class="rect1"></div>
-          <div class="rect2"></div>
-          <div class="rect3"></div>
-          <div class="rect4"></div>
-          <div class="rect5"></div>
-        </div>
-      </span>
-    {% endif %}
+    <span class="test-icon running">
+      <div class="spinner loader status-badge">
+        <div class="rect1"></div>
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
+      </div>
+    </span>
 
-    {% if inArray(status, ['ok', 'answer-correct']) %}
-      <span class="test-icon">
-        <span class="status-badge">
-          <i class="fas fa-check"></i>
-        </span>
+    <span class="test-icon ok answer-correct">
+      <span class="status-badge">
+        <i class="fas fa-check"></i>
       </span>
-    {% endif %}
+    </span>
 
-    {% if inArray(status, ['answer-correct-timeout']) %}
-      <span class="test-icon">
-        <span class="status-badge">
-          <i class="fas fa-exclamation"></i>
-          {# <i class="fas fa-not-equal"></i> #}
-        </span>
+    <span class="test-icon answer-correct-timeout">
+      <span class="status-badge">
+        <i class="fas fa-exclamation"></i>
+        {# <i class="fas fa-not-equal"></i> #}
       </span>
-    {% endif %}
+    </span>
 
-    {% if inArray(status, ['error', 'answer-wrong', 'answer-wrong-timeout', 'error-while-running']) %}
-      <span class="test-icon">
-        <span class="status-badge">
-          <i class="fas fa-times"></i>
-        </span>
+    <span class="test-icon error answer-wrong answer-wrong-timeout error-while-running">
+      <span class="status-badge">
+        <i class="fas fa-times"></i>
       </span>
-    {% endif %}
+    </span>
 
-    {% if inArray(status, ['skipped', 'ignore']) %}
-      <span class="test-icon">
-        <div class="status-badge">
-          <i class="fas fa-question"></i>
-        </div>
-      </span>
-    {% endif %}
+    <span class="test-icon skipped ignore">
+      <div class="status-badge">
+        <i class="fas fa-question"></i>
+      </div>
+    </span>
 
-    {% if status == 'global-timeout' %}
-      <span class="test-icon">
-        <div class="status-badge">
-          <i class="fas fa-question"></i>
-        </div>
-      </span>
-    {% endif %}
+    <span class="test-icon global-timeout">
+      <div class="status-badge">
+        <i class="fas fa-question"></i>
+      </div>
+    </span>
 
-    {% if inArray(status, ['waiting', 'in-queue']) %}
-      <span class="test-icon">
-        <div class="status-badge">
-          <i class="fas fa-clock"></i>
-        </div>
-      </span>
-    {% endif %}
+    <span class="test-icon waiting in-queue">
+      <div class="status-badge">
+        <i class="fas fa-clock"></i>
+      </div>
+    </span>
 
     <a class="btn-block-anim flex-fill" data-toggle="collapse" data-target="#eo-{{ uuid }}">
       {% if duration %}

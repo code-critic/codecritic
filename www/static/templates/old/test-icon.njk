@@ -1,0 +1,45 @@
+{% if status == 'running' %}
+  <div class="spinner loader status-badge">
+    <div class="rect1"></div>
+    <div class="rect2"></div>
+    <div class="rect3"></div>
+    <div class="rect4"></div>
+    <div class="rect5"></div>
+  </div>
+{% endif %}
+
+{% if inArray(status, ['ok', 'answer-correct']) %}
+  <span class="status-badge">
+    <i class="fas fa-check"></i>
+  </span>
+{% endif %}
+
+{% if inArray(status, ['answer-correct-timeout']) %}
+  <span class="status-badge">
+    <i class="fas fa-exclamation"></i>
+  </span>
+{% endif %}
+
+{% if inArray(status, ['error', 'answer-wrong', 'answer-wrong-timeout', 'error-while-running']) %}
+  <span class="status-badge">
+    <i class="fas fa-times"></i>
+  </span>
+{% endif %}
+
+{% if inArray(status, ['skipped', 'ignore']) %}
+  <div class="status-badge">
+    <i class="fas fa-question"></i>
+  </div>
+{% endif %}
+
+{% if status == 'global-timeout' %}
+  <div class="status-badge">
+    <i class="fas fa-question"></i>
+  </div>
+{% endif %}
+
+{% if inArray(status, ['waiting', 'in-queue']) %}
+  <div class="status-badge">
+    <i class="fas fa-clock"></i>
+  </div>
+{% endif %}

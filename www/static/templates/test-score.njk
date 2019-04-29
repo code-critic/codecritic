@@ -1,0 +1,10 @@
+{% if score %}
+  <span class="score" data-toggle="tooltip"
+  title="<b>Final score</b><br/>correct: {{scores[0]}}x<br/> correct+timeout: {{scores[1]}}x<br/> no fatal error: {{scores[2]}}x"
+  data-html="true">
+    <span class="score-value answer-correct">{{ scores[0] | pad(2) }}</span><!--
+  --><span class="score-value answer-correct-timeout">{{ scores[1] | pad(2) }}</span><!--
+  --><span class="score-value answer-wrong">{{ scores[2] | pad(2) }}</span>
+    <i class="fas fa-info-circle"></i>
+  </span>
+{% endif %}

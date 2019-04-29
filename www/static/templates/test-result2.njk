@@ -1,0 +1,116 @@
+<div class="execution-entry execution-test" id="e-{{ uuid }}">
+  <div class="execution-test {{ status }}">
+    <div class="test-case-holder">
+
+      <span class="cell cell-icon">
+        <span class="test-icon running">
+          <span class="status-badge">
+            <i class="fas fa-circle-notch animation-spin-fast"></i>
+            {# cog #}
+          </span>
+        </span>
+
+        <span class="test-icon ok answer-correct">
+          <span class="status-badge">
+            <i class="fas fa-check"></i>
+          </span>
+        </span>
+
+        <span class="test-icon answer-correct-timeout">
+          <span class="status-badge">
+            <i class="fas fa-exclamation"></i>
+          </span>
+        </span>
+
+        <span class="test-icon error answer-wrong answer-wrong-timeout error-while-running">
+          <span class="status-badge">
+            <i class="fas fa-times"></i>
+          </span>
+        </span>
+
+        <span class="test-icon skipped ignore">
+          <div class="status-badge">
+            <i class="fas fa-question"></i>
+          </div>
+        </span>
+
+        <span class="test-icon global-timeout">
+          <div class="status-badge">
+            <i class="fas fa-question"></i>
+          </div>
+        </span>
+
+        <span class="test-icon waiting in-queue">
+          <div class="status-badge">
+            <i class="fas fa-clock"></i>
+          </div>
+        </span>
+      </span>
+
+      <a class="cell cell-href" data-toggle="collapse" data-target="#eo-{{ uuid }}">
+        <span class="test-title">
+          {% if duration %}
+            <span class="duration">
+              [{{ duration | toFixed(2) }}&nbsp;sec]
+            </span>
+          {% endif %}
+          {{ id }}
+          {% if message %}
+            <span class="message">
+              :&nbsp;{{ message }}
+            </span>
+          {% endif %}
+        </span>
+      </a>
+
+      <span class="cell cell-score">
+      </span>
+
+      <span class="cell cell-attachments" style="display: none">
+        {% if attachments | length %}
+          <span data-toggle="tooltip" title="View input and output files">
+            <button class="btn btn-link dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fas fa-folder-open"></i>
+            </button>
+
+            <div class="dropdown-menu">
+              {% for att in attachments %}
+                <a class="dropdown-item p-1 attachment-btn m-0" href="/file/{{ att.path }}/{{ att.name }}" target="_blank">
+                  <i class="fas fa-file"></i>
+                  {{ att.name }}
+                </a>
+              {% endfor %}
+            </div>
+          </span>
+        {% endif %}
+      </span>
+    </div>
+
+    <div class="result-details stdout-stderr collapse" id="eo-{{ uuid }}">
+      <div class="test-details">
+        {% if message_details | length %}
+          <div class="d-flex">
+            <div class="pr-2 empty-padding"></div>
+            <div class="small px-1">
+              {% for line in message_details %}
+                <p class="m-0">{{ line }}</p>
+              {% endfor %}
+            </div>
+          </div>
+
+        {% endif %}
+
+        {% if console | length %}
+          <div class="result-text console">
+            <span class="title">Console:</span>
+            <ul class="std-list">
+              {% for line in console %}
+                <li>{{ line }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

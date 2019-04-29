@@ -1,0 +1,10 @@
+{% if duration %}
+  <span class="duration">
+    [{{ duration | toFixed(2) }}&nbsp;sec]</span>
+{% endif %}
+
+{{ id }}
+
+{% if message %}
+  <span class="message">:&nbsp;{{ message }}</span>
+{% endif %}
