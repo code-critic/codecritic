@@ -4,9 +4,18 @@
 import pytest
 import unittest
 import os
+import sys
+
 from www import start
+from loguru import logger
 
 case = unittest.TestCase('__init__')
+logger.configure(
+    handlers=[dict(sink=sys.stdout, colorize=False, level='INFO')]
+)
+
+
+# -----------------------------------------------------------------------------
 
 
 @pytest.mark.www
@@ -40,11 +49,11 @@ def test_remove_old():
     from env import Env
     from loguru import logger
 
-    info = '\n'.join(['{:>20s}: {:s}'.format(k, str(v)) for k, v in Env.info()])
-    logger.info('Configuration in env.py:\n{}', info)
-    logger.info('removing old files from {}', Env.tmp)
-
+    Env.dump_info('Configuration in env.py')
     from utils import io
+    # delete old files so the test is not influenced
+    io.delete_old_files(Env.tmp, io.HALF_DAY)
+
     foo = Env.tmp.joinpath('foo')
     foo.mkdir(parents=True, exist_ok=True)
     bar = foo.joinpath('bar.txt')
