@@ -9,15 +9,20 @@
     <header>
       {% include "core/header.njk" %}
     </header>
-
+    
     <main>
-      <div class="container z-depth-1 p-4">
+      <div class="container z-depth-1 py-4">
         <article>
-          {% with h=3, mb=1 %}
-            {% include "core/article-head.njk" %}
-          {% endwith %}
-          
-          {% include "admin-settings.njk" %}
+          {% include "core/article-head.njk" %}
+          {% for result in results %}
+            {% if result.live %}
+              {{ result.course.name }} - {{ result.course.year }} - {{ result.problem.name }}
+              
+              <div id="solution-result" data-uuid="{{ result.uuid }}">
+                <div class="solution-result card-body"></div>
+              </div>
+            {% endif %}
+          {% endfor %}
         </article>
       </div>
     </main>
@@ -25,9 +30,9 @@
     <footer class="page-footer font-small fixed-bottom">
       {% include "core/footer.njk" %}
     </footer>
-    
     <script type="text/javascript" src="/static/js/templates.js" charset="utf-8"></script>
     <script type="text/javascript" src="/static/js/sockets.js" charset="utf-8"></script>
-    <script type="text/javascript" src="/static/js/manage-problem.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/process.js" charset="utf-8"></script>
   </body>
+
 </html>

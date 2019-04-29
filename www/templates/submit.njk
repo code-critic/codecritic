@@ -32,7 +32,7 @@
 
                   <div id="submit-solution" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionSubmit">
                     <div class="card-body">
-                      <form class="form" method="post">
+                      <form class="form" method="post" action="{{ url_for('process_solution', course_name=course.name, course_year=course.year) }}">
 
                         <!-- Problem -->
                         <label>Problem</label>
