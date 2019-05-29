@@ -10,6 +10,7 @@ notifications:
 services:
   - docker
 
+# pull image
 before_install:
   - docker pull automatest/all
 
@@ -20,10 +21,8 @@ install:
 
 # run the tests
 script:
+  # TODO maybe use a specific order when testing
   - pytest --cov=src tests
-  # - pytest --cov=src tests/actions/test_processRequestGenerateInput.py
-  # - pytest --cov=src tests/actions/test_processRequestGenerateOutput.py
-  # - pytest --cov=src tests/actions/test_processRequestSolve.py
 
 # if (and when) we succeed coveralls will be published
 after_success:

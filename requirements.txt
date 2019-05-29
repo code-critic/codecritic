@@ -13,3 +13,8 @@ eventlet
 gevent
 gevent-websocket
 singleton_decorator
+markdown
+pillow
+dataclasses-json
+flask-sse
+gunicorn
