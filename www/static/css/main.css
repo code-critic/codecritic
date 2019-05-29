@@ -34,42 +34,6 @@ body {
   transition: height .2s ease !important;
 }
 
-.prob-desc .card-body h1 {
-  font-size: 1.8em;
-}
-.prob-desc .card-body h2 {
-  font-size: 1.6em;
-}
-.prob-desc .card-body h3 {
-  font-size: 1.0em;
-}
-.prob-desc .card-body h4 {
-  font-size: 0.8em;
-}
-.prob-desc .card-body {
-  font-size: 85%;
-}
-.prob-desc .card-body pre code {
-  white-space: pre;
-  width: 100%;
-  display: block;
-  background: rgb(245, 245, 245);
-  border: 1px solid #cfcfcf;
-  color: #333;
-  padding: 0.5rem;
-  border-radius: 0.125rem;
-}
-/* .prob-desc p code.ignore {
-  white-space: inherit;
-  display: inline;
-  background: inherit;
-  border: inherit;
-  font-size: 87.5%;
-  color: #e83e8c;
-  padding: inherit;
-  border-radius: inherit;
-} */
-
 .result {
     background: #FFF;
     padding: 1.5rem;

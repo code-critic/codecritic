@@ -1,1 +1,248 @@
-nav.navbar{color:#fff}nav.navbar .dropdown-menu a{height:30px;display:inline-block;padding:0.5rem 1.0rem}nav.navbar .navbar-back{position:absolute;top:0;left:0;right:0;min-height:200px;z-index:-1}nav.navbar .container{min-height:50px}main a.back-btn{padding:0.75rem 1.0rem;margin:0;border-radius:0.25rem}main .courses .course{margin:0.5rem}main .courses .course .course-img{margin-right:1rem}main .courses .course a{padding:1rem;width:100%;height:100%;display:block;background:#fff}main .courses .course a:hover{-webkit-box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12) !important;box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12) !important}@media (max-width: 992px){nav.navbar{padding:0}}@media (min-width: 1400px){.container{max-width:1300px}}.o-25{opacity:0.25 !important}.o-50{opacity:0.5 !important}.o-75{opacity:0.75 !important}.stat-results .stat-result-all{border:1px dashed #686868}.stat-results .stat-result{padding:0.75rem}.stat-results .stat-result:nth-child(even){background:#e1f5ff}.stat-results .stat-result:nth-child(odd){background:#edffee}#editor{width:100%;height:300px}.count-down{display:none}.count-down.prob-admin-over{color:#6faa5b;background:#e8fce4;display:block;padding:1rem;text-align:center}.count-down.prob-almost-over{color:#a87011;background:#ffe4a4;display:block;padding:1rem;text-align:center}.count-down.prob-over{color:#a81111;background:#ffa4a4;display:block;padding:1rem;text-align:center}
+nav.navbar {
+  color: #fff;
+}
+
+nav.navbar .navbar-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  min-height: 200px;
+  z-index: -1;
+}
+
+nav.navbar .container {
+  min-height: 50px;
+}
+
+main a.back-btn {
+  padding: 0.75rem 1.0rem;
+  margin: 0;
+  border-radius: 0.25rem;
+}
+
+main .article-section {
+  background: #fff;
+  border-radius: 0.25rem;
+}
+
+main .problem-results .result a {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+main .problem-results .score .score-value {
+  margin: 0.05rem;
+  padding: 0.05rem;
+}
+
+main .problem-results > ul {
+  margin: 0;
+  padding: 0;
+}
+
+main .problem-results > ul > li.result {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+main .problem-results > ul > li.result a {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.125rem;
+  margin: 2px 0;
+  font-size: 0.70rem;
+}
+
+main .prob-desc .desc {
+  font-size: 85%;
+}
+
+main .prob-desc .desc h1 {
+  font-size: 1.8em;
+}
+
+main .prob-desc .desc h2 {
+  font-size: 1.6em;
+}
+
+main .prob-desc .desc h3 {
+  font-size: 1.0em;
+}
+
+main .prob-desc .desc h4 {
+  font-size: 0.8em;
+}
+
+main .prob-desc .desc pre code {
+  white-space: pre;
+  width: 100%;
+  display: block;
+  background: whitesmoke;
+  border: 1px solid #cfcfcf;
+  color: #333;
+  padding: 0.5rem;
+  border-radius: 0.125rem;
+}
+
+main .courses .course {
+  margin: 0.5rem;
+}
+
+main .courses .course .course-img {
+  margin-right: 1rem;
+}
+
+main .courses .course a {
+  padding: 1rem;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: #fff;
+}
+
+main .courses .course a:hover {
+  -webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
+}
+
+@media (max-width: 992px) {
+  nav.navbar {
+    padding: 0;
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1300px;
+  }
+}
+
+.o-25 {
+  opacity: 0.25 !important;
+}
+
+.o-50 {
+  opacity: 0.5 !important;
+}
+
+.o-75 {
+  opacity: 0.75 !important;
+}
+
+.stat-results .stat-result-all {
+  border: 1px dashed #686868;
+}
+
+.stat-results .stat-result {
+  padding: 0.75rem;
+}
+
+.stat-results .stat-result:nth-child(even) {
+  background: #e1f5ff;
+}
+
+.stat-results .stat-result:nth-child(odd) {
+  background: #edffee;
+}
+
+#editor {
+  width: 100%;
+  height: 300px;
+}
+
+.count-down {
+  display: none;
+}
+
+.count-down.prob-admin-over {
+  color: #6faa5b;
+  background: #e8fce4;
+  display: block;
+  padding: 1rem;
+  text-align: center;
+}
+
+.count-down.prob-almost-over {
+  color: #a87011;
+  background: #ffe4a4;
+  display: block;
+  padding: 1rem;
+  text-align: center;
+}
+
+.count-down.prob-over {
+  color: #a81111;
+  background: #ffa4a4;
+  display: block;
+  padding: 1rem;
+  text-align: center;
+}
+
+.hljs-ln .hljs-ln-numbers {
+  text-align: center;
+  color: #ccc;
+  vertical-align: top;
+  padding: 3px;
+  cursor: pointer;
+  display: inline-block;
+  min-width: 25px;
+  margin-right: 3px;
+}
+
+.hljs-ln .hljs-ln-numbers:hover {
+  background: #00a3ff;
+  color: #fff;
+}
+
+.hljs-ln .hljs-ln-code {
+  padding-left: 10px;
+  border-left: 1px solid #CCC;
+}
+
+tr.review {
+  white-space: nowrap;
+}
+
+tr.review.review-editor textarea {
+  width: 500px;
+  border-radius: 0.25rem;
+  border: 1px solid #d5d5d5;
+}
+
+tr.review.review-comment td.comments {
+  font-family: Arial;
+  background: white;
+  border-radius: 0.25rem;
+  border: 1px solid #d5d5d5;
+  min-width: 300px;
+  max-width: 500px;
+  display: block;
+}
+
+tr.review.review-comment td.comments .review-comment-entry {
+  padding: 0.5rem;
+}
+
+tr.review.review-comment td.comments .review-comment-entry .head strong {
+  font-family: Roboto, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+tr.review.review-comment td.comments .review-comment-entry .text {
+  white-space: normal;
+}
+
+tr.review.review-comment td.comments .review-comment-entry .text strong {
+  font-weight: bold;
+}
+
+tr.review.review-comment td.comments .review-comment-entry .text > p {
+  margin-bottom: 0.25rem;
+}
+/*# sourceMappingURL=new.min.css.map */

@@ -24,9 +24,46 @@ $statuses: (
       .cell-score .score {
         background: darken($color, 30);
         // border-left: 1px solid rgba(darken($color, 30), .5);
-        
         .score-value {
           background: rgba(#fff, 0.25);
+        }
+      }
+    }
+  }
+}
+
+.problem-results, .search-results {
+  @each $name, $color in $statuses {
+    a.#{$name} {
+      background: lighten($color, 30);
+      color: darken($color, 30);
+      border: 1px solid transparent;
+
+      .ribbon span {
+        color: lighten($color, 23);
+        background: darken($color, 23);
+      }
+      
+      .details {
+        background: lighten($color, 23);
+        color: darken($color, 23);
+      }
+      
+      &:hover {
+        background: lighten($color, 23);
+        color: darken($color, 23);
+        border: 1px solid darken($color, 30);
+      }
+      
+      &.active {
+        color: lighten($color, 30);
+        background: darken($color, 30);
+        padding: 0.75rem;
+      }
+
+      .score {
+        .score-value {
+          background: rgba(#fff, 0.15);
         }
       }
     }
@@ -115,7 +152,7 @@ $statuses: (
     }
 
     .cell-score .score {
-      min-width: 100px;
+      min-width: 110px;
       padding: 0.25rem;
       border-radius: 0.25rem;
       margin: 0 1rem;
@@ -137,6 +174,7 @@ $statuses: (
         margin: 0.1rem;
         padding: 0.1rem;
         border-radius: 0.125rem;
+        display: inline-block;
       }
     }
   }

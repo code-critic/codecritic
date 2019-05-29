@@ -19,8 +19,6 @@ $statuses: (
     display: none;
   }
 }
-
-
 @each $name, $color in $statuses {
   .#{$name}.execution-test {
     .test-icon.#{$name} {

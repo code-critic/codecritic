@@ -1,1 +1,36 @@
-.student nav.navbar .navbar-back{background:#c6e7ff}.student nav.navbar .container{background:#0a5bb0}.student footer{background:#c6e7ff}.student footer>.container{background:#0a5bb0}.admin nav.navbar .navbar-back{background:#ffebc6}.admin nav.navbar .container{background:#d4630d}.admin footer{background:#ffebc6}.admin footer>.container{background:#d4630d}main>.container{background:#ebebeb}
+.student nav.navbar .navbar-back {
+  background: #c6e7ff;
+}
+
+.student nav.navbar .container {
+  background: #0a5bb0;
+}
+
+.student footer {
+  background: #c6e7ff;
+}
+
+.student footer > .container {
+  background: #0a5bb0;
+}
+
+.admin nav.navbar .navbar-back {
+  background: #ffebc6;
+}
+
+.admin nav.navbar .container {
+  background: #d4630d;
+}
+
+.admin footer {
+  background: #ffebc6;
+}
+
+.admin footer > .container {
+  background: #d4630d;
+}
+
+main > .container {
+  background: #ebebeb;
+}
+/*# sourceMappingURL=colors.new.min.css.map */

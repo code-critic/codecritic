@@ -1,11 +1,11 @@
 nav.navbar {
   color: #fff;
 
-  .dropdown-menu a {
-    height: 30px;
-    display: inline-block;
-    padding: 0.5rem 1.0rem;
-  }
+  // .dropdown-menu a {
+  //   min-height: 30px;
+  //   display: inline-block;
+  //   padding: 0.5rem 1.0rem;
+  // }
 
   .navbar-back {
     position: absolute;
@@ -26,6 +26,76 @@ main {
     padding: 0.75rem 1.0rem;
     margin: 0;
     border-radius: 0.25rem;
+  }
+
+  .article-section {
+    background: #fff;
+    border-radius: 0.25rem;
+  }
+
+  .problem-results {
+    .result a {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .score {
+      .score-value {
+        margin: 0.05rem;
+        padding: 0.05rem;
+      }
+    }
+
+    & > ul {
+      margin: 0;
+      padding: 0;
+    }
+
+    & > ul > li.result {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      a {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.125rem;
+        margin: 2px 0;
+        font-size: 0.70rem;
+      }
+    }
+  }
+
+  .prob-desc {
+    .desc {
+      font-size: 85%;
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      h2 {
+        font-size: 1.6em;
+      }
+
+      h3 {
+        font-size: 1.0em;
+      }
+
+      h4 {
+        font-size: 0.8em;
+      }
+
+      pre code {
+        white-space: pre;
+        width: 100%;
+        display: block;
+        background: rgb(245, 245, 245);
+        border: 1px solid #cfcfcf;
+        color: #333;
+        padding: 0.5rem;
+        border-radius: 0.125rem;
+      }
+    }
   }
 
   .courses {
@@ -122,5 +192,74 @@ main {
     display: block;
     padding: 1rem;
     text-align: center;
+  }
+}
+
+.hljs-ln {
+  .hljs-ln-numbers {
+    text-align: center;
+    color: #ccc;
+    vertical-align: top;
+    padding: 3px;
+    cursor: pointer;
+    display: inline-block;
+    min-width: 25px;
+    margin-right: 3px;
+
+    &:hover {
+      background: #00a3ff;
+      color: #fff;
+    }
+  }
+
+  .hljs-ln-code {
+    padding-left: 10px;
+    border-left: 1px solid #CCC;
+  }
+}
+
+tr.review {
+  white-space: nowrap;
+
+  &.review-editor {
+    textarea {
+      width: 500px;
+      border-radius: 0.25rem;
+      border: 1px solid #d5d5d5;
+    }
+  }
+
+  &.review-comment {
+    td.comments {
+      font-family: Arial;
+      background: white;
+      border-radius: 0.25rem;
+      border: 1px solid #d5d5d5;
+      min-width: 300px;
+      max-width: 500px;
+      display: block;
+
+      .review-comment-entry {
+        padding: 0.5rem;
+
+        .head strong {
+          font-family: Roboto, Arial, sans-serif;
+          font-weight: bold;
+          font-size: 1rem;
+        }
+
+        .text {
+          white-space: normal;
+
+          strong {
+            font-weight: bold;
+          }
+
+          & > p {
+            margin-bottom: 0.25rem;
+          }
+        }
+      }
+    }
   }
 }

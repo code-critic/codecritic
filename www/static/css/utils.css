@@ -104,7 +104,6 @@ body #toast-container > div {
 .filter-item-holder {
   border: 5px solid white;
   color: #808080;
-  -webkit-transition: all 0.15s ease-in-out;
   transition: all 0.15s ease-in-out;
 }
 
@@ -133,7 +132,6 @@ body #toast-container > div {
 }
 
 .filter-item-holder select {
-  -webkit-transition: all 0.15s ease-in-out;
   transition: all 0.15s ease-in-out;
   border: none;
   border-radius: 0;
@@ -146,8 +144,7 @@ body #toast-container > div {
 .badge-sm {
   font-size: 0.7rem;
   padding: 0.125rem 0.25rem;
-  -webkit-box-shadow: none;
-          box-shadow: none;
+  box-shadow: none;
 }
 
 .ribbon {
@@ -167,11 +164,9 @@ body #toast-container > div {
   color: #FFF;
   text-transform: uppercase;
   text-align: center;
-  -webkit-transform: rotate(45deg);
-          transform: rotate(45deg);
+  transform: rotate(45deg);
   width: 60px;
   display: block;
-  background: -webkit-gradient(linear, left top, left bottom, from(#F70505), to(#8F0808));
   background: linear-gradient(#F70505 0%, #8F0808 100%);
   position: absolute;
   top: 9px;
@@ -195,14 +190,11 @@ body #toast-container > div {
   color: #FFF;
   text-transform: uppercase;
   text-align: center;
-  -webkit-transform: rotate(-45deg);
-          transform: rotate(-45deg);
+  transform: rotate(-45deg);
   width: 60px;
   display: block;
-  background: -webkit-gradient(linear, left top, left bottom, from(#f7a205), to(#c98506));
   background: linear-gradient(#f7a205 0%, #c98506 100%);
   position: absolute;
   top: 9px;
   left: -14px;
 }
-/*# sourceMappingURL=utils.min.css.map */
