@@ -11,10 +11,49 @@ from env import Env
 from flask import send_file
 from flask_autoindex import AutoIndex
 from utils.strings import string_hash
-from www import app, login_required, admin_required
+from www import app, login_required, admin_required, url_for
 
 
-Link = collections.namedtuple('Link', ['url', 'text'])
+class Link(object):
+    def __init__(self, url, text, tooltip=None):
+        self.url = url
+        self.text = text
+        self.tooltip = tooltip or text
+
+    @classmethod
+    def CoursesBtn(cls):
+        return cls(url_for('view_courses'), 'Courses', 'Go to course selection')
+
+    @classmethod
+    def CourseBtn(cls, course):
+        return cls(
+            url_for('view_course', course_name=course.name, course_year=course.year),
+            course.name,
+            'Go to course %s' % course.name
+        )
+
+    @classmethod
+    def ProblemBtn(cls, course, problem):
+        return cls(
+            url_for('view_result', course_name=course.name, course_year=course.year, problem_id=problem.id),
+            problem.name,
+            'View Results of %s' % problem.name
+        )
+
+
+class Breadcrumbs(list):
+    def add(self, url, text, tooltip=None):
+        self.append(Link(url, text, tooltip))
+        return self
+
+    @classmethod
+    def new(cls, *items):
+        this = Breadcrumbs()
+        for item in items:
+            this.append(item)
+        return this
+
+
 ai = AutoIndex(app, browse_root=Env.courses, add_url_rules=False)
 
 

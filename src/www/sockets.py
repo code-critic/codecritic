@@ -46,7 +46,7 @@ def broadcast_queue_pop(item):
     emit('queue-pop', dict(status=200, item=item), broadcast=True)
 
 
-def _process_solution(user, action, skip_docker, problem_id, course_id, lang_id=None, src=None):
+def _process_solution(user, action, skip_docker, problem_id, course_id, lang_id=None, src=None, _id=None):
     if not user.is_admin() and (
             skip_docker or action in (ProcessRequestType.GENERATE_INPUT, ProcessRequestType.GENERATE_OUTPUT)):
         Emittor.error(
@@ -98,8 +98,10 @@ def _process_solution(user, action, skip_docker, problem_id, course_id, lang_id=
         finally:
             output_dir, attempt = request.save_result()
             if Env.use_database:
+                # replace document instead of creating new one
                 Mongo().save_result(
                     request.get_result_dict(),
+                    _id=_id,
                     output_dir=output_dir,
                     attempt=attempt,
                 )
@@ -121,17 +123,19 @@ def register_routes(app, socketio):
 
     @socketio.on('student-process-solution', namespace=namespace)
     def student_process_solution(data):
+        print(data)
         user = User(session['user'])
         try:
-            solution = session[data['uuid']]
+            document = Mongo().result_by_id(data['_id'])
             _process_solution(
                 user=user,
-                action=solution['action'],
-                skip_docker=not solution['use_docker'],
-                problem_id=solution['problem_id'],
-                course_id=solution['course_id'],
-                lang_id=solution['lang_id'],
-                src=solution['src'],
+                action=document.action,
+                skip_docker=not document.docker,
+                problem_id=document.problem,
+                course_id=document.course,
+                lang_id=document.lang,
+                src=document.solution,
+                _id=data['_id'],
             )
         except:
             logger.exception('Error while processing solution')

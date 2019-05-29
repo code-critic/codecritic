@@ -1,7 +1,11 @@
 #!/bin/python3
 # author: Jan Hybs
 import enum
+from dataclasses import dataclass
 
+@dataclass()
+class ResultStatus:
+    pass
 
 class ExecutorStatus(enum.IntEnum):
 

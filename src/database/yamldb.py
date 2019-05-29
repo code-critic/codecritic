@@ -75,10 +75,8 @@ class YamlDB(object):
             return doc
         raise ValueError('No item "%s" found on %s' % (str(item), str(self)))
 
-    def _load(self, func=yaml.load, **kwargs):
-        opts = self.load_opts.copy()
-        opts.update(kwargs)
-        self._data = func(self.yaml_file.read_text(), **opts) or list()
+    def _load(self, func=yaml.safe_load, **kwargs):
+        self._data = func(self.yaml_file.read_text()) or list()
         return self._data
 
     def _save(self, func=yaml.dump, **kwargs):

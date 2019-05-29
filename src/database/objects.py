@@ -3,19 +3,23 @@
 import pathlib
 
 import typing
+from collections import defaultdict
+
 import yaml
 import copy
 import datetime as dt
-import os
 
 from database import parse_dt
 from database.yamldb import ADB, YamlDB
+from entities.crates import Attachment
 from exceptions import FatalException, ConfigurationException
 
 from utils import strings
 from env import Env
 
 from loguru import logger
+
+from utils.paths import IOEFiles
 
 
 class InvalidConfiguration(Exception):
@@ -153,7 +157,7 @@ class Courses(object):
         for course in root.glob('*'):
             course_yaml = course / 'config.yaml'
             if course.is_dir() and course_yaml.exists() and course_yaml.is_file():
-                config = yaml.load(course_yaml.read_text())
+                config = yaml.safe_load(course_yaml.read_text())
                 yield course, config
 
     def _iter_subcourses(self, root):
@@ -286,6 +290,7 @@ class Problem(ADB):
         self.avail = parse_dt(item.get('avail'))
         self.course = item.get('course')
         self.problem_dir = self.course.problems_dir / self.id
+        self.relative_problem_dir = self.problem_dir.relative_to(Env.root)
 
         if self.reference:
             self.reference.path = self.problem_dir / ('%s' % self.reference.name)
@@ -339,6 +344,18 @@ class Problem(ADB):
                     break
         return result
 
+    def __iter__(self):
+        return iter(self.tests)
+
+    def __getitem__(self, id):
+        for test in self:
+            for subcase in test.cases():
+                if subcase.id == id:
+                    return subcase
+
+        if id != 'Compilation':
+            logger.warning('No such subcase {} in {}', id, self.tests)
+
 
 class ProblemCase(ADB):
     """
@@ -355,6 +372,8 @@ class ProblemCase(ADB):
         self.size = item.get('size')
         self.timeout = item.get('timeout')
         self.problem = problem
+        self._reference_files = None
+
         random = item.get('random')
 
         if random is True:
@@ -363,6 +382,25 @@ class ProblemCase(ADB):
             self.random = 0
         else:
             self.random = int(random)
+
+    @property
+    def reference_files(self):
+        if not self._reference_files:
+            self._reference_files = IOEFiles(self.problem.relative_problem_dir, self.id)
+        return self._reference_files
+
+    def get_attachments(self, user_dir: pathlib.Path) -> typing.List[Attachment]:
+        try:
+            case_paths = IOEFiles(user_dir.relative_to(Env.root), self.id)
+            return [
+                Attachment(name='input.txt', path=case_paths.input),
+                Attachment(name='output.txt', path=case_paths.output),
+                Attachment(name='error.txt', path=case_paths.error),
+                Attachment(name='reference.txt', path=self.reference_files.output),
+            ]
+        except:
+            logger.exception('attachments')
+            return []
 
     def generate_input_args(self, validate=False):
         if validate:
@@ -389,3 +427,21 @@ class ProblemCase(ADB):
                     timeout=self.timeout,
                 )
                 yield ProblemCase(data, self.problem)
+
+
+class Notifications(object):
+    def __init__(self, *item):
+        self.items = item
+        self.per_course = defaultdict(list)
+        for n in self.items:
+            self.per_course[n['course']].append(n)
+
+    def __len__(self):
+        return len(self.items)
+
+    def __iter__(self):
+        return iter(self.items)
+
+    def peek(self, full=True):
+        return self.__dict__
+

@@ -3,12 +3,16 @@
 
 from uuid import uuid4
 
+from typing import List
 from flask import redirect, request, session, url_for
 from loguru import logger
 
-from database.objects import Courses, Languages, User
+from database.mongo import Mongo
+from database.objects import Courses, Languages, User, Problem
+from env import Env
 from www import admin_required, dump_error, login_required, render_template_ext
-from www.utils_www import Link
+from www.utils_www import Link, Breadcrumbs
+from entities import crates
 
 
 def register_routes(app, socketio):
@@ -16,57 +20,116 @@ def register_routes(app, socketio):
     @login_required
     @dump_error
     def process_solution(course_name, course_year):
+        user = User(session['user'])
+
         try:
             course = Courses().find_one(name=course_name, year=course_year, only_active=False)
             problem = course.problem_db[request.form['prob-id']]
             lang = Languages.db()[request.form['lang-id']]
-            src = request.form['src']
+            solution = request.form['src']
             use_docker = request.form.get('use-docker', 'off') == 'on'
-            uuid = uuid4().hex
 
-            session[uuid] = dict(
-                problem_id=problem.id,
-                lang_id=lang.id,
-                course_id=course.id,
-                use_docker=use_docker,
-                src=src,
+            test_result = crates.TestResult(
+                user=user.id,
+                problem=problem.id,
+                lang=lang.id,
+                course=course.id,
+                docker=use_docker,
+                solution=solution,
                 action='solve',
             )
+            # save to the db and redirect with _id
+            insert_result = Mongo().save_result(test_result.peek())
 
-            return redirect(url_for('view_result', uuid=uuid))
+            return redirect(
+                url_for(
+                    'view_result',
+                    course_name=course.name,
+                    course_year=course.year,
+                    problem_id=problem.id,
+                    _id=str(insert_result.inserted_id)
+                )
+            )
 
         except:
             logger.exception('Could not parse data')
 
-    @app.route('/results/<string:uuid>')
+    @app.route('/r/<string:_id>')
     @login_required
     @dump_error
-    def view_result(uuid=None):
-
+    def perma_result(_id):
         user = User(session['user'])
-        results = list()
-
-        if uuid:
-            solution = session[uuid]
-            course = Courses()[solution['course_id']]
-            results.append(dict(
-                course=Courses()[solution['course_id']],
-                problem=course.problem_db[solution['problem_id']],
-                lang=Languages.db()[solution['lang_id']],
-                src=solution['src'],
-                use_docker=solution['use_docker'],
-                live=True,
-                uuid=uuid,
-            ))
+        document = Mongo().result_by_id(_id)
+        course = document.ref_course
+        problem = document.ref_problem
+        breadcrumbs = [Link.CoursesBtn(), Link.CourseBtn(course), Link.ProblemBtn(course, problem)]
 
         return render_template_ext(
             'results.njk',
             user=user,
-            results=results,
+            notifications=Mongo().read_notifications(user.id),
+            results=[document],
+            result=None,
+            requestReview=False,
 
-            title='Results',
-            subtitle=user.name,
-            back=Link(url_for('view_courses'), 'course selection'),
+            title='Problem %s' % problem.name,
+            breadcrumbs=Breadcrumbs.new(*breadcrumbs),
+        )
+
+    @app.route('/results/<string:course_name>/<string:course_year>/<string:problem_id>/<string:_id>')
+    @app.route('/results/<string:course_name>/<string:course_year>/<string:problem_id>')
+    @login_required
+    @dump_error
+    def view_result(course_name, course_year, problem_id, _id=None):
+        user = User(session['user'])
+
+        if user.is_admin():
+            return redirect(
+                url_for('admin_problem', course_name=course_name, course_year=course_year, problem_id=problem_id)
+            )
+
+        course = Courses().find_one(name=course_name, year=course_year, only_active=False)
+        problem = course.problem_db[problem_id]
+        results = list()
+        result = None
+        breadcrumbs = [Link.CoursesBtn(), Link.CourseBtn(course)]
+
+        # TODO check access
+        if _id:
+            document = Mongo().result_by_id(_id)
+            if document:
+                # add to previous solution if already executed
+                if document.result:
+                    results.append(document.peek())
+                else:
+                    result = document.peek()
+                    breadcrumbs.append(
+                        Link.ProblemBtn(course, problem)
+                    )
+
+        if Env.use_database:
+            for prev in Mongo().peek_last_n_results(20, user.id, course.id, problem.id):
+                # push only valid result
+                if prev.get('result') and str(prev['_id']) != str(_id):
+                    results.append(prev)
+
+        if _id:
+            for r in results:
+                if str(r['_id']) == str(_id):
+                    r['active'] = 'active'
+
+        results = sorted(results, reverse=True, key=lambda x: x.get('attempt'))
+
+        return render_template_ext(
+            'results.njk',
+            user=user,
+            notifications=Mongo().read_notifications(user.id),
+            results=results,
+            result=result,
+            requestReview=True,
+
+            title='Problem %s' % problem.name,
+            breadcrumbs=Breadcrumbs.new(*breadcrumbs),
         )
 
     @app.route('/course/<string:course_name>/<string:course_year>')
@@ -81,13 +144,16 @@ def register_routes(app, socketio):
         return render_template_ext(
             'submit.njk',
             user=user,
+            notifications=Mongo().read_notifications(user.id),
             course=course,
             languages=languages,
             problems=problems,
 
             title=course.name,
             subtitle=course.year,
-            back=Link(url_for('view_courses'), 'course selection'),
+            breadcrumbs=Breadcrumbs.new(
+                Link.CoursesBtn(),
+            ),
         )
 
     @app.route('/admin/<string:course_name>/<string:course_year>/<string:problem_id>')
@@ -97,19 +163,24 @@ def register_routes(app, socketio):
     def admin_problem(course_name, course_year, problem_id):
         user = User(session['user'])
         course = Courses().find_one(name=course_name, year=course_year, only_active=False)
+        problems_ids = ','.join([x.id for x in list(course.problem_db.find())])
         problem = course.problem_db[problem_id]
         languages = Languages.db().find(disabled=(None, False))
 
         return render_template_ext(
             'problem.njk',
             user=user,
+            notifications=Mongo().read_notifications(user.id),
             course=course,
             languages=languages,
             problem=problem,
+            problems_ids=problems_ids,
 
-            title='Manage %s' % course.name,
-            subtitle=problem.name,
-            back=Link(url_for('view_course', course_name=course_name, course_year=course_year), 'problem selection'),
+            title='Manage problem %s' % problem.name,
+            breadcrumbs=Breadcrumbs.new(
+                Link.CoursesBtn(),
+                Link.CourseBtn(course)
+            ),
         )
 
     @app.route('/courses')
@@ -126,5 +197,6 @@ def register_routes(app, socketio):
             'courses.njk',
             title='Course list',
             user=user,
+            notifications=Mongo().read_notifications(user.id),
             courses=courses
         )

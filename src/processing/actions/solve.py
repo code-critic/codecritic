@@ -90,9 +90,6 @@ class ProcessRequestSolve(AbstractAction):
                 result = extract_console(result)
 
             rr[id] = result
-            request._register_attachment(id=id, name='input', path=subcase.temp.input)
-            request._register_attachment(id=id, name='output', path=subcase.temp.output)
-            request._register_attachment(id=id, name='error', path=subcase.temp.error)
-            request._register_attachment(id=id, name='reference', path=subcase.problem.output)
+            rr[id].attachments.extend(subcase.subcase.get_attachments(subcase.temp_dir))
 
             request.event_execute_test.close_event.trigger(rr[id])

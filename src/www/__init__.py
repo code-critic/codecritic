@@ -4,32 +4,49 @@
 import enum
 import pathlib
 
+from bson import objectid
 from flask import Flask, redirect, session, render_template, url_for
 import flask.json
 from flask_cors import CORS
 from loguru import logger
 
+from entities.crates import ICrate
 from env import Env
 from functools import wraps
 
 
+def default(obj):
+    return CustomJSONEncoder().default(obj)
+
+
 class CustomJSONEncoder(flask.json.JSONEncoder):
     def default(self, obj):
-        from processing import ExecutorStatus
+        try:
+            from processing import ExecutorStatus
 
-        if isinstance(obj, ExecutorStatus):
-            return obj.str
+            if isinstance(obj, ExecutorStatus):
+                return obj.str
 
-        if isinstance(obj, enum.Enum):
-            return obj.value
+            if isinstance(obj, enum.Enum):
+                return obj.value
 
-        if isinstance(obj, pathlib.Path):
-            return str(obj)
+            if isinstance(obj, (pathlib.Path, pathlib.PosixPath)):
+                return str(obj)
 
-        if hasattr(obj, 'peek'):
-            return obj.peek()
+            if isinstance(obj, objectid.ObjectId):
+                return str(obj)
 
-        return flask.json.JSONEncoder.default(self, obj)
+            if isinstance(obj, ICrate):
+                return obj.peek()
+
+            if hasattr(obj, 'peek'):
+                return obj.peek()
+
+            return flask.json.JSONEncoder.default(self, obj)
+        except:
+            logger.exception('encoder error')
+            return {}
+
 
 
 def login_required(f):

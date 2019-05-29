@@ -86,7 +86,7 @@ class Env(object):
     @classmethod
     def database_config(cls):
         import yaml
-        return yaml.load(cls.database_secret.read_text())
+        return yaml.safe_load(cls.database_secret.read_text())
 
     @classmethod
     def info_dict(cls):

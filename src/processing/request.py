@@ -1,11 +1,13 @@
 #!/bin/python3
 # author: Jan Hybs
-import datetime
+
+import os
 import os
 import pathlib
 import shutil
 import typing
 
+from entities.crates import TestResult
 from utils.paths import IOEPaths
 
 
@@ -90,7 +92,6 @@ class ProcessRequest(object):
         self.lang = Languages.db().get(lang)
         self.case_ids = cases or self.problem.test_ids
         self.cases = self.problem.tests_from_ids(self.case_ids)
-        self.datetime = datetime.datetime.now()
 
         self.user = user
         self.solution = src
@@ -129,21 +130,17 @@ class ProcessRequest(object):
                 '  type={self.type}\n'
                 ')').format(self=self)
 
-    def peek(self, ):
-        return dict(
+    def peek(self, full: bool=True):
+        return TestResult(
             uuid=self.uuid,
             user=self.user.id,
-            course=self.course,
-            lang=self.lang,
-            prob=self.problem,
-            action=self.type,
-            evaluation=self.evalution_result,
+            course=self.course.id,
+            lang=self.lang.id if self.lang else None,
+            problem=self.problem.id,
+            action=str(self.type.value),
+            result=self.result.peek(full) if self.result else None,
+            docker=self.docker,
         )
-
-    @property
-    def evalution_result(self):
-        self.evaluate_solution()
-        return self.result.result
 
     # ------------------------------------------
 
@@ -281,13 +278,14 @@ class ProcessRequest(object):
             logger.warning('It is already saved in a problem directory: {}', self.problem_dir)
             return None, None
 
+        import datetime
         format_dict = dict(
             problem=self.problem,
             course=self.course,
             user=self.user,
             lang=self.lang,
             status=self.result.result.status,
-            datetime=self.datetime,
+            datetime=datetime.datetime.now(),
         )
 
         student_base_dir = Env.results.joinpath(Env.student_dir_format.format(**format_dict))
@@ -324,7 +322,6 @@ class ProcessRequest(object):
     def get_log_dict(self):
         doc = dict(
             user=self.user.id,
-            datetime=datetime.datetime.now(),
             action=self.type.value,
             course=self.course.id,
             problem=self.problem.id,
@@ -353,11 +350,6 @@ class ProcessRequest(object):
         #     base['tests'] = tests
 
         return self.result.peek(False)
-
-    def _register_attachment(self, id, name, path: pathlib.Path):
-        if path.exists():
-            rel_path = str(path.relative_to(Env.root))
-            self.result[id].add_attachment(dict(name=name+'.txt', path=rel_path))
 
 
 def _configure_cmd(cmd, file):

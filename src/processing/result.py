@@ -3,6 +3,7 @@
 import pathlib
 import typing
 
+from entities.crates import CaseResult, TestResult
 from loguru import logger
 from processing import ExecutorStatus, ProcessRequestType
 from utils.crypto import sha1
@@ -78,7 +79,7 @@ class RequestResult(object):
         self[ExecutorResult.COMPILATION] = value
 
     def peek(self, full=True):
-        return dict(
+        return TestResult(
             lang=self.lang.id if self.lang else None,
             solution=self.solution,
             docker=self.docker,
@@ -110,7 +111,7 @@ class ExecutorResult(object):
         self.uuid = None
         self.id = None
 
-        self.duration = 0
+        self.duration = 0.0
 
         self.message = None
         self.message_details = None
@@ -146,9 +147,6 @@ class ExecutorResult(object):
         self.uuid = sha1(id)
         return self
 
-    def add_attachment(self, *attachment: dict):
-        self.attachments.extend(attachment)
-
     def __call__(self, status=None, returncode=None, error=None, duration=None):
         if status is not None:
             self.status = status
@@ -175,9 +173,9 @@ class ExecutorResult(object):
     def failed(self):
         return self.returncode != 0
 
-    def peek(self, full=True):
+    def peek(self, full=True) -> CaseResult:
         if full:
-            return dict(
+            return CaseResult(
                 uuid=self.uuid,
                 id=self.id,
                 status=self.status.str,
@@ -192,7 +190,7 @@ class ExecutorResult(object):
                 scores=self.scores,
             )
 
-        doc = dict(
+        return CaseResult(
             id=self.id,
             status=self.status.str,
             cmd=' '.join(ensure_iterable(self.cmd)),
@@ -203,10 +201,10 @@ class ExecutorResult(object):
             score=self.score,
             scores=self.scores,
         )
-        for p in ('cmd', 'message', 'message_details'):
-            if p in doc and not doc[p]:
-                doc.pop(p)
-        return doc
+        # for p in ('cmd', 'message', 'message_details'):
+        #     if p in doc and not doc[p]:
+        #         doc.pop(p)
+        # return doc
 
     @classmethod
     def empty_result(cls, id, status=ExecutorStatus.IN_QUEUE):
