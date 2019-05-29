@@ -1,521 +1,163 @@
-var Automatest = (function() {
-
-  var namespace = '';
-  var root = '';
-  var $target = '';
-  var callback = null;
-  var socket = null;
-  var URL = location.protocol + '//' + document.domain + ':' + location.port + namespace;
-  var env = nunjucks.configure(URL, {
-    autoescape: true
-  });
-  env.addGlobal('inArray', function(value, arr) {
-    return arr.includes(value);
-  });
-  env.addFilter('toFixed', function(num, digits) {
-    return parseFloat(num).toFixed(digits)
-  });
-
-  var registerSocket = function(_callback) {
-    var called = false;
-    console.log(Automatest.socket, socket);
-    socket = io.connect(URL, {
-      reconnection: false,
-      timeout: 100 * 1000,
-    });
-    console.log(Automatest.socket, socket);
-    socket.on('connect', function() {
-      console.log('connected');
-      
-      if (!called && _callback) {
-        _callback(socket);
-        called = true;
-      }
-    });
-    socket.on('connect_timeout', function() {
-      console.log('connect_timeout');
-    });
-    socket.on('connect_error', function() {
-      console.log('connect_error');
-    });
-
-    socket.on('reconnect', (attemptNumber) => {
-      console.log('reconnect ' + attemptNumber);
-    });
-    socket.on('reconnecting', (attemptNumber) => {
-      console.log('reconnecting ' + attemptNumber);
-    });
-    socket.on('disconnect', (reason) => {
-      console.log('disconnect');
-      console.log(reason);
-      if (reason === 'io server disconnect') {
-        // the disconnection was initiated by the server, you need to reconnect manually
-        socket.connect();
-      }
-      // else the socket will automatically try to reconnect
-    });
-
-    // var oldOnevent = socket.onevent;
-    // socket.onevent = function(packet) {
-    //   if (packet.data) {
-    //     console.log('>>>', {
-    //       name: packet.data[0],
-    //       payload: packet.data[1]
-    //     })
-    //   }
-    //   oldOnevent.apply(socket, arguments)
-    // }
-
-    socket.on('debug', function(event) {
-      logData(event);
-    });
-
-    socket.on('queue-status', function(event) {
-      $target.html(
-        nunjucks.render(root + 'static/templates/list-queue-items.njk', event.data)
-      );
-    });
-
-    socket.on('queue-push', function(event) {
-      logData(event);
-
-      $target.find('.queue-status ul').append(
-        nunjucks.render(root + 'static/templates/list-queue-item.njk', event.data)
-      );
-      var item = document.getElementById('queue-' + event.data.id);
-      $(item).css('display', 'none').show('fast');
-    });
-
-    socket.on('queue-pop', function(event) {
-      logData(event);
-
-      var item = document.getElementById('queue-' + event.data.id);
-      $(item).hide();
-    });
-
-    socket.on('process-start-me', function(event) {
-      logData(event);
-
-      $target.html(
-        nunjucks.render(root + 'static/templates/process-execute.njk', event)
-      );
-      // for (id in event.results) {
-      //   var item = event.results[id];
-      //   $('#e-' + item.uuid).html(
-      //     nunjucks.render(root + 'static/templates/test-result.njk', item)
-      //   )
-      // }
-      $('.execution > .execution-entry').hide().show('fast');
-    });
-
-    socket.on('process-end-me', function(event) {
-      logData(event);
-
-      $target.find('.evaluation').addClass(event.data.evaluation.status).show().find('.evaluation-result').html(
-        nunjucks.render(root + 'static/templates/test-result2.njk', event.data.evaluation)
-      )
-      $target.find('.collapse').collapse('show');
-      if (callback) {
-        callback(event);
-      }
-    });
-
-    socket.on('execute-test-start-me', function(event) {
-      logData(event);
-
-      var $testDiv = $(document.getElementById('e-' + event.test.uuid));
-      $testDiv.find('.execution-test').attr('class', 'execution-test ' + event.test.status);
-      $testDiv.find('.test-icon').html(
-        nunjucks.render(root + 'static/templates/test-icon.njk', {
-          status: event.test.status
-        })
-      );
-    });
-
-    socket.on('execute-test-end-me', function(event) {
-      logData(event);
-
-      var $testDiv = $(document.getElementById('e-' + event.test.uuid));
-      $testDiv.find('.execution-test').attr('class', 'execution-test ' + event.test.status);
-      $testDiv.find('.test-icon').html(
-        nunjucks.render(root + 'static/templates/test-icon.njk', {
-          status: event.test.status
-        })
-      );
-      $testDiv.find('.test-title').html(
-        nunjucks.render(root + 'static/templates/test-title.njk', event.test)
-      );
-      $testDiv.find('.test-details').html(
-        nunjucks.render(root + 'static/templates/test-details.njk', event.test)
-      );
-      $testDiv.find('.test-attachments').show().html(
-        nunjucks.render(root + 'static/templates/test-attachments.njk', event.test)
-      );
-
-      $testDiv.find('[data-toggle="tooltip"]').tooltip();
-    });
-
-    socket.on('fatal-error', function(event) {
-      logData(event);
-      $target.html(
-        nunjucks.render(root + 'static/templates/fatal-error.njk', event)
-      );
-
-      if (callback) {
-        callback(event);
-      }
-    });
-
-    socket.on('compile-start-me', function(event) {
-      logData(event);
-      $target.find('.compilation').html(
-        nunjucks.render(root + 'static/templates/test-result.njk', event.result)
-      )
-    });
-    socket.on('compile-end-me', function(event) {
-      logData(event);
-      $target.find('.compilation').html(
-        nunjucks.render(root + 'static/templates/test-result.njk', event.result)
-      )
-    });
-  }
-
-  return {
-    socket: this.socket,
-    openSocket: function(_callback) {
-      return registerSocket(_callback);
-    },
-    setTarget(target) {
-      $target = $(target);
-    },
-    submitSolution: function(socket, courseID, problemID, languageID, sourceCode, actionType, useDocker, _callback) {
-      callback = _callback;
-      socket.emit('student-solution-submit', {
-        type: actionType,
-        course: courseID,
-        prob: problemID,
-        lang: languageID,
-        src: sourceCode,
-        docker: useDocker,
-      });
-    },
-    processSolution: function(socket, uuid, _callback) {
-      callback = _callback;
-      socket.emit('student-process-solution', {
-        uuid: uuid,
-      });
-    },
-  }
-})();
-
-var toArray = function(arr) {
-  return Array.isArray(arr) ? arr : [arr];
+class CCUtils {
+    static toArray(arr) {
+        return Array.isArray(arr) ? arr : [arr];
+    }
+    static storagePut(idx, value) {
+        var key = CCUtils.toArray(idx).join('/');
+        try {
+            localStorage.setItem(key, value);
+        }
+        catch (e) {
+        }
+    }
+    static storageGet(idx, def) {
+        var key = CCUtils.toArray(idx).join('/');
+        try {
+            if (key in localStorage) {
+                return localStorage.getItem(key);
+            }
+            else {
+                return def === undefined ? null : def;
+            }
+        }
+        catch (e) {
+            return def === undefined ? null : def;
+        }
+    }
+    static courseStorage(courseID) {
+        var course = CCUtils.toArray(courseID);
+        return {
+            storageGet: function (idx, def = undefined) {
+                return CCUtils.storageGet(course.concat(CCUtils.toArray(idx)), def);
+            },
+            storagePut: function (idx, value) {
+                return CCUtils.storagePut(course.concat(CCUtils.toArray(idx)), value);
+            }
+        };
+    }
+    static registerDnD(holder, success) {
+        if (!window.FileReader) {
+            return false;
+        }
+        var MAX_SIZE = 1024 * 1024 * 2;
+        var $holder = $(holder);
+        $holder.addClass('draggable');
+        holder = $holder.get(0);
+        holder.ondragover = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $holder.addClass('hover');
+            return false;
+        };
+        holder.ondragenter = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $holder.addClass('hover');
+            return false;
+        };
+        holder.ondragleave = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $holder.removeClass('hover');
+            return false;
+        };
+        holder.ondragend = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $holder.removeClass('hover');
+            return false;
+        };
+        holder.ondrop = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $holder.removeClass('hover');
+            try {
+                var file = e.dataTransfer.files[0];
+                var reader = new FileReader();
+                if (file.size > MAX_SIZE) {
+                    alert('The file is too big');
+                    return false;
+                }
+                reader.onload = function (event) {
+                    success(file, event.target.result);
+                };
+                reader.readAsText(file);
+            }
+            catch (e) {
+                console.log(e);
+            }
+            return false;
+        };
+    }
+    static logData(data) {
+        if (data.data == 'ok, connected') {
+            $('#log').empty();
+        }
+        var copy = $.extend(true, {}, data);
+        var msg = '<b>' + copy.event + '</b>: ';
+        delete copy.event;
+        delete copy.status;
+        msg += JSON.stringify(copy) + '\n';
+        $('#log').append(msg);
+    }
+    static loadNotifications(callback) {
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: '/api/notifications/list',
+            contentType: 'application/json;charset=UTF-8',
+            data: null,
+            success: function (data) {
+                if (callback) {
+                    callback(data);
+                }
+                else {
+                    var length = data.notifications.items.length;
+                    var oldLength = $('.notification-menu a').length;
+                    if (length == oldLength) {
+                        return;
+                    }
+                    $('#notifications').html(Templates.render('common/notifications', { notifications: data.notifications.items }));
+                    CCUtils.relativeTime($('#notifications'));
+                    if (length > 0) {
+                        $('#notifications').removeClass('d-none');
+                    }
+                    else {
+                        $('#notifications').addClass('d-none');
+                    }
+                    window.favicon.badge(length);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log('ajax failed', xhr.status, thrownError);
+            }
+        });
+    }
+    static relativeTime(element) {
+        $(element).find('.time-relative').each(function (i, element) {
+            var dt = window.moment(Number($(this).data('time')));
+            $(this).text(dt.fromNow());
+            $(this).parent().attr('title', dt.locale('cs').format('llll'));
+        });
+    }
+    static enableTooltips(element) {
+        $(element).find('[data-toggle="tooltip"]').tooltip();
+    }
 }
-
-var storagePut = function(idx, value) {
-  var key = toArray(idx).join('/');
-  try {
-    localStorage.setItem(key, value);
-  } catch (e) {
-    // ignore local storage error
-  }
-};
-
-var storageGet = function(idx, def) {
-  var key = toArray(idx).join('/');
-  try {
-    if (key in localStorage) {
-      return localStorage.getItem(key);
-    } else {
-      return def === undefined ? null : def;
-    }
-  } catch (e) {
-    // ignore local storage error
-    return def === undefined ? null : def;
-  }
-};
-
-
-var courseStorage = function(courseID) {
-  var course = toArray(courseID);
-
-  return {
-    storageGet: function(idx, def) {
-      return storageGet(course.concat(toArray(idx)), def);
-    },
-    storagePut: function(idx, value) {
-      return storagePut(course.concat(toArray(idx)), value);
-    }
-  }
-};
-
-var registerDnD = function(holder, success) {
-  if (!window.FileReader) {
-    return false;
-  }
-
-  // max size of 2 MB
-  var MAX_SIZE = 1024 * 1024 * 2;
-  var $holder = $(holder);
-  $holder.addClass('draggable');
-  holder = $holder.get(0);
-
-  holder.ondragover = function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    $holder.addClass('hover');
-    return false;
-  };
-  holder.ondragenter = function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    $holder.addClass('hover');
-    return false;
-  };
-
-  holder.ondragleave = function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    $holder.removeClass('hover');
-    return false;
-  };
-  holder.ondragend = function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    $holder.removeClass('hover');
-    return false;
-  };
-
-  holder.ondrop = function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    $holder.removeClass('hover');
-
-    try {
-      var file = e.dataTransfer.files[0];
-      var reader = new FileReader();
-      if (file.size > MAX_SIZE) {
-        alert('The file is too big');
-        return false;
-      }
-
-      reader.onload = function(event) {
-        success(file, event.target.result);
-      };
-
-      reader.readAsText(file);
-    } catch (e) {
-      console.log(e);
-    }
-
-
-    return false;
-  };
-};
-
-
-
-var logData = function(data) {
-  if (data.data == 'ok, connected') {
-    $('#log').empty();
-  }
-  var copy = $.extend(true, {}, data);
-  var msg = '<b>' + copy.event + '</b>: ';
-  delete copy.event;
-  delete copy.status;
-  msg += JSON.stringify(copy) + '\n';
-  $('#log').append(msg);
-};
-
-var _showcase = {
-  "results": {
-    IN_QUEUE: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.IN_QUEUE",
-      "message": "ExecutorStatus.IN_QUEUE",
-      "message_details": [],
-      "returncode": null,
-      "status": "in-queue",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "d5f2588bb2e9b63063eb4d5db43c13c01bd96866"
-    },
-    RUNNING: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.RUNNING",
-      "message": "ExecutorStatus.RUNNING",
-      "message_details": [],
-      "returncode": null,
-      "status": "running",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "a216200b0e7fac3296fbef0c06df1367d872b840"
-    },
-    IGNORE: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.IGNORE",
-      "message": "ExecutorStatus.IGNORE",
-      "message_details": [],
-      "returncode": null,
-      "status": "ignore",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "b5b18180580381272bacd032d5a51e96c86dd586"
-    },
-    OK: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.OK",
-      "message": "ExecutorStatus.OK",
-      "message_details": [],
-      "returncode": null,
-      "status": "ok",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "46c48c19ddd8ab3df6f48fd4cd8ac522f659cbac"
-    },
-    ANSWER_CORRECT: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.ANSWER_CORRECT",
-      "message": "ExecutorStatus.ANSWER_CORRECT",
-      "message_details": [],
-      "returncode": null,
-      "status": "answer-correct",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "a7b113d80fa9e2edccd52a52fffd2d5a24b5aea7"
-    },
-    ANSWER_CORRECT_TIMEOUT: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.ANSWER_CORRECT_TIMEOUT",
-      "message": "ExecutorStatus.ANSWER_CORRECT_TIMEOUT",
-      "message_details": [],
-      "returncode": null,
-      "status": "answer-correct-timeout",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "88aeb82278cdf663a52b7a73c885d66f6633b53b"
-    },
-    ANSWER_WRONG: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.ANSWER_WRONG",
-      "message": "ExecutorStatus.ANSWER_WRONG",
-      "message_details": [],
-      "returncode": null,
-      "status": "answer-wrong",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "8434f46886c76fbd29fee76bd3e136e497de59b5"
-    },
-    ANSWER_WRONG_TIMEOUT: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.ANSWER_WRONG_TIMEOUT",
-      "message": "ExecutorStatus.ANSWER_WRONG_TIMEOUT",
-      "message_details": [],
-      "returncode": null,
-      "status": "answer-wrong-timeout",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "4ba7e3ef76bc013869e7df456f2b1c3206aa2e2a"
-    },
-    SKIPPED: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.SKIPPED",
-      "message": "ExecutorStatus.SKIPPED",
-      "message_details": [],
-      "returncode": null,
-      "status": "skipped",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "491d1f548ccc7d028e8de8f92eb61c41454dc1e4"
-    },
-    SOFT_TIMEOUT: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.SOFT_TIMEOUT",
-      "message": "ExecutorStatus.SOFT_TIMEOUT",
-      "message_details": [],
-      "returncode": null,
-      "status": "soft-timeout",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "10fa7e263c084952f5385dc618059c3e64aefd06"
-    },
-    GLOBAL_TIMEOUT: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.GLOBAL_TIMEOUT",
-      "message": "ExecutorStatus.GLOBAL_TIMEOUT",
-      "message_details": [],
-      "returncode": null,
-      "status": "global-timeout",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "483a78795ca564cd1c30f5e72c9fc00c46c40d0b"
-    },
-    FILE_NOT_FOUND: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.FILE_NOT_FOUND",
-      "message": "ExecutorStatus.FILE_NOT_FOUND",
-      "message_details": [],
-      "returncode": null,
-      "status": "file-not-found",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "624581e2c9affd98b09ec0e5aac308d4454373be"
-    },
-    ERROR_WHILE_RUNNING: {
-      "cmd": [],
-      "console": [],
-      "duration": 0,
-      "id": "ExecutorStatus.ERROR_WHILE_RUNNING",
-      "message": "ExecutorStatus.ERROR_WHILE_RUNNING",
-      "message_details": [],
-      "returncode": null,
-      "status": "error-while-running",
-      "stderr": [],
-      "stdin": [],
-      "stdout": [],
-      "uuid": "c1b07a5a8ad543916cbe39ec2d9fe234d0bff1b2"
-    }
-  },
-  "user": "jan.hybs",
-  "uuid": "fbf00cd60a3c4419b6410d3145253019"
-};
-
-$(document).ready(function() {
-  $('[data-toggle="tooltip"]').tooltip();
+$(document).ready(function () {
+    var $user = $('#cc-user');
+    window.user = {
+        id: $user.data('user-id'),
+        name: $user.data('user-name'),
+        isAdmin: $user.data('user-admin') == 'True',
+    };
+    console.log(window.user);
+    Globals.initEnv();
+    $('[data-toggle="tooltip"]').tooltip();
+    window.favicon = new window.Favico({
+        animation: 'up',
+    });
+    setInterval(CCUtils.loadNotifications, 5000);
+    CCUtils.loadNotifications();
 });
+//# sourceMappingURL=core.js.map

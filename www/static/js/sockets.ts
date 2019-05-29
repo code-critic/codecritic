@@ -24,43 +24,47 @@ enum Status {
   COMPILATION_FAILED = "compilation-failed",
 }
 
-interface TestAttachment {
+interface Attachment {
   name: string;
   path: string;
 }
 
-interface TestResult {
+interface CaseResult {
   id: string;
-  uuid: string;
   status: Status;
-  attachments: TestAttachment[];
   duration: number;
-
-  scores: number[];
-  score: number;
   returncode: number;
-
-  console: string[];
   message: string;
+  
+  scores?: number[];
+  score?: number;
+  cmd?: string;
+  uuid?: string;
+  
+  console: string[];
   message_details: string[];
+  attachments: Attachment[];
 }
 
-interface Problem {
+interface TestResult {
     action: string;
-    course: any;
-    lang: any;
-    user: any;
-    uuid: string;
-    result: TestResult;
-    results: TestResult[];
+    course: string;
+    problem: string;
+    user: string;
+    result: CaseResult;
+    results: CaseResult[];
+    
+    uuid?: string;
+    lang?: string;
+    solution?: string;
+}
+
+interface CaseEvent {
+  data: CaseResult;
 }
 
 interface TestEvent {
   data: TestResult;
-}
-
-interface ProblemEvent {
-  data: Problem;
 }
 
 class CC {
@@ -112,30 +116,30 @@ class CC {
       docker: useDocker,
     });
   }
-  public processSolution(uuid: string, on_complete?: Function, on_error?: Function) {
+  public processSolution(_id: string, on_complete?: Function, on_error?: Function) {
     this.on_complete = on_complete;
     this.on_error = on_error;
     console.log('emitting process solution');
     this.socket.emit('student-process-solution', {
-      uuid: uuid,
+      _id: _id,
     });
   }
 
-  private drawTest(test: TestResult) {
+  private drawTest(test: CaseResult) {
     var canvas: JQuery = this.canvas.find(`#e-${test.uuid} .execution-test`);
     canvas.attr('class', `execution-test ${test.status}`);
 
     canvas.find('.test-title').html(
-      Templates.testTitle.render(test)
+      Templates.render('test-title', test)
     );
     canvas.find('.test-details').html(
-      Templates.testDetails.render(test)
+      Templates.render('test-details', test)
     );
     canvas.find('.cell-attachments').show().html(
-      Templates.testAttachments.render(test)
+      Templates.render('test-attachments', test)
     );
     canvas.find('.cell-score').show().html(
-      Templates.testScore.render(test)
+      Templates.render('test-score', test)
     );
     canvas.find('[data-toggle="tooltip"]').tooltip();
   }
@@ -169,7 +173,7 @@ class CC {
   private registerSocketQueueEvents() {
     this.socket.on('queue-status', (event) => {
       this.canvas.html(
-        Templates.listQueueItems.render(event.data)
+        Templates.render('queue/list-queue-items', event.data)
       );
     });
 
@@ -177,7 +181,7 @@ class CC {
       logData(event);
 
       this.canvas.find('.queue-status ul').append(
-        Templates.listQueueItem.render(event.data)
+        Templates.render('queue/list-queue-item', event.data)
       );
       var item = document.getElementById('queue-' + event.data.id);
       $(item).css('display', 'none').show('fast');
@@ -190,26 +194,26 @@ class CC {
   }
 
   private registerSocketProcessEvents() {
-    this.socket.on('process-start-me', (event: ProblemEvent) => {
+    this.socket.on('process-start-me', (event: TestEvent) => {
       logData(event);
 
       this.canvas.html(
-        Templates.processExecute.render(event)
+        Templates.render('process-execute', event)
       );
       var nodes = "";
       event.data.results.forEach((item) => {
-        nodes += Templates.testResult2.render(item)
+        nodes += Templates.render('test-result2', item)
       });
       this.canvas.find('.test-cases').html(nodes);
       this.canvas.find('.final-evaluation').html(
-        Templates.testResult2.render(event.data.result)
+        Templates.render('test-result2', event.data.result)
       );
     });
 
-    this.socket.on('process-end-me', (event: ProblemEvent) => {
+    this.socket.on('process-end-me', (event: TestEvent) => {
       logData(event);
       this.canvas.find('.evaluation').addClass(event.data.result.status).show().find('.evaluation-result').html(
-        Templates.testResult2.render(event.data.result)
+        Templates.render('test-result2', event.data.result)
       )
       this.drawTest(event.data.result);
       event.data.results.forEach((item) => {
@@ -223,7 +227,7 @@ class CC {
     this.socket.on('fatal-error', (event) => {
       logData(event);
       this.canvas.html(
-        Templates.fatalError.render(event)
+        Templates.render('fatal-error', event)
       );
       if (this.on_error) {
         this.on_error(event);
@@ -232,22 +236,22 @@ class CC {
   }
 
   private registerSocketTestEvents() {
-    this.socket.on('execute-test-start-me', (event: TestEvent) => {
+    this.socket.on('execute-test-start-me', (event: CaseEvent) => {
       logData(event);
       this.drawTest(event.data);
     });
 
-    this.socket.on('execute-test-end-me', (event: TestEvent) => {
+    this.socket.on('execute-test-end-me', (event: CaseEvent) => {
       logData(event);
       this.drawTest(event.data);
     });
 
-    this.socket.on('compile-start-me', (event: TestEvent) => {
+    this.socket.on('compile-start-me', (event: CaseEvent) => {
       logData(event);
       this.drawTest(event.data);
     });
 
-    this.socket.on('compile-end-me', (event: TestEvent) => {
+    this.socket.on('compile-end-me', (event: CaseEvent) => {
       logData(event);
       this.drawTest(event.data);
     });

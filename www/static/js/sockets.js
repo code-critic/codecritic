@@ -18,30 +18,29 @@ var Status;
     Status["ERROR_WHILE_RUNNING"] = "error-while-running";
     Status["COMPILATION_FAILED"] = "compilation-failed";
 })(Status || (Status = {}));
-var CC = (function () {
-    function CC(canvas) {
-        this.URL = location.protocol + "//" + document.domain + ":" + location.port;
+class CC {
+    constructor(canvas) {
+        this.URL = `${location.protocol}//${document.domain}:${location.port}`;
         this.canvas = canvas;
     }
-    CC.prototype.connect = function (callback) {
-        var _this = this;
+    connect(callback) {
         var first = true;
         this.socket = io.connect(this.URL, {
             reconnection: false,
-            timeout: 100 * 1000
+            timeout: 100 * 1000,
         });
-        this.socket.on('connect', function () {
-            _this.registerSocketQueueEvents();
-            _this.registerSocketProcessEvents();
-            _this.registerSocketTestEvents();
-            _this.registerSocketDebugEvents();
+        this.socket.on('connect', () => {
+            this.registerSocketQueueEvents();
+            this.registerSocketProcessEvents();
+            this.registerSocketTestEvents();
+            this.registerSocketDebugEvents();
             if (callback && first) {
                 callback();
                 first = false;
             }
         });
-    };
-    CC.prototype.submitSolution = function (courseID, problemID, languageID, sourceCode, actionType, useDocker, on_complete, on_error) {
+    }
+    submitSolution(courseID, problemID, languageID, sourceCode, actionType, useDocker, on_complete, on_error) {
         this.on_complete = on_complete;
         this.on_error = on_error;
         this.socket.emit('student-solution-submit', {
@@ -50,115 +49,111 @@ var CC = (function () {
             prob: problemID,
             lang: languageID,
             src: sourceCode,
-            docker: useDocker
+            docker: useDocker,
         });
-    };
-    CC.prototype.processSolution = function (uuid, on_complete, on_error) {
+    }
+    processSolution(_id, on_complete, on_error) {
         this.on_complete = on_complete;
         this.on_error = on_error;
         console.log('emitting process solution');
         this.socket.emit('student-process-solution', {
-            uuid: uuid
+            _id: _id,
         });
-    };
-    CC.prototype.drawTest = function (test) {
-        var canvas = this.canvas.find("#e-" + test.uuid + " .execution-test");
-        canvas.attr('class', "execution-test " + test.status);
-        canvas.find('.test-title').html(Templates.testTitle.render(test));
-        canvas.find('.test-details').html(Templates.testDetails.render(test));
-        canvas.find('.cell-attachments').show().html(Templates.testAttachments.render(test));
-        canvas.find('.cell-score').show().html(Templates.testScore.render(test));
+    }
+    drawTest(test) {
+        var canvas = this.canvas.find(`#e-${test.uuid} .execution-test`);
+        canvas.attr('class', `execution-test ${test.status}`);
+        canvas.find('.test-title').html(Templates.render('test-title', test));
+        canvas.find('.test-details').html(Templates.render('test-details', test));
+        canvas.find('.cell-attachments').show().html(Templates.render('test-attachments', test));
+        canvas.find('.cell-score').show().html(Templates.render('test-score', test));
         canvas.find('[data-toggle="tooltip"]').tooltip();
-    };
-    CC.prototype.registerSocketDebugEvents = function () {
-        var _this = this;
-        this.socket.on('connect_timeout', function () {
+    }
+    registerSocketDebugEvents() {
+        this.socket.on('connect_timeout', () => {
             console.log('connect_timeout');
         });
-        this.socket.on('connect_error', function () {
+        this.socket.on('connect_error', () => {
             console.log('connect_error');
         });
-        this.socket.on('reconnect', function (attemptNumber) {
+        this.socket.on('reconnect', (attemptNumber) => {
             console.log('reconnect ' + attemptNumber);
         });
-        this.socket.on('reconnecting', function (attemptNumber) {
+        this.socket.on('reconnecting', (attemptNumber) => {
             console.log('reconnecting ' + attemptNumber);
         });
-        this.socket.on('disconnect', function (reason) {
+        this.socket.on('disconnect', (reason) => {
             console.log('disconnect', reason);
             if (reason === 'io server disconnect') {
-                _this.socket.connect();
+                this.socket.connect();
             }
         });
-        this.socket.on('debug', function (event) {
+        this.socket.on('debug', (event) => {
             console.log(event);
         });
-    };
-    CC.prototype.registerSocketQueueEvents = function () {
-        var _this = this;
-        this.socket.on('queue-status', function (event) {
-            _this.canvas.html(Templates.listQueueItems.render(event.data));
+    }
+    registerSocketQueueEvents() {
+        this.socket.on('queue-status', (event) => {
+            this.canvas.html(Templates.render('queue/list-queue-items', event.data));
         });
-        this.socket.on('queue-push', function (event) {
+        this.socket.on('queue-push', (event) => {
             logData(event);
-            _this.canvas.find('.queue-status ul').append(Templates.listQueueItem.render(event.data));
+            this.canvas.find('.queue-status ul').append(Templates.render('queue/list-queue-item', event.data));
             var item = document.getElementById('queue-' + event.data.id);
             $(item).css('display', 'none').show('fast');
         });
-        this.socket.on('queue-pop', function (event) {
+        this.socket.on('queue-pop', (event) => {
             var item = document.getElementById('queue-' + event.data.id);
             $(item).hide();
         });
-    };
-    CC.prototype.registerSocketProcessEvents = function () {
-        var _this = this;
-        this.socket.on('process-start-me', function (event) {
+    }
+    registerSocketProcessEvents() {
+        this.socket.on('process-start-me', (event) => {
             logData(event);
-            _this.canvas.html(Templates.processExecute.render(event));
+            this.canvas.html(Templates.render('process-execute', event));
             var nodes = "";
-            event.data.results.forEach(function (item) {
-                nodes += Templates.testResult2.render(item);
+            event.data.results.forEach((item) => {
+                nodes += Templates.render('test-result2', item);
             });
-            _this.canvas.find('.test-cases').html(nodes);
-            _this.canvas.find('.final-evaluation').html(Templates.testResult2.render(event.data.result));
+            this.canvas.find('.test-cases').html(nodes);
+            this.canvas.find('.final-evaluation').html(Templates.render('test-result2', event.data.result));
         });
-        this.socket.on('process-end-me', function (event) {
+        this.socket.on('process-end-me', (event) => {
             logData(event);
-            _this.canvas.find('.evaluation').addClass(event.data.result.status).show().find('.evaluation-result').html(Templates.testResult2.render(event.data.result));
-            _this.drawTest(event.data.result);
-            event.data.results.forEach(function (item) {
-                _this.drawTest(item);
+            this.canvas.find('.evaluation').addClass(event.data.result.status).show().find('.evaluation-result').html(Templates.render('test-result2', event.data.result));
+            this.drawTest(event.data.result);
+            event.data.results.forEach((item) => {
+                this.drawTest(item);
             });
-            if (_this.on_complete) {
-                _this.on_complete(event);
+            if (this.on_complete) {
+                this.on_complete(event);
             }
         });
-        this.socket.on('fatal-error', function (event) {
+        this.socket.on('fatal-error', (event) => {
             logData(event);
-            _this.canvas.html(Templates.fatalError.render(event));
-            if (_this.on_error) {
-                _this.on_error(event);
+            this.canvas.html(Templates.render('fatal-error', event));
+            if (this.on_error) {
+                this.on_error(event);
             }
         });
-    };
-    CC.prototype.registerSocketTestEvents = function () {
-        var _this = this;
-        this.socket.on('execute-test-start-me', function (event) {
+    }
+    registerSocketTestEvents() {
+        this.socket.on('execute-test-start-me', (event) => {
             logData(event);
-            _this.drawTest(event.data);
+            this.drawTest(event.data);
         });
-        this.socket.on('execute-test-end-me', function (event) {
+        this.socket.on('execute-test-end-me', (event) => {
             logData(event);
-            _this.drawTest(event.data);
+            this.drawTest(event.data);
         });
-        this.socket.on('compile-start-me', function (event) {
+        this.socket.on('compile-start-me', (event) => {
             logData(event);
-            _this.drawTest(event.data);
+            this.drawTest(event.data);
         });
-        this.socket.on('compile-end-me', function (event) {
+        this.socket.on('compile-end-me', (event) => {
             logData(event);
-            _this.drawTest(event.data);
+            this.drawTest(event.data);
         });
-    };
-    return CC;
-}());
+    }
+}
+//# sourceMappingURL=sockets.js.map
