@@ -132,7 +132,7 @@ body #toast-container > div {
   padding: 0;
 }
 
-.filter-item-holder select {
+.filter-item-holder select, .filter-item-holder input {
   -webkit-transition: all 0.15s ease-in-out;
   transition: all 0.15s ease-in-out;
   border: none;

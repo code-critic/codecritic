@@ -214,9 +214,11 @@ $(document).ready(function() {
         previous.find('.final-evaluation').html(
           Templates.render('test-result2', data.result)
         );
-
-        renderSourceCode(data.solution);
-        renderComments(data.review);
+        
+        if (data.solution) {
+            renderSourceCode(data.solution);
+            renderComments(data.review);
+        }
         updateCounterPlaceholder();
         previous.find('[data-toggle="tooltip"]').tooltip();
         previous.removeClass('disabled alpha-5');

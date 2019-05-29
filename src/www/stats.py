@@ -67,6 +67,10 @@ def register_routes(app, socketio):
 
         sort_by_inner = data['filters']['sort-by-inner']
         sort_by_outer = data['filters']['sort-by-outer']
+        search = str(data['filters']['search']).strip()
+        print(search)
+        if search:
+            filters['user'] = {'$regex': f".*{search}.*"}
 
         add_filter('course')
         add_filter('filters.problem', 'problem', skip_if_all)
@@ -79,7 +83,7 @@ def register_routes(app, socketio):
         pipeline = [
             {'$match': filters},
             {'$project': {
-                'has_comments': {'$ne': ['$review', None]},
+                'review': 1,
                 **base_properties}
             },
             {'$sort': {sort_by_inner: -1}},

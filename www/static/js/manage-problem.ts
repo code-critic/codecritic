@@ -1,6 +1,7 @@
 $(document).ready(function () {
   var $inputForm = $('#generate-input-form');
   var $outputForm = $('#generate-output-form');
+  var $searchForm = $('#search-form');
   var $referenceForm = $('#reference-form');
   var $adminZone = $('#admin-zone');
 
@@ -33,6 +34,7 @@ $(document).ready(function () {
     F('sort-by-inner', 'Sort attempts', 'sort-amount-up', 'result.score', ['result.score', '_id']),
     F('sort-by-outer', 'Sort students', 'sort-amount-up', '_id', ['_id']),
     F('status', 'Exit status', 'check', 'all', ['answer-correct', 'answer-correct-timeout', 'answer-wrong', 'all'], 'col-12 col-md-4'),
+    F('search', 'Search', 'search', null, null, null, 'search'),
     F('refresh', 'Refresh', null, null, null, null, 'refresh'),
     // { name: 'course', desc: 'Course', type: 'select', value: courseID , options: [courseID, 'all'] },
   ];
@@ -122,6 +124,10 @@ $(document).ready(function () {
     );
     return false;
   });
+  
+  $searchForm.submit(function(){
+    return false;
+  })
 
   $lastResultsTab.on('show.bs.tab', function (e) {
     loadData();
