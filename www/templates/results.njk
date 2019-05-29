@@ -3,26 +3,86 @@
 
   <head>
     {% include "core/head.njk" %}
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/default.min.css">
   </head>
 
   <body class="{{ 'admin' if user.is_admin() else 'student' }}">
     <header>
       {% include "core/header.njk" %}
     </header>
-    
+
     <main>
       <div class="container z-depth-1 py-4">
         <article>
           {% include "core/article-head.njk" %}
-          {% for result in results %}
-            {% if result.live %}
-              {{ result.course.name }} - {{ result.course.year }} - {{ result.problem.name }}
-              
-              <div id="solution-result" data-uuid="{{ result.uuid }}">
-                <div class="solution-result card-body"></div>
-              </div>
-            {% endif %}
-          {% endfor %}
+
+          <div class="row problem-results-holder no-gutters">
+            <div class="col-12 white {{ 'col-md-3' if results|length > 1 else '' }}">
+              <section class="article-section problem-results p-2">
+                {% if result or results | length %}
+                  <ul>
+                    {% if result %}
+                      <li class="result">
+                        <a href="#" class="live-result running active" data-uuid="{{result._id}}">
+                          <span>#NEW</span>
+                        </a>
+                      </li>
+                    {% endif %}
+                    {% for prev in results %}
+                      <li class="result">
+                        <a href="#" class="prev-result {{ prev.result.status }} {{ prev.active }}" data-uuid="{{prev._id}}">
+                          <span>attempt #{{ prev.attempt }}</span>
+                          {% if prev.result.score %}
+                            <span class="score {{ prev.result.status }}" data-toggle="tooltip"
+                            data-html="true">
+                              <span class="score-value answer-correct">{{ '%02d' | format(prev.result.scores[0]) }}</span><!--
+                            --><span class="score-value answer-correct-timeout">{{ '%02d' | format(prev.result.scores[1]) }}</span><!--
+                            --><span class="score-value answer-wrong">{{ '%02d' | format(prev.result.scores[2]) }}</span>
+                            </span>
+                          {% endif %}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </section>
+            </div>
+
+            <div class="col-12 white {{ 'col-md-9' if results|length > 1 else '' }}">
+              <section class="article-section px-2">
+                {% if result %}
+                  <div id="solution-result-current" data-_id="{{ result._id }}" class="py-2">
+                    <h2>Connecting to the server...</h2>
+                  </div>
+                {% endif %}
+                <div id="solution-result-previous" class="py-2" style="display: none;">
+                  <h2>Loading result...</h2>
+                </div>
+                <div class="request-review {{ '' if requestReview else 'd-none' }}">
+                  <button id="request-review-btn" class="request-review-btn btn btn-large btn-block btn-primary" 
+                  data-placement="top" data-toggle="popover" data-trigger="hover" data-html="true" style="display: none;"
+                  title="<i class='fas fa-question'></i> What is code review" data-content="<p>When you request code review, teacher will be notified and will be able to view and comment this attempt.</p><p>You can request code review if you believe your solution is final but also if you are having difficulties with this problem.</p>">
+                    Request code review
+                  </button>
+                </div>
+              </section>
+            </div>
+
+            <div class="col-12 white">
+              <section class="article-section mx-1 p-2">
+                <a href="#" class="finish-review" type="btn" style="display: none;">
+                  Add <span class="placeholder-comment-count"></span> comments
+                </a>
+                <div id="source-code">
+                  <pre class="small"><code class="hljs"></code></pre>
+                </div>
+                <a href="#" class="finish-review" type="btn" style="display: none;">
+                  Add <span class="placeholder-comment-count"></span> comments
+                </a>
+              </section>
+            </div>
+          </div>
+
         </article>
       </div>
     </main>
@@ -30,9 +90,12 @@
     <footer class="page-footer font-small fixed-bottom">
       {% include "core/footer.njk" %}
     </footer>
-    <script type="text/javascript" src="/static/js/templates.js" charset="utf-8"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+    {# <script src="//cdn.jsdelivr.net/npm/highlightjs-line-numbers.js@2.6.0/dist/highlightjs-line-numbers.min.js"></script> #}
+    <script type="text/javascript" src="/static/js/lib/highlightjs-line-numbers.js"></script>
     <script type="text/javascript" src="/static/js/sockets.js" charset="utf-8"></script>
     <script type="text/javascript" src="/static/js/process.js" charset="utf-8"></script>
+
   </body>
 
 </html>

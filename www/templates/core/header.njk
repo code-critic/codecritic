@@ -15,12 +15,16 @@
     </div>
 
     <ul class="nav navbar-nav nav-flex-icons ml-auto">
-      <li class="nav-item dropdown dropdown-animating">
-        <a class="nav-link dropdown-toggle waves-effect waves-light" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fas fa-user-shield" data-toggle="tooltip" title="Elevated privileged (role {{ user.role }})"></i>
-          <span class="ml-1">{{ user.name }}</span>
+      <li class="nav-item dropdown">
+        <a class="nav-link waves-effect waves-light" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {% if user.is_admin() %}
+            <i class="fas fa-user-shield" data-toggle="tooltip" title="Elevated privileged (role {{ user.role }})"></i>
+            <span id="cc-user" data-user-id="{{ user.id }}" data-user-name="{{ user.name }}" data-user-admin="{{ user.is_admin() }}" class="ml-1">{{ user.name }}</span>
+          {% else %}
+            <span id="cc-user" data-user-id="{{ user.id }}" data-user-name="{{ user.name }}" data-user-admin="{{ user.is_admin() }}" class="ml-1">{{ user.name }}</span>
+          {% endif %}
         </a>
-        <div class="dropdown-menu animated fadeIn fadeOut">
+        <div class="dropdown-menu">
           {% if user.is_admin() %}
             {% if user.affi %}
               <div class="mx-2 my-1 text-muted smaller">
@@ -65,7 +69,43 @@
             <i class="fas fa-power-off"></i>
             Logout
           </a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+        </div>
+      </li>
+      <li id="notifications" class="pl-1 nav-item dropleft {{ 'd-none' if notifications | length == 0 else ''}}">
+        {# {% if notifications and notifications | length %}
+          <a class="nav-link waves-effect waves-light pr-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-bell"></i>
+            <span class="badge badge-danger z-depth-0 smaller position-absolute">{{ notifications | length }}</span>
+          </a>
+          <div class="dropdown-menu notification-menu">
+            {% for n in notifications %}
+              <a class="dropdown-item px-2 py-1" href="{{ url_for('perma_result', _id=n.document) }}">
+                <strong class="p-0 m-0">
+                  {% if n.event == 'codereview' %}
+                    <i class="fas fa-code"></i>
+                  {% elif n.event == 'new-comment' %}
+                    <i class="fas fa-comment"></i>
+                  {% endif %}
+
+                  <span class="text-muted smaller">
+                    {{n.course}}
+                    &middot;
+                    {{n.problem}}
+                    &middot;
+                  </span>
+                  {{ n.title }}
+                </strong>
+                <p class="small text-muted p-0 m-0">
+                  {{ n.description }}
+                </p>
+              </a>
+              {% if not loop.last %}
+                <div class="dropdown-divider"></div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %} #}
+      </li>
+    </ul>
+  </div>
+</nav>

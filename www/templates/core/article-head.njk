@@ -1,11 +1,28 @@
-<h{{ h or 1 }} class="mb-{{ mb or 4 }}">
+<div class="article-head py-1">
   {% if back %}
     <a href="{{ back.url }}" class="btn text-dark back-btn waves-effect z-depth-0" data-toggle="tooltip" title="Go back to {{ back.text }}">
       <i class="fas fa-chevron-left"></i>
     </a>
   {% endif %}
-  {{ title }}
-  {% if subtitle %}
-    &middot;{{ subtitle }}
+  {% if breadcrumbs | length %}
+    <nav class="breadcrumbs">
+      {% for link in breadcrumbs %}
+        <a href="{{ link.url }}" class="bread-item" data-toggle="tooltip" title="{{ link.tooltip }}">
+          {{ link.text }}
+        </a>
+        {# {% if not loop.last %} #}
+        <span class="bread-divider">&gt;</span>
+        {# {% endif %} #}
+      {% endfor %}
+      {{ title }}
+      {% if subtitle %}
+        &middot;{{ subtitle }}
+      {% endif %}
+    </nav>
+  {% else %}
+    {{ title }}
+    {% if subtitle %}
+      &middot;{{ subtitle }}
+    {% endif %}
   {% endif %}
-</h{{ h or 1 }}>
+</div>

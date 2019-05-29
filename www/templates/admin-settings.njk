@@ -1,21 +1,21 @@
-<section class="admin-zone card-danger p-3" id="admin-zone" data-course="{{ course.id }}" data-problem="{{ problem.id }}">
+<section class="admin-zone card-danger p-3" id="admin-zone" data-problem-ids="{{ problems_ids }}" data-course="{{ course.id }}" data-problem="{{ problem.id }}">
   <h3>
     <i class="fas fa-exclamation-circle"></i>
     Danger Zone
   </h3>
   <nav>
     <div class="nav nav-tabs md-tabs" id="nav-tab" role="tablist">
-      <a class="nav-item nav-link active" id="generate-input-tab" data-toggle="tab" href="#generate-input-nav" role="tab" aria-controls="generate-input-nav" aria-selected="true">
+      <a class="nav-item nav-link active" id="last-results-tab" data-toggle="tab" href="#last-results-nav" role="tab" aria-controls="last-results-nav" aria-selected="false">
+        <i class="fas fa-poll" aria-hidden="true"></i>
+        Last recieved results
+      </a>
+      <a class="nav-item nav-link" id="generate-input-tab" data-toggle="tab" href="#generate-input-nav" role="tab" aria-controls="generate-input-nav" aria-selected="true">
         <i class="fas fa-reply" aria-hidden="true"></i>
         Generate input
       </a>
       <a class="nav-item nav-link" id="generate-output-tab" data-toggle="tab" href="#generate-output-nav" role="tab" aria-controls="generate-output-nav" aria-selected="false">
         <i class="fas fa-share" aria-hidden="true"></i>
         Generate output
-      </a>
-      <a class="nav-item nav-link" id="last-results-tab" data-toggle="tab" href="#last-results-nav" role="tab" aria-controls="last-results-nav" aria-selected="false">
-        <i class="fas fa-poll" aria-hidden="true"></i>
-        Last recieved results
       </a>
       <a class="disabled o-50 nav-item nav-link" id="reference-tab" data-toggle="tab" href="#reference-nav" role="tab" aria-controls="reference-nav" aria-selected="false">
         <i class="fas fa-code" aria-hidden="true"></i>
@@ -25,9 +25,19 @@
   </nav>
 
   <div class="tab-content pt-5 px-3" id="nav-tabContent">
+
     {# ---------------------------------------------------------------------- #}
 
-    <div class="tab-pane fade active show" id="generate-input-nav" role="tabpanel" aria-labelledby="generate-input-tab">
+    <div class="tab-pane fade result active show" id="last-results-nav" role="tabpanel" aria-labelledby="last-results-tab">
+      <form>
+        <div class="row filters no-gutters"></div>
+        <div class="search-results"></div>
+      </form>
+    </div>
+
+    {# ---------------------------------------------------------------------- #}
+
+    <div class="tab-pane fade" id="generate-input-nav" role="tabpanel" aria-labelledby="generate-input-tab">
       <form id="generate-input-form" class="form" method="post">
         <h2>Generate input files</h2>
         <p>
@@ -82,20 +92,12 @@
 
     {# ---------------------------------------------------------------------- #}
 
-    <div class="tab-pane fade result" id="reference-nav" role="tabpanel" aria-labelledby="reference-tab">
-    </div>
-    
-    {# ---------------------------------------------------------------------- #}
+    <div class="tab-pane fade result" id="reference-nav" role="tabpanel" aria-labelledby="reference-tab"></div>
 
-    <div class="tab-pane fade result" id="last-results-nav" role="tabpanel" aria-labelledby="last-results-tab">
-      Fetching data...
-    </div>
-    
-    
   </div>
 
   <div class="solution-result" style="display: none;">
-    <hr class="hr-danger" />
+    <hr class="hr-danger"/>
     <h2>Action result</h2>
     <div class="result">
       <em>Output will be here.</em>
