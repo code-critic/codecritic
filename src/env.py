@@ -22,6 +22,13 @@ Final evaluation {status.name}
 '''.strip()
 
 
+def _try_cmd(cmd, default=None):
+    try:
+        return subprocess.check_output(cmd).decode()
+    except:
+        return default
+
+
 class _Env(object):
     """
     Internal config
@@ -68,7 +75,7 @@ class Env(object):
     url_slave = 'http://flowdb.nti.tul.cz:5000'
     url_login = 'https://flowdb.nti.tul.cz/secure'
     url_logout = 'https://flowdb.nti.tul.cz/Shibboleth.sso/Logout'
-    HEAD = subprocess.check_output(_head_command).decode()
+    HEAD = _try_cmd(_head_command, default='HEAD-unknown')
 
     # -------------------------------------------------------------------------
 

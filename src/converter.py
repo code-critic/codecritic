@@ -2,10 +2,8 @@
 # author: Jan Hybs
 
 
-def convert_db():
+def convert_db(from_db, to_db):
     from database.mongo import Mongo
-    import yaml
-    import pyperclip
     from plucky import plucks
     from processing.statuses import Status
 
@@ -24,17 +22,23 @@ def convert_db():
 
     def compute_score(statuses):
         return dict(
-                score=sum(plucks(statuses, 'score')),
-                scores=[
-                    len([s.score for s in statuses if s.code == 100]),
-                    len([s.score for s in statuses if s.code == 101]),
-                    len([s.score for s in statuses if s.code == 200]),
-                ]
-            )
+            score=sum(plucks(statuses, 'score')),
+            scores=[
+                len([s.score for s in statuses if s.code == 100]),
+                len([s.score for s in statuses if s.code == 101]),
+                len([s.score for s in statuses if s.code == 200]),
+            ]
+        )
 
-    items = mongo.data.find()
+    processed_ids = [str(x['_id']) for x in mongo.db.get_collection(to_db).find({}, {'_id': 1})]
+    items = mongo.db.get_collection(from_db).find()
     updated = list()
+
     for item in items:
+        # skip already processed items
+        if str(item['_id']) in processed_ids:
+            continue
+
         rename(item, 'language', 'lang')
         rename(item, 'tests', 'results')
         delete(item, 'datetime')
@@ -57,8 +61,14 @@ def convert_db():
                 result['id'] = 'Result'
         updated.append(item)
 
-    print(
-        mongo.db.get_collection('data2').insert_many(
+    if updated:
+        ack = mongo.db.get_collection(to_db).insert_many(
             updated
         )
-    )
+
+        print(ack)
+        print(ack.acknowledged)
+        print(len(ack.inserted_ids))
+
+
+# convert_db('data', 'data-1.0.1')
