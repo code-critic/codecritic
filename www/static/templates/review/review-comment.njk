@@ -1,0 +1,29 @@
+<tr class="review review-comment">
+  <td class="fill"></td>
+  <td class="comments">
+    {% for comment in review %}
+    {% set isMe = user == comment.user %}
+      <div class="review-comment-entry {{ 'me' if isMe else '' }}">
+        <span class="head">
+          <span class="time text-muted" data-toggle="tooltip" data-placement="left" title="{{ comment.time }}">
+            <i class="far fa-clock"></i>
+            <span class="time-relative" data-time="{{ comment.time * 1000 }}"></span>
+          </span>
+          <br />
+          <span data-toggle="tooltip" data-placement="left" title="{{ comment.user }}">
+            {% if isMe %}
+              <strong>you</strong>
+              <i class="fas fa-user-circle bigger pr-1"></i>
+            {% else %}
+              <i class="fas fa-user-circle bigger pr-1"></i>
+              <strong>{{ comment.user }}</strong>
+            {% endif %}
+          </span>
+        </span>
+        <div class="text mx-4">
+          {{ comment.text | safe }}
+        </div>
+      </div>
+    {% endfor %}
+  </td>
+</tr>

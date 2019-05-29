@@ -1,0 +1,47 @@
+{% if notifications and notifications | length %}
+  <a class="nav-link waves-effect waves-light pr-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <i class="fas fa-bell"></i>
+    <span class="badge badge-danger z-depth-0 smaller position-absolute">{{ notifications | length }}</span>
+  </a>
+  <div class="dropdown-menu notification-menu">
+    {% for n in notifications %}
+      <a class="dropdown-item notification-item px-2 py-1" href="/r/{{ n.document }}">
+        <p class="p-0 m-0">
+          {% if n.event == 'codereview' %}
+            <i class="fas fa-code"></i>
+          {% elif n.event == 'new-comment' %}
+            <i class="fas fa-comment"></i>
+          {% endif %}
+
+          <span class="text-muted small">
+            {{n.course}}
+            &middot;
+            {{n.problem}}
+            &middot;
+            <span class="time" data-toggle="tooltip" data-placement="left" title="{{ n.time }}">
+              <i class="far fa-clock"></i>
+              <span class="time-relative" data-time="{{ n.time * 1000 }}"></span>
+            </span>
+          </span>
+        </p>
+        
+        <p class="pl-2 my-0 ml-3">
+          <strong>{{ n.title }}</strong>
+        </p>
+
+        <p class="desc small text-muted pl-2 my-0 ml-3">
+          {{ n.description }}
+        </p>
+      </a>
+      {% if not loop.last %}
+        <div class="dropdown-divider"></div>
+      {% endif %}
+    {% endfor %}
+    {# {% for course, ns in notifications.per_course.items() %}
+      <a class="dropdown-item" href="{{ url_for('perma_result', _id=ns.document) }}">
+        {{ course }}
+        <span class="badge badge-danger z-depth-0">{{ ns | length }}</span>
+      </a>
+    {% endfor %} #}
+  </div>
+{% endif %}

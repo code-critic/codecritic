@@ -1,0 +1,35 @@
+{% for f in filters %}
+  {% set selectClasses = 'col-12 col-md-2' %}
+  {% if f.type == 'select' %}
+    <div class="filter-item-holder {{ f.classes if f.classes else selectClasses }}">
+      <label for="filter-{{ f.name }}">
+        {% if f.icon %}
+          <i class="fas fa-{{ f.icon }}" aria-hidden="true"></i>
+        {% endif %}
+        {{ f.desc }}
+      </label>
+      <select class="filter-item browser-default custom-select" id="filter-{{ f.name }}" name="{{ f.name }}">
+        {% for opt in f.options %}
+          {% if opt == f.value %}
+            <option selected="selected" value="{{ opt }}">{{ opt }}</option>
+          {% else %}
+            <option value="{{ opt }}">{{ opt }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+  {% elif f.type == 'search' %}
+    <div class="filter-item-holder {{ f.classes if f.classes else 'col-12 col-md-6 col-lg-4' }}">
+      <label for="filter-{{ f.name }}">
+        <i class="fas fa-search" aria-hidden="true"></i>{{ f.desc }}</label>
+      <input class="filter-item form-control" type="text" placeholder="Search" aria-label="Search" id="filter-{{ f.name }}" name="{{ f.name }}">
+    </div>
+  {% elif f.type == 'refresh' %}
+    <div class="filter-item-holder {{ f.classes if f.classes else selectClasses }}">
+      <label for="filter-{{ f.name }}">&nbsp;</label>
+      <button type="button" class="btn-search btn btn-elegant btn-block z-depth-0">
+        <i class="fas fa-search" aria-hidden="true"></i> search
+      </button>
+    </div>
+  {% endif %}
+{% endfor %}

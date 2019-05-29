@@ -1,0 +1,70 @@
+<div class="py-3">
+  <hr class="my-2"/>
+
+  {% if not users | length %}
+    <h3>No results</h3>
+  {% else %}
+    {% for user in users %}
+      <h2>{{ user._id }}</h2>
+      <div class="row no-gutters">
+        {% for result in user.results %}
+          {% set scores = result.result.scores %}
+          <a target="_blank" class="col-12 col-sm-2 {{ result.result.status }} {{ 'review-request' if result.review_request else '' }}" href="/r/{{ result._id }}">
+            <div class="p-1 d-flex flex-column">
+              <div class="details">
+                <p class='p-0 m-0'>
+                  <span class="time" data-toggle="tooltip" data-placement="left" title="{{ result.time }}">
+                    <i class="far fa-clock"></i>
+                    <span class="time-relative" data-time="{{ result.time * 1000 }}"></span>
+                  </span>
+                </p>
+                <p class='p-0 m-0'>
+                  #{{ result.attempt }} {{ result.result.status }}
+                </p>
+              </div>
+              <dl class="m-0 p-0">
+                {% if scores | length %}
+                  <dt>score</dt>
+                  <dd>
+                    <span class="score">
+                      <span class="score-value answer-correct">{{ scores[0] | pad(2) }}</span>
+                      <span class="score-value answer-correct-timeout">{{ scores[1] | pad(2) }}</span>
+                      <span class="score-value answer-wrong">{{ scores[2] | pad(2) }}</span>
+                    </span>
+                  </dd>
+                {% endif %}
+
+                {% if config.course == 'all' %}
+                  <dt>course</dt>
+                  <dd>{{ result.course }}</dd>
+                {% endif %}
+
+                {% if config.problem == 'all' %}
+                  <dt>problem</dt>
+                  <dd>{{ result.problem }}</dd>
+                {% endif %}
+
+                <dt>language</dt>
+                <dd>{{ result.lang }}</dd>
+              </dl>
+            </div>
+
+            <span class="text-center d-block">
+            {% if result.review_request %}
+              <span class="badge badge-sm badge-danger" data-toggle="tooltip" data-placement="left" title="Review requested on {{ result.review_request }}">
+                REVIEW
+              </span>
+            {% endif %}
+
+            {% if result.has_comments %}
+              <span class="badge badge-sm badge-dark" data-toggle="tooltip" data-placement="left" title="Code was commented on">
+                COMMENTED
+              </span>
+            {% endif %}
+            </span>
+          </a>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
