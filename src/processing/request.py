@@ -302,7 +302,7 @@ class ProcessRequest(object):
         logger.info('Saving result to {}', student_full_dir)
 
         if self.result_dir.exists():
-            shutil.copytree(self.result_dir, student_full_dir)
+            shutil.copytree(str(self.result_dir), student_full_dir)
         else:
             logger.warning('dir {} does not exists', self.result_dir)
         student_full_dir.mkdir(parents=True, exist_ok=True)

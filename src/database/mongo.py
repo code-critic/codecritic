@@ -117,6 +117,7 @@ class Mongo(object):
 
     def peek_last_n_results(self, n=10, user_id=None, course_id=None, problem_id=None, statuses=None, status_op='$in'):
         filters = self._fix_dict(dict(user=user_id, course=course_id, problem=problem_id))
+        filters['action'] = 'solve'
 
         statuses = ensure_iterable(statuses)
         if statuses:

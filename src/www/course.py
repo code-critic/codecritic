@@ -118,7 +118,13 @@ def register_routes(app, socketio):
                 if str(r['_id']) == str(_id):
                     r['active'] = 'active'
 
-        results = sorted(results, reverse=True, key=lambda x: x.get('attempt'))
+        def get_attempt(obj):
+            try:
+                return int(obj.get('attempt', 0))
+            except:
+                return 0
+
+        results = sorted(results, reverse=True, key=get_attempt)
 
         return render_template_ext(
             'results.njk',
