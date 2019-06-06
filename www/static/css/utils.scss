@@ -53,6 +53,16 @@ body #toast-container>div {
 }
 
 .search-results {
+  
+  .user-group {
+    padding: 5px;
+    transition: all 0.15s ease-in-out;
+    
+    &:hover {
+      background: #fcfcfc;
+      box-shadow: 0 0 5px #a5a5a5 inset;
+    }
+  }
 
   .details {
     font-weight: bold;
@@ -195,5 +205,17 @@ body #toast-container>div {
     position: absolute;
     top: 9px;
     left: -14px;
+  }
+}
+
+.final-evaluation .execution-test .cell-score .score span.score-value {
+  &.answer-correct {
+    background: #19820c;
+  }
+  &.answer-correct-timeout {
+    background: #c07c00;
+  }
+  &.answer-wrong {
+    background: #a90303;
   }
 }

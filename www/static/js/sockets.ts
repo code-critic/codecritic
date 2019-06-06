@@ -4,7 +4,7 @@
 /// <reference path="templates.ts"/>
 
 function logData(event) {
-  console.log(event);
+  //console.log(event);
 }
 
 enum Status {
@@ -159,14 +159,14 @@ class CC {
       console.log('reconnecting ' + attemptNumber);
     });
     this.socket.on('disconnect', (reason) => {
-      console.log('disconnect', reason);
+      //console.log('disconnect', reason);
       if (reason === 'io server disconnect') {
         // the disconnection was initiated by the server, you need to reconnect manually
         this.socket.connect();
       }
     });
     this.socket.on('debug', (event) => {
-      console.log(event);
+      //console.log(event);
     });
   }
 

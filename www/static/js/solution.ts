@@ -136,7 +136,7 @@ $(document).ready(function() {
     var problemID = $(this).val();
     var problemName = $(this).find('option[value="' + problemID + '"]').data('problem-name');
     
-    console.log(problemID, problemName);
+    // console.log(problemID, problemName);
     var $id = $('#desc-' + problemID);
     $('.prob-desc').addClass('d-none');
     $id.removeClass('d-none');

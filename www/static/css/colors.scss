@@ -23,10 +23,10 @@ $statuses: (
       border-bottom: 5px solid lighten($color, 15);
 
       .cell-score .score {
-        background: darken($color, 30);
-        // border-left: 1px solid rgba(darken($color, 30), .5);
-        .score-value {
-          background: rgba(#fff, 0.25);
+        background: white;
+        border: 2px solid darken($color, 30);
+        i {
+          color: darken($color, 30);
         }
       }
     }

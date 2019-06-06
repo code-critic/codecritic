@@ -1,3 +1,186 @@
-.execution-test .test-icon{display:none}.in-queue.execution-test .test-icon.in-queue{display:flex;flex-direction:column;justify-content:center}.running.execution-test .test-icon.running{display:flex;flex-direction:column;justify-content:center}.ignore.execution-test .test-icon.ignore{display:flex;flex-direction:column;justify-content:center}.ok.execution-test .test-icon.ok{display:flex;flex-direction:column;justify-content:center}.answer-correct.execution-test .test-icon.answer-correct{display:flex;flex-direction:column;justify-content:center}.answer-correct-timeout.execution-test .test-icon.answer-correct-timeout{display:flex;flex-direction:column;justify-content:center}.answer-wrong.execution-test .test-icon.answer-wrong{display:flex;flex-direction:column;justify-content:center}.answer-wrong-timeout.execution-test .test-icon.answer-wrong-timeout{display:flex;flex-direction:column;justify-content:center}.skipped.execution-test .test-icon.skipped{display:flex;flex-direction:column;justify-content:center}.soft-timeout.execution-test .test-icon.soft-timeout{display:flex;flex-direction:column;justify-content:center}.global-timeout.execution-test .test-icon.global-timeout{display:flex;flex-direction:column;justify-content:center}.file-not-found.execution-test .test-icon.file-not-found{display:flex;flex-direction:column;justify-content:center}.error-while-running.execution-test .test-icon.error-while-running{display:flex;flex-direction:column;justify-content:center}.compilation-failed.execution-test .test-icon.compilation-failed{display:flex;flex-direction:column;justify-content:center}
+.execution-test .test-icon {
+  display: none;
+}
 
+.in-queue.execution-test .test-icon.in-queue {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.running.execution-test .test-icon.running {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.ignore.execution-test .test-icon.ignore {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.ok.execution-test .test-icon.ok {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.answer-correct.execution-test .test-icon.answer-correct {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.answer-correct-timeout.execution-test .test-icon.answer-correct-timeout {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.answer-wrong.execution-test .test-icon.answer-wrong {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.answer-wrong-timeout.execution-test .test-icon.answer-wrong-timeout {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.skipped.execution-test .test-icon.skipped {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.soft-timeout.execution-test .test-icon.soft-timeout {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.global-timeout.execution-test .test-icon.global-timeout {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.file-not-found.execution-test .test-icon.file-not-found {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.error-while-running.execution-test .test-icon.error-while-running {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.compilation-failed.execution-test .test-icon.compilation-failed {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
 /*# sourceMappingURL=icons.min.css.map */

@@ -116,6 +116,7 @@ class Mongo(object):
         return cursor
 
     def peek_last_n_results(self, n=10, user_id=None, course_id=None, problem_id=None, statuses=None, status_op='$in'):
+        from entities.crates import TestResult
         filters = self._fix_dict(dict(user=user_id, course=course_id, problem=problem_id))
         filters['action'] = 'solve'
 
@@ -128,11 +129,12 @@ class Mongo(object):
             filters, {x: 1 for x in self.base_properties}
         ).sort('_id', -1).limit(n)
 
-        return cursor
+        return [TestResult(**x) for x in cursor]
 
     def result_by_id(self, _id):
         from entities.crates import TestResult
         result = self.data.find_one(dict(_id=objectid.ObjectId(_id)))
+
         if result:
             return TestResult(**result)
         return None
@@ -194,7 +196,10 @@ class Mongo(object):
         :param _id:
         :return:
         """
-        return self.events.delete_many(dict(to=to, document=_id, event=event))
+        if to:
+            return self.events.delete_many(dict(to=to, document=_id, event=event))
+        else:
+            return self.events.delete_many(dict(document=_id, event=event))
 
     @staticmethod
     def _fix_dict(d: dict):

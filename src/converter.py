@@ -26,7 +26,7 @@ def convert_db(from_db, to_db):
             scores=[
                 len([s.score for s in statuses if s.code == 100]),
                 len([s.score for s in statuses if s.code == 101]),
-                len([s.score for s in statuses if s.code == 200]),
+                len([s.score for s in statuses if s.code in (200, 201)]),
             ]
         )
 
@@ -71,4 +71,4 @@ def convert_db(from_db, to_db):
         print(len(ack.inserted_ids))
 
 
-# convert_db('data', 'data-1.0.1')
+convert_db('data', 'data-1.0.1')

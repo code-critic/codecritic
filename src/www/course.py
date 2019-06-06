@@ -108,19 +108,19 @@ def register_routes(app, socketio):
                     )
 
         if Env.use_database:
-            for prev in Mongo().peek_last_n_results(20, user.id, course.id, problem.id):
+            for prev in Mongo().peek_last_n_results(10, user.id, course.id, problem.id):
                 # push only valid result
-                if prev.get('result') and str(prev['_id']) != str(_id):
+                if prev.result and str(prev._id) != str(_id):
                     results.append(prev)
 
         if _id:
             for r in results:
-                if str(r['_id']) == str(_id):
-                    r['active'] = 'active'
+                if str(r_id) == str(_id):
+                    r.active = 'active'
 
         def get_attempt(obj):
             try:
-                return int(obj.get('attempt', 0))
+                return int(obj.attempt)
             except:
                 return 0
 

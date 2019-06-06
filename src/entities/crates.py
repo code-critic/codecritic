@@ -41,11 +41,11 @@ class CaseResult(ICrate):
 
 @dataclass
 class TestResult(ICrate):
-    action: str
     user: str
     course: str
     problem: str
-    docker: bool
+    action: str = None
+    docker: bool = None
     result: Optional[CaseResult] = None
     results: List[CaseResult] = field(default_factory=list)
 
@@ -59,6 +59,30 @@ class TestResult(ICrate):
     review_request: Optional[dict] = None
 
     compilation: any = None
+    time: any = None
+    active: any = None
+
+    def __post_init__(self):
+        if self._id and not self.time:
+            try:
+                import datetime
+                self.time = datetime.datetime.timestamp(self._id.generation_time)
+            except:
+                self.time = 0
+
+    @property
+    def firstname(self):
+        try:
+            return str(self.user.split('.')[0]).capitalize()
+        except:
+            return self.user
+
+    @property
+    def lastname(self):
+        try:
+            return str(self.user.split('.')[-1]).capitalize()
+        except:
+            return self.user
 
     @property
     def ref_course(self):

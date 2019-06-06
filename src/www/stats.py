@@ -68,7 +68,7 @@ def register_routes(app, socketio):
         sort_by_inner = data['filters']['sort-by-inner']
         sort_by_outer = data['filters']['sort-by-outer']
         search = str(data['filters']['search']).strip()
-        print(search)
+
         if search:
             filters['user'] = {'$regex': f".*{search}.*"}
 
@@ -91,10 +91,17 @@ def register_routes(app, socketio):
                 '_id': '$user',
                 'results': {'$push': '$$ROOT'}  # $$ROOT
             }},
-            {'$sort': {sort_by_outer: -1}},
         ]
         print(pipeline, limit_per_user)
         items = list(Mongo().data.aggregate(pipeline))
+
+        def add_fields(x):
+            x['firstname'] = str(x['_id']).split('.')[0]
+            x['lastname'] = str(x['_id']).split('.')[-1]
+            return x
+
+        items = map(add_fields, items)
+        items = sorted(items, key=lambda x: x[sort_by_outer])
 
         result = list()
         for item in items:
@@ -242,7 +249,7 @@ def register_routes(app, socketio):
                 else:
                     logger.warning('notification already exists: {}', event_document)
 
-        mark_as_read = Mongo().mark_as_read(to=user.id, _id=_id, event='codereview')
+        mark_as_read = Mongo().mark_as_read(_id=_id, event='codereview', to=None)
         logger.info('mark-as-read: {}', mark_as_read)
 
         update_one = Mongo().update_fields(_id, review=review)

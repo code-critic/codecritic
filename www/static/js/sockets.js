@@ -1,5 +1,4 @@
 function logData(event) {
-    console.log(event);
 }
 var Status;
 (function (Status) {
@@ -83,13 +82,11 @@ class CC {
             console.log('reconnecting ' + attemptNumber);
         });
         this.socket.on('disconnect', (reason) => {
-            console.log('disconnect', reason);
             if (reason === 'io server disconnect') {
                 this.socket.connect();
             }
         });
         this.socket.on('debug', (event) => {
-            console.log(event);
         });
     }
     registerSocketQueueEvents() {

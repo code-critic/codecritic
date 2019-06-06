@@ -31,13 +31,25 @@
                     {% for prev in results %}
                       <li class="result">
                         <a href="#" class="prev-result {{ prev.result.status }} {{ prev.active }}" data-uuid="{{prev._id}}">
-                          <span>attempt #{{ prev.attempt }}</span>
+                          <span>
+                            <p class="p-0 m-0">
+                              {{ prev.user }}
+                              attempt #{{ prev.attempt }}
+                            </p>
+                            <p class="p-0 m-0">
+                              <span class="time" data-toggle="tooltip" data-placement="left" title="{{ prev.time }}">
+                                <i class="far fa-clock"></i>
+                                <span class="time-relative" data-time="{{ prev.time * 1000 }}"></span>
+                              </span>
+                            </p>
+                          </span>
                           {% if prev.result.score %}
-                            <span class="score {{ prev.result.status }}" data-toggle="tooltip"
-                            data-html="true">
-                              <span class="score-value answer-correct">{{ '%02d' | format(prev.result.scores[0]) }}</span><!--
-                            --><span class="score-value answer-correct-timeout">{{ '%02d' | format(prev.result.scores[1]) }}</span><!--
-                            --><span class="score-value answer-wrong">{{ '%02d' | format(prev.result.scores[2]) }}</span>
+                            <span class="score {{ prev.result.status }}" data-toggle="tooltip" data-html="true">
+                              <span class="score-value answer-correct">{{ '%02d' | format(prev.result.scores[0]) }}</span>
+                              <!-- -->
+                              <span class="score-value answer-correct-timeout">{{ '%02d' | format(prev.result.scores[1]) }}</span>
+                              <!-- -->
+                              <span class="score-value answer-wrong">{{ '%02d' | format(prev.result.scores[2]) }}</span>
                             </span>
                           {% endif %}
                         </a>
@@ -59,9 +71,16 @@
                   <h2>Loading result...</h2>
                 </div>
                 <div class="request-review {{ '' if requestReview else 'd-none' }}">
-                  <button id="request-review-btn" class="request-review-btn btn btn-large btn-block btn-primary" 
-                  data-placement="top" data-toggle="popover" data-trigger="hover" data-html="true" style="display: none;"
-                  title="<i class='fas fa-question'></i> What is code review" data-content="<p>When you request code review, teacher will be notified and will be able to view and comment this attempt.</p><p>You can request code review if you believe your solution is final but also if you are having difficulties with this problem.</p>">
+                  <button
+                    id="request-review-btn"
+                    class="request-review-btn btn btn-large btn-block btn-primary"
+                    data-placement="top"
+                    data-toggle="popover"
+                    data-trigger="hover"
+                    data-html="true"
+                    style="display: none;"
+                    title="<i class='fas fa-question'></i> What is code review"
+                    data-content="<p>When you request code review, teacher will be notified and will be able to view and comment this attempt.</p><p>You can request code review if you believe your solution is final but also if you are having difficulties with this problem.</p>">
                     Request code review
                   </button>
                 </div>
@@ -71,13 +90,17 @@
             <div class="col-12 white">
               <section class="article-section mx-1 p-2">
                 <a href="#" class="finish-review" type="btn" style="display: none;">
-                  Add <span class="placeholder-comment-count"></span> comments
+                  Add
+                  <span class="placeholder-comment-count"></span>
+                  comments
                 </a>
                 <div id="source-code">
                   <pre class="small"><code class="hljs"></code></pre>
                 </div>
                 <a href="#" class="finish-review" type="btn" style="display: none;">
-                  Add <span class="placeholder-comment-count"></span> comments
+                  Add
+                  <span class="placeholder-comment-count"></span>
+                  comments
                 </a>
               </section>
             </div>

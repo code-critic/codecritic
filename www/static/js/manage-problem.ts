@@ -31,8 +31,8 @@ $(document).ready(function () {
     F('daterange', 'Date range', 'calendar', 'week', ['day', 'week', 'two weeks', 'month', 'all']),
     F('limit-per-user', 'of attempts', 'hashtag', '3', ['1', '3', '5', 'all']),
     F('has-review-flag', 'Has review flag', 'flag', 'all', ['yes', 'no', 'all']),
+    F('sort-by-outer', 'Sort students', 'sort-amount-up', 'lastname', ['firstname', 'lastname']),
     F('sort-by-inner', 'Sort attempts', 'sort-amount-up', 'result.score', ['result.score', '_id']),
-    F('sort-by-outer', 'Sort students', 'sort-amount-up', '_id', ['_id']),
     F('status', 'Exit status', 'check', 'all', ['answer-correct', 'answer-correct-timeout', 'answer-wrong', 'all'], 'col-12 col-md-4'),
     F('search', 'Search', 'search', null, null, null, 'search'),
     F('refresh', 'Refresh', null, null, null, null, 'refresh'),
@@ -75,6 +75,7 @@ $(document).ready(function () {
       data: JSON.stringify(config),
       success: function (data) {
         resultCanvas.removeClass('disabled alpha-5');
+        console.log(config);
         resultCanvas.html(
           Templates.render('admin/user-results', { users: data, config: config })
         );
