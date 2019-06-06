@@ -115,7 +115,7 @@ def register_routes(app, socketio):
 
         if _id:
             for r in results:
-                if str(r_id) == str(_id):
+                if str(r._id) == str(_id):
                     r.active = 'active'
 
         def get_attempt(obj):
