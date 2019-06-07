@@ -5,6 +5,7 @@ import time
 
 import yaml
 from bson import objectid
+from bson.errors import InvalidId
 from loguru import logger
 from pymongo import MongoClient
 from singleton_decorator import singleton
@@ -13,6 +14,7 @@ from database.objects import Notifications
 from entities.crates import ICrate
 from env import Env
 from utils.strings import ensure_iterable
+from utils.types import ensure_type
 
 
 SINCE_EPOCH = datetime.datetime.fromtimestamp(0)
@@ -71,7 +73,8 @@ class Mongo(object):
         if isinstance(result, ICrate):
             result = result.peek()
 
-        logger.error('_id: {}', _id)
+        _id: objectid.ObjectId = ensure_type(_id, objectid.ObjectId)
+
         try:
             cp = result.copy()
             cp.update(extra)
@@ -87,7 +90,7 @@ class Mongo(object):
 
         result.update(extra)
         if _id:
-            result['_id'] = objectid.ObjectId(_id)
+            result['_id'] = _id
             return self.data.replace_one(dict(_id=result['_id']), result)
 
         if '_id' in result:
@@ -133,7 +136,10 @@ class Mongo(object):
 
     def result_by_id(self, _id):
         from entities.crates import TestResult
-        result = self.data.find_one(dict(_id=objectid.ObjectId(_id)))
+        try:
+            result = self.data.find_one(dict(_id=objectid.ObjectId(_id)))
+        except InvalidId:
+            return None
 
         if result:
             return TestResult(**result)

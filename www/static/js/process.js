@@ -10,6 +10,7 @@ $(document).ready(function () {
     var lastObject = null;
     var lastTarget = null;
     var cc = new CC(current);
+    var ccp = new CC(previous);
     var onRender = function () {
         if (lastObject.review_request_) {
             requestReviewBtn.fadeOut('fast');
@@ -43,6 +44,20 @@ $(document).ready(function () {
     });
     var submitSolution = function () {
         cc.processSolution(_id, function (event) {
+            $('.live-result').addClass(event.data.result.status);
+            finished = true;
+            currentSrc = event.data.solution;
+            lastObject = event.data;
+            lastObject._id = $('.live-result').data('uuid');
+            console.log(lastObject);
+            renderSourceCode(currentSrc);
+            renderComments(null);
+        }, function (event) {
+            console.log('failed', event);
+        });
+    };
+    var rerunSolution = function (doc_id) {
+        ccp.rerunSolution(doc_id, function (event) {
             $('.live-result').addClass(event.data.result.status);
             finished = true;
             currentSrc = event.data.solution;
@@ -197,6 +212,12 @@ $(document).ready(function () {
                 updateCounterPlaceholder();
                 previous.find('[data-toggle="tooltip"]').tooltip();
                 previous.removeClass('disabled alpha-5');
+                if (data.result == null) {
+                    console.log('broken');
+                    ccp.connect(function () {
+                        setTimeout(rerunSolution, 500, data._id);
+                    });
+                }
             }
         });
         return false;

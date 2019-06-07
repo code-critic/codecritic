@@ -54,8 +54,16 @@ class CC {
     processSolution(_id, on_complete, on_error) {
         this.on_complete = on_complete;
         this.on_error = on_error;
-        console.log('emitting process solution');
+        console.log('emitting student-process-solution');
         this.socket.emit('student-process-solution', {
+            _id: _id,
+        });
+    }
+    rerunSolution(_id, on_complete, on_error) {
+        this.on_complete = on_complete;
+        this.on_error = on_error;
+        console.log('emitting rerun-solution');
+        this.socket.emit('rerun-solution', {
             _id: _id,
         });
     }
