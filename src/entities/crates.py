@@ -4,7 +4,8 @@
 from typing import Optional, List
 import pathlib
 from dataclasses import dataclass, field, asdict
-
+from utils.crypto import sha1
+from loguru import logger
 
 Text = List[str]
 
@@ -23,11 +24,11 @@ class Attachment(ICrate):
 
 @dataclass
 class CaseResult(ICrate):
-    id: str
-    status: str
-    duration: float
-    returncode: int
-    message: str
+    id: str = None
+    status: str = None
+    duration: float = None
+    returncode: int = None
+    message: Optional[str] = None
 
     score: Optional[int] = None
     scores: Optional[List[int]] = None
@@ -37,6 +38,10 @@ class CaseResult(ICrate):
     console: Optional[Text] = field(default_factory=list)
     message_details: Optional[Text] = field(default_factory=list)
     attachments: List[Attachment] = field(default_factory=list)
+
+    def __post_init__(self):
+        if self.id and not self.uuid:
+            self.uuid = sha1(self.id)
 
 
 @dataclass
@@ -69,6 +74,14 @@ class TestResult(ICrate):
                 self.time = datetime.datetime.timestamp(self._id.generation_time)
             except:
                 self.time = 0
+
+        try:
+            if self.results:
+                for i, x in enumerate(self.results):
+                    if isinstance(x, dict):
+                        self.results[i] = CaseResult(**x)
+        except Exception as e:
+            logger.exception("Error wile converting dict to CaseResult")
 
     @property
     def firstname(self):

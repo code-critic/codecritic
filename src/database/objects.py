@@ -1,24 +1,21 @@
 #!/bin/python3
 # author: Jan Hybs
-import pathlib
-
-import typing
-from collections import defaultdict
-
-import yaml
 import copy
 import datetime as dt
+import pathlib
+import typing
+from collections import defaultdict
+from dataclasses import dataclass
+
+import yaml
+from loguru import logger
 
 from database import parse_dt
 from database.yamldb import ADB, YamlDB
 from entities.crates import Attachment
-from exceptions import FatalException, ConfigurationException
-
-from utils import strings
 from env import Env
-
-from loguru import logger
-
+from exceptions import ConfigurationException, FatalException
+from utils import strings
 from utils.paths import IOEFiles
 
 
@@ -79,7 +76,7 @@ class User(ADB):
     def affi_pairs(self):
         items = self.affi.split(', ') if self.affi else list()
         for i in range(0, len(items), 3):
-            yield ', '.join(items[i:i+3])
+            yield ', '.join(items[i:i + 3])
 
 
 class Course(ADB):
@@ -141,6 +138,7 @@ class Courses(object):
     """
     :type courses: typing.List[Course]
     """
+
     def __init__(self):
         self.courses = list()
         for course, config in self._iter_courses():
@@ -236,6 +234,7 @@ class Script(object):
     :type lang: str
     :type path: pathlib.Path
     """
+
     def __init__(self, item: dict):
         super().__init__()
         self.path = None
@@ -251,7 +250,7 @@ class Script(object):
                 langs = list(Languages.db().find(extension=ext))
                 if len(langs) > 1:
                     logger.warning('ambiguous language language auto detected from file %s' % self.name)
-                    
+
                 self.lang = langs[0].id
             except:
                 raise InvalidConfiguration('Could not find the language of a reference file %s' % self.name)
@@ -402,6 +401,20 @@ class ProblemCase(ADB):
             logger.exception('attachments')
             return []
 
+    def get_path_to_output_files(self, user_dir: pathlib.Path):
+        case_paths = IOEFiles(user_dir.relative_to(Env.root), self.id)
+        reference_files = IOEFiles(self.problem.relative_problem_dir, self.id)
+
+        @dataclass
+        class OutputCrate:
+            reference: pathlib.Path
+            generated: pathlib.Path
+
+        return OutputCrate(
+            reference=reference_files.output,
+            generated=case_paths.output
+        )
+
     def generate_input_args(self, validate=False):
         if validate:
             return ['-v']
@@ -444,4 +457,3 @@ class Notifications(object):
 
     def peek(self, full=True):
         return self.__dict__
-

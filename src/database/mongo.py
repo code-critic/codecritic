@@ -14,7 +14,7 @@ from database.objects import Notifications
 from entities.crates import ICrate
 from env import Env
 from utils.strings import ensure_iterable
-from utils.types import ensure_type
+from utils.type_util import ensure_type
 
 
 SINCE_EPOCH = datetime.datetime.fromtimestamp(0)

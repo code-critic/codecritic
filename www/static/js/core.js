@@ -151,8 +151,8 @@ $(document).ready(function () {
         name: $user.data('user-name'),
         isAdmin: $user.data('user-admin') == 'True',
     };
-    console.log(window.user);
     Globals.initEnv();
+    CCUtils.relativeTime($('.time'));
     $('[data-toggle="tooltip"]').tooltip();
     window.favicon = new window.Favico({
         animation: 'up',

@@ -52,6 +52,7 @@ $(document).ready(function () {
             console.log(lastObject);
             renderSourceCode(currentSrc);
             renderComments(null);
+            CC.registerDiffEvents(event.data._id);
         }, function (event) {
             console.log('failed', event);
         });
@@ -201,6 +202,7 @@ $(document).ready(function () {
                 previous.html(Templates.render('process-execute', data));
                 var nodes = "";
                 data.results.forEach((item) => {
+                    console.log(item);
                     nodes += Templates.render('test-result2', item);
                 });
                 previous.find('.test-cases').html(nodes);
@@ -218,6 +220,7 @@ $(document).ready(function () {
                         setTimeout(rerunSolution, 500, data._id);
                     });
                 }
+                CC.registerDiffEvents(data._id);
             }
         });
         return false;

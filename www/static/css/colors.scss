@@ -100,6 +100,10 @@ $statuses: (
       color: darken($color, 30) !important;
     }
 
+    .cell-diff .btn-link i {
+      color: darken($color, 30) !important;
+    }
+
     .result-details {
       background: lighten($color, 35);
     }
@@ -114,14 +118,18 @@ $statuses: (
       color: darken($color, 33);
     }
 
-    .btn-link.dropdown-toggle {
+    .btn-link {
       padding: 0.35rem;
       margin: 0;
-      background: none !important;
+      background: none;
       box-shadow: none !important;
-      border-radius: 50%;
-      width: 30px;
+      min-width: 30px;
       height: 30px;
+
+      &:hover {
+        text-decoration: none;
+        background: lighten($color, 33) !important;
+      }
 
       &::after {
         display: none;

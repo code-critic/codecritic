@@ -124,9 +124,9 @@ def register_routes(app, socketio):
         if output_dir:
             for case in result.results:
                 try:
-                    case_config = result.ref_problem[case['id']]
+                    case_config = result.ref_problem[case.id]
                     if case_config:
-                        case['attachments'] = case_config.get_attachments(
+                        case.attachments = case_config.get_attachments(
                             user_dir=Env.root.joinpath(output_dir)
                         )
                 except AttributeError:
@@ -151,6 +151,32 @@ def register_routes(app, socketio):
         return flask.json.dumps(dict(
             notifications=Mongo().read_notifications(user.id).peek(),
         ))
+
+    @app.route('/api/filediff/reference-output/<string:doc_id>/<string:case_id>', methods=['GET'])
+    @login_required
+    def get_side_by_side_diff(doc_id, case_id):
+        result = Mongo().result_by_id(doc_id)
+        output_dir = result.output_dir
+
+        if output_dir:
+            try:
+                case_config = result.ref_problem[case_id]
+                if case_config:
+                    attachments = case_config.get_path_to_output_files(
+                        user_dir=Env.root.joinpath(output_dir)
+                    )
+                    from utils import comparison
+                    result = comparison.line_by_line_diff(
+                        Env.root / attachments.reference,
+                        Env.root / attachments.generated
+                    )
+                    return result.html
+            except FileNotFoundError:
+                logger.exception('Could not find files for comparison')
+                return 'Could not find files'
+            except:
+                logger.exception('Error while comparing')
+                return 'Error while comparison'
 
     @app.route('/api/codereview/add', methods=['POST'])
     @login_required

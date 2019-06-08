@@ -46,7 +46,7 @@
         </span>
       </span>
 
-      <a class="cell cell-href" data-toggle="collapse" data-target="#eo-{{ uuid }}">
+      <span class="cell cell-href">
         <span class="test-title">
           {% if duration %}
             <span class="duration">
@@ -60,16 +60,16 @@
             </span>
           {% endif %}
         </span>
-      </a>
+      </span>
 
       <span class="cell cell-score">
         {% if score %}
-          <span class="score" data-toggle="tooltip"
-          title="<b>Final score</b><br/>correct: {{scores[0]}}x<br/> correct+timeout: {{scores[1]}}x<br/> no fatal error: {{scores[2]}}x"
-          data-html="true">
-            <span class="score-value answer-correct">{{ scores[0] | pad(2) }}</span><!--
-          --><span class="score-value answer-correct-timeout">{{ scores[1] | pad(2) }}</span><!--
-          --><span class="score-value answer-wrong">{{ scores[2] | pad(2) }}</span>
+          <span class="score" data-toggle="tooltip" title="<b>Final score</b><br/>correct: {{scores[0]}}x<br/> correct+timeout: {{scores[1]}}x<br/> no fatal error: {{scores[2]}}x" data-html="true">
+            <span class="score-value answer-correct">{{ scores[0] | pad(2) }}</span>
+            <!-- -->
+            <span class="score-value answer-correct-timeout">{{ scores[1] | pad(2) }}</span>
+            <!-- -->
+            <span class="score-value answer-wrong">{{ scores[2] | pad(2) }}</span>
             <i class="fas fa-info-circle"></i>
           </span>
         {% endif %}
@@ -78,7 +78,8 @@
       <span class="cell cell-attachments">
         {% if attachments | length %}
           <span data-toggle="tooltip" title="View input and output files">
-            <button class="btn btn-link dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-link dropdown-toggle smaller" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Browse files
               <i class="fas fa-folder-open"></i>
             </button>
 
@@ -93,10 +94,25 @@
           </span>
         {% endif %}
       </span>
+
+      {% if id != 'Result' and id != 'Compilation' %}
+        <span class="cell cell-diff">
+          <button class="btn btn-link smaller" type="button" data-id="{{ id }}" data-target="#eo-{{ uuid }} .diff-result">
+            View diff
+            <i class="fas fa-columns"></i>
+          </button>
+        </span>
+      {% endif %}
     </div>
 
-    <div class="result-details stdout-stderr collapse" id="eo-{{ uuid }}">
+    <div class="result-details stdout-stderr" id="eo-{{ uuid }}">
       <div class="test-details">
+
+        <div class="d-flex">
+          <div class="pr-2 empty-padding"></div>
+          <div class="smalll px-1 diff-result"></div>
+        </div>
+        
         {% if message_details | length %}
           <div class="d-flex">
             <div class="pr-2 empty-padding"></div>
@@ -106,7 +122,6 @@
               {% endfor %}
             </div>
           </div>
-
         {% endif %}
 
         {% if console | length %}

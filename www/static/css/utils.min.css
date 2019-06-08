@@ -144,7 +144,8 @@ body #toast-container > div {
   padding: 0;
 }
 
-.filter-item-holder select, .filter-item-holder input {
+.filter-item-holder select,
+.filter-item-holder input {
   -webkit-transition: all 0.15s ease-in-out;
   transition: all 0.15s ease-in-out;
   border: none;
@@ -228,5 +229,48 @@ body #toast-container > div {
 
 .final-evaluation .execution-test .cell-score .score span.score-value.answer-wrong {
   background: #a90303;
+}
+
+.cell-diff {
+  display: none !important;
+}
+
+.cell-diff.registered {
+  display: inherit !important;
+}
+
+.diff .empty::after {
+  content: "reached end of file";
+  font-style: italic;
+  color: #6c757d;
+}
+
+.diff th {
+  font-weight: bold;
+}
+
+.diff th, .diff td {
+  text-align: center;
+  padding: 0 10px;
+}
+
+.diff td.line {
+  color: #6c757d;
+  border-right: 1px solid #6c757d;
+  padding-right: 10px;
+  margin: 0 10px;
+  display: block;
+}
+
+.diff td.ref, .diff td.gen {
+  font-family: 'Courier New', Courier, monospace;
+  text-align: left;
+  margin: 0 10px;
+  border-right: 1px solid #6c757d;
+  min-width: 150px;
+}
+
+.diff th.res {
+  padding: 0;
 }
 /*# sourceMappingURL=utils.min.css.map */

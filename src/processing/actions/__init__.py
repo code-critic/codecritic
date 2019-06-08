@@ -136,7 +136,7 @@ class AbstractAction(object):
         return True
 
     @classmethod
-    def _evaluate_result(cls, result, compare_result, subcase):
+    def _evaluate_result(cls, result, compare_result: Comparator, subcase):
         if compare_result:
             # CORRECT RESULT
             if result.status is ExecutorStatus.OK:
@@ -164,5 +164,5 @@ class AbstractAction(object):
                 )
                 result.status = ExecutorStatus.ANSWER_WRONG_TIMEOUT
 
-            result.console = compare_result.message
+            #result.console = compare_result.message
         return result

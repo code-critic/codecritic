@@ -100,9 +100,9 @@ def register_routes(app, socketio):
             if document:
                 # add to previous solution if already executed
                 if document.result:
-                    results.append(document.peek())
+                    results.append(document)
                 else:
-                    result = document.peek()
+                    result = document
                     breadcrumbs.append(
                         Link.ProblemBtn(course, problem)
                     )
