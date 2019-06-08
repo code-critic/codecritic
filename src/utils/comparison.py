@@ -72,11 +72,3 @@ def read_n_lines(f, n=5):
                 # end of file
                 pass
 
-
-f1 = '/home/jan-hybs/projects/cc/codecritic/courses/TGH/2019/results/bohm.lukas/WEBISL/01-101-AT-answer-correct-timeout/output/WEBISL_case_1'
-f1b = '/home/jan-hybs/projects/cc/codecritic/courses/TGH/2019/results/bohm.lukas/WEBISL/01-101-AT-answer-correct-timeout/output/WEBISL_case_9'
-
-f2 = '/home/jan-hybs/projects/cc/codecritic/courses/TGH/2019/problems/WEBISL/output/WEBISL_case_1'
-f2b = '/home/jan-hybs/projects/cc/codecritic/courses/TGH/2019/problems/WEBISL/output/WEBISL_case_9'
-
-print(line_by_line_diff(f1, f2))
