@@ -145,7 +145,7 @@ class AbstractAction(object):
 
             # CORRECT RESULT BUT TIMED OUT
             elif result.status is ExecutorStatus.SOFT_TIMEOUT:
-                result.message = 'Submitted solution is correct but does not meet runtime criteria'
+                result.message = 'Submitted solution is correct but does not meet runtime criteria (duration > %1.3f sec)' % subcase.timeout
                 result.message_details = 'Allowed time is %1.3f sec sec but was running for %1.3f sec' % (
                     subcase.timeout, result.duration
                 )

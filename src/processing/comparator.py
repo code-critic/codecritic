@@ -42,12 +42,12 @@ class Comparator(object):
             output.append(l2)
 
             if l1 != l2:
-                error.extend([
-                    'line %d error:' % (i + 1),
-                    '     expected: %s' % l1,
-                    '        found: %s' % l2,
-                    ''
-                ])
+                # error.extend([
+                #     'line %d error:' % (i + 1),
+                #     '     expected: %s' % l1,
+                #     '        found: %s' % l2,
+                #     ''
+                # ])
                 result = False
                 if not keep_going:
                     break

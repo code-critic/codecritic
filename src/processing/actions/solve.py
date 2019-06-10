@@ -52,7 +52,7 @@ class ProcessRequestSolve(AbstractAction):
             f1=subcase.problem.output,
             f2=subcase.temp.output
         )
-        return self._evaluate_result(result, compare_result, subcase)
+        return compare_result
 
     def _run(self):
         request = self.request
@@ -62,7 +62,7 @@ class ProcessRequestSolve(AbstractAction):
 
         for subcase in request.iter_subcases():
             id = subcase.id
-
+    
             if not self._check_stdin_exists(subcase):
                 rr[id].status = ExecutorStatus.SKIPPED
                 rr[id].message = 'skipped'
@@ -74,16 +74,17 @@ class ProcessRequestSolve(AbstractAction):
             logger.opt(ansi=True).debug('{} - {}', log_base, cmd)
 
             # actually execute the code
-
             rr[id].status = ExecutorStatus.RUNNING
             request.event_execute_test.open_event.trigger(rr[id])
             with executor.set_streams(**subcase.temp_files(self.type)) as ex:
                 timeout = (subcase.timeout or Env.case_timeout) * request.lang.scale
                 result = ex.run(cmd, soft_limit=timeout).register(id)
+                result.timeout = timeout
 
             # if ok we compare
             if result.status in (ExecutorStatus.OK, ExecutorStatus.SOFT_TIMEOUT):
-                result = self.compare_files(subcase, result)
+                compare_result = self.compare_files(subcase, result)
+                result = self._evaluate_result(result, compare_result, subcase)
 
             # otherwise we try to extract errors
             else:

@@ -244,14 +244,12 @@ class ProcessRequest(object):
             self.result.result.duration = self.action_executor.duration
             ok_score = statuses.count(ExecutorStatus.ANSWER_CORRECT)
             at_score = statuses.count(ExecutorStatus.ANSWER_CORRECT_TIMEOUT)
-            wr_score = statuses.count(ExecutorStatus.ANSWER_WRONG) + statuses.count(ExecutorStatus.ANSWER_WRONG_TIMEOUT)
             rest_statuses = (
                 ExecutorStatus.ANSWER_CORRECT,
                 ExecutorStatus.ANSWER_CORRECT_TIMEOUT,
-                ExecutorStatus.ANSWER_WRONG,
-                ExecutorStatus.ANSWER_WRONG_TIMEOUT
+                ExecutorStatus.OK,
             )
-            rest = [x for x in statuses if x not in rest_statuses]
+            wr_score = len([x for x in statuses if x not in rest_statuses])
 
             self.result.result.score = (
                 (10**4) * ok_score +
