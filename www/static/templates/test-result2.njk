@@ -70,7 +70,6 @@
             <span class="score-value answer-correct-timeout">{{ scores[1] | pad(2) }}</span>
             <!-- -->
             <span class="score-value answer-wrong">{{ scores[2] | pad(2) }}</span>
-            <i class="fas fa-info-circle"></i>
           </span>
         {% endif %}
       </span>
@@ -79,8 +78,8 @@
         {% if attachments | length %}
           <span data-toggle="tooltip" title="View input and output files">
             <button class="btn btn-link dropdown-toggle smaller" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Browse files
               <i class="fas fa-folder-open"></i>
+              Browse files
             </button>
 
             <div class="dropdown-menu">
@@ -98,8 +97,8 @@
       {% if id != 'Result' and id != 'Compilation' %}
         <span class="cell cell-diff">
           <button class="btn btn-link smaller" type="button" data-id="{{ id }}" data-target="#eo-{{ uuid }} .diff-result">
-            View diff
             <i class="fas fa-columns"></i>
+            View diff
           </button>
         </span>
       {% endif %}

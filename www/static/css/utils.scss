@@ -209,21 +209,6 @@ body #toast-container>div {
   }
 }
 
-.final-evaluation .execution-test .cell-score .score span.score-value {
-  &.answer-correct {
-    background: #19820c;
-  }
-
-  &.answer-correct-timeout {
-    background: #c07c00;
-  }
-
-  &.answer-wrong {
-    background: #a90303;
-  }
-}
-
-
 .cell-diff {
   display: none !important;
 

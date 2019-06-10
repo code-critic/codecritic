@@ -24,10 +24,7 @@ $statuses: (
 
       .cell-score .score {
         background: white;
-        border: 2px solid darken($color, 30);
-        i {
-          color: darken($color, 30);
-        }
+        // border: 2px solid darken($color, 30);
       }
     }
   }
@@ -60,12 +57,6 @@ $statuses: (
         color: lighten($color, 30);
         background: darken($color, 30);
         padding: 0.75rem;
-      }
-
-      .score {
-        .score-value {
-          background: rgba(#fff, 0.15);
-        }
       }
     }
   }
@@ -120,11 +111,11 @@ $statuses: (
 
     .btn-link {
       padding: 0.35rem;
-      margin: 0;
+      margin: 0.5rem;
       background: none;
       box-shadow: none !important;
       min-width: 30px;
-      height: 30px;
+      min-height: 30px;
 
       &:hover {
         text-decoration: none;
@@ -161,29 +152,14 @@ $statuses: (
     }
 
     .cell-score .score {
-      min-width: 110px;
+      min-width: 40px;
       padding: 0.25rem;
-      border-radius: 0.25rem;
-      margin: 0 1rem;
+      margin: 1rem;
       color: #fff;
       text-align: center;
 
-      .fa {
-        font-size: 0.8rem;
-      }
-
-      .score-divider::after {
-        content: '-';
-      }
-
       .score-value {
-        font-weight: bold;
-        font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
         font-size: 0.9rem;
-        margin: 0.1rem;
-        padding: 0.1rem;
-        border-radius: 0.125rem;
-        display: inline-block;
       }
     }
   }
