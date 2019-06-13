@@ -67,7 +67,7 @@ $(document).ready(function () {
             $('.lang-select').val(languageID);
         }
         if (sourceCode) {
-            editor.setValue(sourceCode);
+            editor.setValue(sourceCode, 1);
         }
     };
     var saveProblemAndLang = function () {
@@ -102,14 +102,27 @@ $(document).ready(function () {
         var key = [problemID, languageID];
         var sourceCode = cs.storageGet(key.concat('sourceCode'));
         if (sourceCode) {
-            editor.setValue(sourceCode);
+            editor.setValue(sourceCode, 1);
         }
     };
     $('.lang-select').change(function () {
-        var style = $('.lang-select option:checked').data('style');
-        editor.session.setMode('ace/mode/' + style);
+        var langID = $(this).val();
+        var langName = $(this).find(`option[value="${langID}"]`).data('name');
+        var langStyle = $(this).find(`option[value="${langID}"]`).data('style');
+        editor.session.setMode('ace/mode/' + langStyle);
+        $('.lang-name-placeholder').text(langName);
+        $('.lang-id-placeholder').text(langID);
+        $('.lang-style-placeholder').text(langStyle);
         saveProblemAndLang();
         loadCode();
+    });
+    $('.view-lang-example-link').click(function () {
+        var href = $(this).data('href');
+        var langID = $('.lang-select').val();
+        var langStyle = $('.lang-select').find(`option[value="${langID}"]`).data('style');
+        editor.session.setMode('ace/mode/' + langStyle);
+        editor.setValue(LangExamples.examples[langID], 1);
+        editor.focus();
     });
     $('.prob-select').change(function () {
         var problemID = $(this).val();
@@ -143,7 +156,7 @@ $(document).ready(function () {
             var style = $('option[data-ext="' + ext + '"]').val();
             $('.lang-select').val(style);
             editor.session.setMode('ace/mode/' + style);
-            editor.setValue(data);
+            editor.setValue(data, 1);
         }
         catch (e) {
             console.log(e);
