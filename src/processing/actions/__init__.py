@@ -54,10 +54,14 @@ class AbstractAction(object):
 
         if result.failed():
             if result.status is ExecutorStatus.GLOBAL_TIMEOUT:
-                raise CompileException('Compilation was interrupted (did not finish in time)', details=result.read_stdout())
+                details = str(result.read_stdout())
+                logger.error('Compilation failed:\n{}', details)
+                raise CompileException('Compilation was interrupted (did not finish in time)', details=details)
             else:
                 result.status = ExecutorStatus.COMPILATION_FAILED
-                raise CompileException('Compilation failed', details=result.read_stdout())
+                details = str(result.read_stdout())
+                logger.error('Compilation failed:\n{}', details)
+                raise CompileException('Compilation failed', details=details)
 
         self.request.event_compile.close_event.trigger(self.request.result.compilation)
 

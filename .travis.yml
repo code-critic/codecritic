@@ -22,7 +22,7 @@ install:
 # run the tests
 script:
   # TODO maybe use a specific order when testing
-  - pytest --cov=src tests
+  - pytest --cov=src tests -m "no_docker"
 
 # if (and when) we succeed coveralls will be published
 after_success:

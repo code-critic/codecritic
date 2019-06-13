@@ -112,3 +112,5 @@ venv.bak/
 .tmp/
 data/
 /old/
+www/cc/node_modules
+www/cc/package-lock.json
