@@ -65,7 +65,7 @@ def register_routes(app, socketio):
         breadcrumbs = [Link.CoursesBtn(), Link.CourseBtn(course), Link.ProblemBtn(course, problem)]
 
         return render_template_ext(
-            'results.njk',
+            'view_result.njk',
             user=user,
             notifications=Mongo().read_notifications(user.id),
             results=[document],
@@ -74,6 +74,11 @@ def register_routes(app, socketio):
 
             title='Problem %s' % problem.name,
             breadcrumbs=Breadcrumbs.new(*breadcrumbs),
+            js=[
+                '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js',
+                '/static/js/lib/highlightjs-line-numbers.js'
+            ],
+            js_no_cache=['sockets.js', 'process.js']
         )
 
     @app.route('/results/<string:course_name>/<string:course_year>/<string:problem_id>/<string:_id>')
@@ -127,7 +132,7 @@ def register_routes(app, socketio):
         results = sorted(results, reverse=True, key=get_attempt)
 
         return render_template_ext(
-            'results.njk',
+            'view_result.njk',
             user=user,
             notifications=Mongo().read_notifications(user.id),
             results=results,
@@ -136,6 +141,11 @@ def register_routes(app, socketio):
 
             title='Problem %s' % problem.name,
             breadcrumbs=Breadcrumbs.new(*breadcrumbs),
+            js=[
+                '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js',
+                '/static/js/lib/highlightjs-line-numbers.js'
+            ],
+            js_no_cache=['sockets.js', 'process.js']
         )
 
     @app.route('/course/<string:course_name>/<string:course_year>')
@@ -148,7 +158,7 @@ def register_routes(app, socketio):
         languages = Languages.db().find(disabled=(None, False))
 
         return render_template_ext(
-            'submit.njk',
+            'view_course.njk',
             user=user,
             notifications=Mongo().read_notifications(user.id),
             course=course,
@@ -160,6 +170,7 @@ def register_routes(app, socketio):
             breadcrumbs=Breadcrumbs.new(
                 Link.CoursesBtn(),
             ),
+            js_no_cache=['solution.js']
         )
 
     @app.route('/admin/<string:course_name>/<string:course_year>/<string:problem_id>')
@@ -174,7 +185,7 @@ def register_routes(app, socketio):
         languages = Languages.db().find(disabled=(None, False))
 
         return render_template_ext(
-            'problem.njk',
+            'admin_problem.njk',
             user=user,
             notifications=Mongo().read_notifications(user.id),
             course=course,
@@ -187,6 +198,7 @@ def register_routes(app, socketio):
                 Link.CoursesBtn(),
                 Link.CourseBtn(course)
             ),
+            js_no_cache=['sockets.js', 'manage-problem.js']
         )
 
     @app.route('/courses')
@@ -200,7 +212,7 @@ def register_routes(app, socketio):
         ))
 
         return render_template_ext(
-            'courses.njk',
+            'view_courses.njk',
             title='Course list',
             user=user,
             notifications=Mongo().read_notifications(user.id),

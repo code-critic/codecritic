@@ -12,8 +12,18 @@
 <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
 <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ext-language_tools.js"></script>
 <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script type="text/javascript" src="/static/js/templates.js" charset="utf-8"></script>
-<script type="text/javascript" src="/static/js/core.js" charset="utf-8"></script>
+
+<script type="text/javascript" src="/static/js/templates.js?{{version}}" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/core.js?{{version}}" charset="utf-8"></script>
+
+{% for js in js %}
+  <script type="text/javascript" src="{{js}}" charset="utf-8"></script>
+{% endfor %}
+
+{% for js in js_no_cache %}
+  <script type="text/javascript" src="/static/js/{{js}}?{{version}}" charset="utf-8"></script>
+{% endfor %}
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138207028-1"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
