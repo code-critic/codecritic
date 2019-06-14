@@ -248,3 +248,8 @@ body #toast-container>div {
     padding: 0;
   }
 }
+
+.navbar .dropdown-menu {
+  max-height: 410px;
+  overflow-y: scroll;
+}

@@ -171,6 +171,9 @@ def register_routes(app, socketio):
                         Env.root / attachments.generated
                     )
                     return result.html
+                else:
+                    logger.error(f'Could not find case {case_id}')
+                    return f'Could not find case {case_id}'
             except FileNotFoundError:
                 logger.exception('Could not find files for comparison')
                 return 'Could not find files'
