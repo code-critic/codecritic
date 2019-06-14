@@ -81,6 +81,16 @@ $(document).ready(function () {
         );
         CCUtils.relativeTime(resultCanvas);
         CCUtils.enableTooltips(resultCanvas);
+        $('#table_id').DataTable({
+          searching: false,
+          paging: false,
+          info: false,
+          autoWidth: false,
+          order: [],
+        });
+        $('.element-link').click(function(){
+            window.open($(this).data('href'), '_blank');
+        });
       },
       error: function (xhr, ajaxOptions, thrownError) {
         alert(xhr.status);

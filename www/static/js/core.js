@@ -139,6 +139,11 @@ class CCUtils {
             $(this).text(dt.fromNow());
             $(this).parent().attr('title', dt.locale('cs').format('llll'));
         });
+        $(element).find('.time-relative-short').each(function (i, element) {
+            var dt = window.moment(Number($(this).data('time')));
+            $(this).text(dt.fromNow());
+            $(this).attr('title', dt.locale('cs').format('llll'));
+        });
     }
     static enableTooltips(element) {
         $(element).find('[data-toggle="tooltip"]').tooltip();

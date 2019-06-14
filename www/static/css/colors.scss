@@ -30,8 +30,27 @@ $statuses: (
   }
 }
 
-.problem-results, .search-results {
+.problem-results,
+.search-results {
   @each $name, $color in $statuses {
+    tr.#{$name} {
+      background: lighten($color, 33);
+      color: darken($color, 35);
+
+      &:hover {
+        background: lighten($color, 25);
+        color: darken($color, 35);
+        
+        .lighten {
+          background: lighten($color, 35);
+        }
+      }
+
+      .lighten {
+        background: lighten($color, 40);
+      }
+    }
+
     a.#{$name} {
       background: lighten($color, 30);
       color: darken($color, 30);
@@ -41,18 +60,18 @@ $statuses: (
         color: lighten($color, 23);
         background: darken($color, 23);
       }
-      
+
       .details {
         background: lighten($color, 23);
         color: darken($color, 23);
       }
-      
+
       &:hover {
         background: lighten($color, 23);
         color: darken($color, 23);
         border: 1px solid darken($color, 30);
       }
-      
+
       &.active {
         color: lighten($color, 30);
         background: darken($color, 30);
