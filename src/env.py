@@ -43,7 +43,7 @@ class Env(object):
     """
     Public config
     """
-    version = '0.2.1'
+    version = '0.2.2'
     root = _root
     src = _root / 'src'
     cfg = _root / 'cfg'
