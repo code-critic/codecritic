@@ -178,7 +178,7 @@ class Mongo(object):
     def load_results(self, *args, **kwargs):
         return self.data.find(*args, **kwargs)
 
-    def read_notifications(self, user_id, course_id=None, problem_id=None):
+    def load_notifications(self, user_id, course_id=None, problem_id=None):
         filters = dict(to=user_id)
         if course_id:
             filters['course'] = course_id
@@ -188,6 +188,16 @@ class Mongo(object):
         result = list(self.events.find(filters))
         return Notifications(*result)
 
+    def read_notifications(self, user_id, n_id):
+        if n_id == 'all':
+            ns = self.load_notifications(user_id=user_id).items
+            for n in ns:
+                self.mark_as_read(n_id=n['_id'])
+            return len(ns) if ns else 0
+        else:
+            self.mark_as_read(n_id=n_id)
+            return 1
+
     def add_notification(self, data):
         id = {'from': data['from'], 'to': data['to'], 'document': data['document']}
         if self.events.find_one(id) is None:
@@ -195,15 +205,21 @@ class Mongo(object):
             return self.events.insert_one(data).acknowledged
         return False
 
-    def mark_as_read(self, to, _id, event):
+    def mark_as_read(self, to=None, _id=None, event=None, n_id=None):
         """
         Will remove notifications where recipient is to and document is _id
         :param to:
         :param _id:
         :return:
         """
+        if n_id:
+            return self.events.delete_one(dict(_id=n_id))
+
         if to:
-            return self.events.delete_many(dict(to=to, document=_id, event=event))
+            if event:
+                return self.events.delete_many(dict(to=to, document=_id, event=event))
+            else:
+                return self.events.delete_many(dict(to=to))
         else:
             return self.events.delete_many(dict(document=_id, event=event))
 

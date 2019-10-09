@@ -150,6 +150,18 @@ class CCUtils {
     $('#log').append(msg);
   }
 
+  static apiCall(url: string, data: any, success: any=null, error: any=null) {
+    $.ajax({
+      type: 'POST',
+      dataType: "json",
+      url: url,
+      contentType: 'application/json;charset=UTF-8',
+      data: data ? JSON.stringify(data) : null,
+      success: success,
+      error: error,
+    });
+  }
+
   static loadNotifications (callback?: Function) {
     $.ajax({
       type: 'POST',
@@ -178,7 +190,22 @@ class CCUtils {
           } else {
             $('#notifications').addClass('d-none');
           }
-          
+
+          $('a[data-api-action]').each((index, elem) => {
+              $(elem).click((i) => {
+                const action = $(elem).data['api-action'];
+                CCUtils.apiCall(
+                  '/api/notifications/read',
+                  {_id: 'all'},
+                  data => {
+                    console.log(data);
+                  },
+                  data => {
+                    console.log(data);
+                  }
+                )
+              })
+          });
           window.favicon.badge(length);
         }
       },

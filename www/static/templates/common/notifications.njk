@@ -4,6 +4,11 @@
     <span class="badge badge-danger z-depth-0 smaller position-absolute">{{ notifications | length }}</span>
   </a>
   <div class="dropdown-menu notification-menu">
+
+    <a class="dropdown-item" data-api-action="/api/notifications/read">
+      <i class="fas fa-ball"></i>
+      Read all notification
+    </a>
     {% for n in notifications %}
       <a class="dropdown-item notification-item px-2 py-1" href="/r/{{ n.document }}">
         <p class="p-0 m-0">

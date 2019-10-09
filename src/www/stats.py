@@ -149,7 +149,17 @@ def register_routes(app, socketio):
     def load_notifications():
         user = User(session['user'])
         return flask.json.dumps(dict(
-            notifications=Mongo().read_notifications(user.id).peek(),
+            notifications=Mongo().load_notifications(user.id).peek(),
+        ))
+
+    @app.route('/api/notifications/read', methods=['POST'])
+    @login_required
+    def read_notifications():
+        user = User(session['user'])
+        data = request.json
+
+        return flask.json.dumps(dict(
+            notifications=Mongo().read_notifications(user.id, n_id=data['_id'])
         ))
 
     @app.route('/api/filediff/reference-output/<string:doc_id>/<string:case_id>', methods=['GET'])

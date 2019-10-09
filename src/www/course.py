@@ -67,7 +67,7 @@ def register_routes(app, socketio):
         return render_template_ext(
             'view_result.njk',
             user=user,
-            notifications=Mongo().read_notifications(user.id),
+            notifications=Mongo().load_notifications(user.id),
             results=[document],
             result=None,
             requestReview=False,
@@ -134,7 +134,7 @@ def register_routes(app, socketio):
         return render_template_ext(
             'view_result.njk',
             user=user,
-            notifications=Mongo().read_notifications(user.id),
+            notifications=Mongo().load_notifications(user.id),
             results=results,
             result=result,
             requestReview=True,
@@ -160,7 +160,7 @@ def register_routes(app, socketio):
         return render_template_ext(
             'view_course.njk',
             user=user,
-            notifications=Mongo().read_notifications(user.id),
+            notifications=Mongo().load_notifications(user.id),
             course=course,
             languages=languages,
             problems=problems,
@@ -187,7 +187,7 @@ def register_routes(app, socketio):
         return render_template_ext(
             'admin_problem.njk',
             user=user,
-            notifications=Mongo().read_notifications(user.id),
+            notifications=Mongo().load_notifications(user.id),
             course=course,
             languages=languages,
             problem=problem,
@@ -215,6 +215,6 @@ def register_routes(app, socketio):
             'view_courses.njk',
             title='Course list',
             user=user,
-            notifications=Mongo().read_notifications(user.id),
+            notifications=Mongo().load_notifications(user.id),
             courses=courses
         )

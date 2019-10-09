@@ -2,6 +2,7 @@
   {% if not users | length %}
     <h2>No results</h2>
   {% else %}
+     total: {{ users | length}}
     <table id="table_id" class="table table-sm table-bordered">
       <thead class="thead-light">
         <tr>
