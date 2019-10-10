@@ -105,6 +105,12 @@ class ProcessRequest(object):
             logger.debug('using pseudo random tmp dir in debug mode')
             self.rand = 'jan.hybs-DEBUG'
 
+        # fix java code
+        if self.type is ProcessRequestType.SOLVE:
+            if self.lang and self.lang.id == 'JAVA':
+                from utils.javafix import fix_java_solution
+                self.solution = fix_java_solution(self.solution)
+
         self.action_executor = None
         self.subcases = None
         self.result = RequestResult(self)
