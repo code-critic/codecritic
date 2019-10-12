@@ -201,6 +201,7 @@ $(document).ready(function() {
 
   $('.prob-select').trigger('change');
   $('.lang-select').trigger('change');
+  $('.cat-select').trigger('change');
   
 
   CCUtils.registerDnD($('#submit-solution .src-group'), function(file, data) {

@@ -163,6 +163,7 @@ $(document).ready(function () {
     loadCode();
     $('.prob-select').trigger('change');
     $('.lang-select').trigger('change');
+    $('.cat-select').trigger('change');
     CCUtils.registerDnD($('#submit-solution .src-group'), function (file, data) {
         try {
             var ext = file.name.split('.').slice(-1)[0];
