@@ -26,15 +26,32 @@
                     <label>Problem</label>
                     <div class="custom-control mb-4">
                       <div class="input-group mb-3">
+
+                        {% if has_categories %}
+                          <div class="input-group-append">
+                            <select class="browser-default custom-select cat-select" name="cat-id" data-course="{{ course.id }}">
+                              {% for cat, ps in cat_problems.items() %}
+                                <option data-problem-name="{{ cat }}" value="{{ cat }}">
+                                  {{ cat }}
+                                </option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        {% endif %}
+
                         <select class="browser-default custom-select prob-select" name="prob-id" data-course="{{ course.id }}">
-                          {% for problem in problems %}
-                            <option data-problem-name="{{ problem.name }}" value="{{ problem.id }}">{{ problem.name }}
-                              {% if not problem.is_active() %}
+                          {% for cat, ps in cat_problems.items() %}
+                            {% for problem in ps %}
+                              <option data-problem-cat="{{ problem.cat }}" data-problem-name="{{ problem.name }}" value="{{ problem.id }}">
+                                {{ problem.name }}
+                                {% if not problem.is_active() %}
                                 [submission closed]
                               {% endif %}
-                            </option>
+                              </option>
+                            {% endfor %}
                           {% endfor %}
                         </select>
+
                         {% if user.is_admin() %}
                           <div class="input-group-append">
                             <a href="#" class="input-group-text manage-problem-link btn-danger small" data-href="{{ url_for('admin_problem', course_name=course.name, course_year=course.year, problem_id='')}}">

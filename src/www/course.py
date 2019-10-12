@@ -2,6 +2,8 @@
 # author: Jan Hybs
 
 from uuid import uuid4
+from itertools import groupby
+from collections import OrderedDict
 
 from typing import List
 from flask import redirect, request, session, url_for
@@ -13,6 +15,8 @@ from env import Env
 from www import admin_required, dump_error, login_required, render_template_ext
 from www.utils_www import Link, Breadcrumbs
 from entities import crates
+
+problem_cat_getter = lambda x: x.cat
 
 
 def register_routes(app, socketio):
@@ -154,8 +158,19 @@ def register_routes(app, socketio):
     def view_course(course_name, course_year):
         user = User(session['user'])
         course = Courses().find_one(name=course_name, year=course_year, only_active=False)
-        problems = list(course.problem_db.find(disabled=(None, False)))
+        problems: List[Problem] = sorted(
+            list(course.problem_db.find(disabled=(None, False))),
+            key=problem_cat_getter
+        )
+
         languages = Languages.db().find(disabled=(None, False))
+
+        if not user.is_admin():
+            problems = [p for p in problems if p.is_visible()]
+
+        cat_problems = OrderedDict()
+        for cat, items in groupby(problems, key=problem_cat_getter):
+            cat_problems[cat] = list(items)
 
         return render_template_ext(
             'view_course.njk',
@@ -163,7 +178,9 @@ def register_routes(app, socketio):
             notifications=Mongo().load_notifications(user.id),
             course=course,
             languages=languages,
+            has_categories=len(cat_problems) > 1,
             problems=problems,
+            cat_problems=cat_problems,
 
             title=course.name,
             subtitle=course.year,

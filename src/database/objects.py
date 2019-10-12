@@ -283,10 +283,12 @@ class Problem(ADB):
         super().__init__()
         self.id = str(item['id'])
         self.name = item.get('name', self.id)
+        self.cat = item.get('cat', '__all__')
         self.desc = item.get('desc')
         self.reference = Script(item.get('reference')) if item.get('reference') else None
         self.disabled = item.get('disabled', False)
         self.avail = parse_dt(item.get('avail'))
+        self.since = parse_dt(item.get('since'))
         self.course = item.get('course')
         self.problem_dir = self.course.problems_dir / self.id
         self.relative_problem_dir = self.problem_dir.relative_to(Env.root)
@@ -301,7 +303,7 @@ class Problem(ADB):
             self.tests.append(ProblemCase(test, self))
 
     def peek(self):
-        return self._peek('id', 'name', 'disabled', 'timeout')
+        return self._peek('id', 'name', 'disabled', 'timeout', 'cat')
 
     @property
     def description(self):
@@ -324,8 +326,17 @@ class Problem(ADB):
             return 10**10
         return int((self.avail - dt.datetime.now()).total_seconds())
 
+    @property
+    def time_since(self):
+        if not self.since:
+            return 10**10
+        return int((dt.datetime.now() - self.since).total_seconds())
+
     def is_active(self):
         return not self.disabled and self.time_left > 0
+
+    def is_visible(self):
+        return not self.disabled and self.time_since > 0
 
     @property
     def test_ids(self) -> typing.List[str]:

@@ -12,6 +12,7 @@ $(document).ready(function () {
     var ONE_WEEK = ONE_DAY * 7;
     var ONE_MONTH = ONE_DAY * 31;
     var ONE_YEAR = ONE_DAY * 365;
+    var category = null;
     $('.count-down').each(function (index, item) {
         var $item = $(item);
         var timeLeft = Number($item.data('time-left'));
@@ -123,6 +124,18 @@ $(document).ready(function () {
         editor.session.setMode('ace/mode/' + langStyle);
         editor.setValue(LangExamples.examples[langID], 1);
         editor.focus();
+    });
+    $('.cat-select').change(function () {
+        category = $(this).val();
+        const isCat = `option[data-problem-cat="${category}"]`;
+        const isNotCat = `option[data-problem-cat!="${category}"]`;
+        const isCatOptions = $('.prob-select').find(isCat);
+        isCatOptions.show();
+        $('.prob-select').find(isNotCat).hide();
+        var firstVisible = $($('.prob-select').find('option:not(:hidden)').get(0));
+        $('.prob-select')
+            .val(firstVisible.val())
+            .trigger('change');
     });
     $('.prob-select').change(function () {
         var problemID = $(this).val();
