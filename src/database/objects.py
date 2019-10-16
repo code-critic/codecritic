@@ -96,7 +96,7 @@ class Course(ADB):
     :type disabled: bool
     :type teachers: list[str]
     :type students: list[SimpleUser]
-    :type tags: dict[str, list[str]]
+    :type tags: list[dict[str, list[str]]]
     """
     storage = 'courses.yaml'
     _problems = dict()
@@ -110,7 +110,7 @@ class Course(ADB):
         self.disabled = item.get('disabled', False)
         self.teachers = item.get('teachers', list())
         self.students = []
-        self.tags = item.get('tags', {})
+        self.tags = item.get('tags', [])
 
         for student in item.get('students', []):
             if isinstance(student, dict):
