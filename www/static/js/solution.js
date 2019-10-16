@@ -130,15 +130,12 @@ $(document).ready(function () {
         const isCat = `option[data-problem-cat="${category}"]`;
         const isNotCat = `option[data-problem-cat!="${category}"]`;
         const isCatOptions = $('.prob-select').find(isCat);
-        console.log(isCat);
         isCatOptions.show();
         $('.prob-select').find(isNotCat).hide();
-        var firstVisible = $($('.prob-select').find('option:not(:hidden)').get(0));
-        console.log(isCatOptions);
-        console.log(firstVisible);
-        if (firstVisible.val()) {
+        const val = $(isCatOptions.get(0)).val();
+        if (val) {
             $('.prob-select')
-                .val(firstVisible.val())
+                .val(val)
                 .trigger('change');
         }
     });
