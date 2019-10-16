@@ -155,12 +155,17 @@ $(document).ready(function() {
     const isCat = `option[data-problem-cat="${category}"]`;
     const isNotCat = `option[data-problem-cat!="${category}"]`;
     const isCatOptions = $('.prob-select').find(isCat);
+    console.log(isCat);
     isCatOptions.show();
     $('.prob-select').find(isNotCat).hide();
     var firstVisible = $($('.prob-select').find('option:not(:hidden)').get(0));
-    $('.prob-select')
-      .val(firstVisible.val())
-      .trigger('change');
+    console.log(isCatOptions);
+    console.log(firstVisible);
+    if (firstVisible.val()) {
+      $('.prob-select')
+        .val(firstVisible.val())
+        .trigger('change');     
+    }
   });
   
   $('.prob-select').change(function() {
