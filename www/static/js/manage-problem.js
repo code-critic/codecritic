@@ -1,3 +1,10 @@
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 $(document).ready(function () {
     var $inputForm = $('#generate-input-form');
     var $outputForm = $('#generate-output-form');
@@ -11,8 +18,14 @@ $(document).ready(function () {
     var resultCanvas = $('.search-results');
     var sourceCode = null;
     var languageID = null;
+    var tags = window.course.tags;
     var cc = new CC($target);
-    var F = function (name, desc, icon = null, value = null, options = [], classes = null, type = 'select') {
+    var F = function (name, desc, icon, value, options, classes, type) {
+        if (icon === void 0) { icon = null; }
+        if (value === void 0) { value = null; }
+        if (options === void 0) { options = []; }
+        if (classes === void 0) { classes = null; }
+        if (type === void 0) { type = 'select'; }
         return {
             name: name,
             desc: desc,
@@ -20,7 +33,7 @@ $(document).ready(function () {
             type: type,
             value: value,
             options: options,
-            classes: classes,
+            classes: classes
         };
     };
     var filters = [
@@ -31,15 +44,19 @@ $(document).ready(function () {
         F('sort-by-outer', 'Sort students', 'sort-amount-up', 'lastname', ['firstname', 'lastname']),
         F('sort-by-inner', 'Sort attempts', 'sort-amount-up', 'result.score', ['result.score', '_id']),
         F('status', 'Exit status', 'check', 'all', ['answer-correct', 'answer-correct-timeout', 'answer-wrong', 'all'], 'col-12 col-md-4'),
+    ];
+    filters = __spreadArrays(filters, tags.map(function (i) { return F("tag-" + i.name, i.name, 'hashtag', 'all', __spreadArrays(['all'], i.values)); }), [
         F('search', 'Search', 'search', null, null, null, 'search'),
         F('refresh', 'Refresh', null, null, null, null, 'refresh'),
-    ];
+    ]);
     var $lastResultsNav = $('#last-results-nav');
     var $lastResultsTab = $('#last-results-tab');
     CCUtils.enableTooltips($lastResultsNav.find('.filters').html(Templates.render('admin/filters', { filters: filters })));
+    // ---------------------------------------------------------------------------
     var collectFilters = function () {
         var result = {};
-        for (var f of filters) {
+        for (var _i = 0, filters_1 = filters; _i < filters_1.length; _i++) {
+            var f = filters_1[_i];
             var $item = $lastResultsNav.find('#filter-' + f.name);
             result[f.name] = $item.val();
         }
@@ -49,7 +66,7 @@ $(document).ready(function () {
         var config = {
             course: courseID,
             problem: problemID,
-            filters: collectFilters(),
+            filters: collectFilters()
         };
         resultCanvas.addClass('disabled alpha-5');
         $.ajax({
@@ -69,7 +86,7 @@ $(document).ready(function () {
                     paging: false,
                     info: false,
                     autoWidth: false,
-                    order: [],
+                    order: []
                 });
                 $('.element-link').click(function () {
                     window.open($(this).data('href'), '_blank');
@@ -81,6 +98,7 @@ $(document).ready(function () {
             }
         });
     };
+    // ---------------------------------------------------------------------------
     $inputForm.submit(function () {
         $adminZone.find('.solution-result').show();
         var $form = $(this);
@@ -117,6 +135,7 @@ $(document).ready(function () {
     $('.btn-search').click(function () {
         loadData();
     });
+    // ---------------------------------------------------------------------------
     cc.connect();
     loadData();
 });

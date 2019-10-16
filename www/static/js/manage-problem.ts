@@ -1,3 +1,14 @@
+
+interface CourseTags {
+  name: string;
+  values: CourseTag[];
+}
+
+interface CourseTag {
+  name: string;
+  value: string;
+}
+
 $(document).ready(function () {
   var $inputForm = $('#generate-input-form');
   var $outputForm = $('#generate-output-form');
@@ -12,6 +23,7 @@ $(document).ready(function () {
   var resultCanvas = $('.search-results');
   var sourceCode = null;
   var languageID = null;
+  var tags: CourseTags[] = window.course.tags;
   var cc = new CC($target);
 
   var F = function(name, desc, icon=null, value=null, options=[], classes=null, type='select') {
@@ -34,9 +46,13 @@ $(document).ready(function () {
     F('sort-by-outer', 'Sort students', 'sort-amount-up', 'lastname', ['firstname', 'lastname']),
     F('sort-by-inner', 'Sort attempts', 'sort-amount-up', 'result.score', ['result.score', '_id']),
     F('status', 'Exit status', 'check', 'all', ['answer-correct', 'answer-correct-timeout', 'answer-wrong', 'all'], 'col-12 col-md-4'),
+    // { name: 'course', desc: 'Course', type: 'select', value: courseID , options: [courseID, 'all'] },
+  ];
+  filters = [
+    ...filters,
+    ...tags.map(i => F(`tag-${i.name}`, i.name, 'hashtag', 'all', ['all', ...i.values])),
     F('search', 'Search', 'search', null, null, null, 'search'),
     F('refresh', 'Refresh', null, null, null, null, 'refresh'),
-    // { name: 'course', desc: 'Course', type: 'select', value: courseID , options: [courseID, 'all'] },
   ];
 
   var $lastResultsNav = $('#last-results-nav');
