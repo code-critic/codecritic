@@ -203,6 +203,7 @@ def register_routes(app, socketio):
 
         return render_template_ext(
             'admin_problem.njk',
+            tags=course.tags,
             user=user,
             notifications=Mongo().load_notifications(user.id),
             course=course,

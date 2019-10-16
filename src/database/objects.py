@@ -23,6 +23,17 @@ class InvalidConfiguration(Exception):
     pass
 
 
+class SimpleUser(dict):
+    """
+    :type id: str
+    :type tags: list[str]
+    """
+    def __init__(self, **kwargs):
+        self.id = kwargs.pop('id')
+        self.tags = kwargs.pop('tags', [])
+        super().__init__(kwargs)
+
+
 class User(ADB):
     """
     :type id: str
@@ -50,12 +61,9 @@ class User(ADB):
     def is_admin(self):
         return self.role in ('root', 'admin')
 
-    def in_course(self, course):
-        """
-        :param course: Course
-        """
+    def in_course(self, course: 'Course'):
         if course.students:
-            if self.id in course.students:
+            if self.id in [x.id for x in course.students]:
                 return True
 
         if course.teachers:
@@ -87,7 +95,8 @@ class Course(ADB):
     :type year: str
     :type disabled: bool
     :type teachers: list[str]
-    :type students: list[str]
+    :type students: list[SimpleUser]
+    :type tags: dict[str, list[str]]
     """
     storage = 'courses.yaml'
     _problems = dict()
@@ -100,7 +109,14 @@ class Course(ADB):
         self.year = item.get('year')
         self.disabled = item.get('disabled', False)
         self.teachers = item.get('teachers', list())
-        self.students = item.get('students', list())
+        self.students = []
+        self.tags = item.get('tags', {})
+
+        for student in item.get('students', []):
+            if isinstance(student, dict):
+                self.students.append(SimpleUser(**student))
+            else:
+                self.students.append(SimpleUser(id=student))
 
         if 'config' in item:
             self.yaml_file = pathlib.Path(item['config'])
@@ -120,6 +136,12 @@ class Course(ADB):
 
     def peek(self):
         return self._peek('id', 'name', 'desc', 'year', 'enabled')
+
+    def student_has_tag(self, student_id, tag, value):
+        students = [x for x in self.students if x.id == student_id]
+        if not students:
+            return False
+        return value in students[0].tags
 
     @property
     def problem_db(self):
@@ -323,13 +345,13 @@ class Problem(ADB):
     @property
     def time_left(self):
         if not self.avail:
-            return 10**10
+            return 10 ** 10
         return int((self.avail - dt.datetime.now()).total_seconds())
 
     @property
     def time_since(self):
         if not self.since:
-            return 10**10
+            return 10 ** 10
         return int((dt.datetime.now() - self.since).total_seconds())
 
     def is_active(self):

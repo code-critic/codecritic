@@ -11,7 +11,7 @@ from flask import request, session
 from loguru import logger
 
 from database.mongo import Mongo
-from database.objects import User
+from database.objects import User, Courses
 from env import Env
 from www import login_required
 
@@ -92,8 +92,24 @@ def register_routes(app, socketio):
                 'results': {'$push': '$$ROOT'}  # $$ROOT
             }},
         ]
-        print(pipeline, limit_per_user)
+        # print(pipeline, limit_per_user)
         items = list(Mongo().data.aggregate(pipeline))
+        try:
+            course = Courses()[data['course']]
+        except:
+            course = None
+
+        if course:
+            for key in data['filters'].keys():
+                if key.startswith('tag-'):
+                    tag = key[4:]
+                    value = data['filters'][key]
+                    if value == 'all':
+                        continue
+
+                    items = [x for x in items if course.student_has_tag(x['_id'], tag, value)]
+
+        # tags = .get('tag-group', None)
 
         def add_fields(x):
             x['firstname'] = str(x['_id']).split('.')[0]
