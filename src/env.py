@@ -43,7 +43,7 @@ class Env(object):
     """
     Public config
     """
-    version = '0.2.3'
+    version = '0.2.4'
     root = _root
     src = _root / 'src'
     cfg = _root / 'cfg'
@@ -114,4 +114,3 @@ class Env(object):
         from loguru import logger
         info = '\n'.join(['{:>20s}: {:s}'.format(k, str(v)) for k, v in cls.info_dict()])
         logger.info('{}:\n{}', msg, info)
-
