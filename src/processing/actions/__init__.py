@@ -20,7 +20,7 @@ class AbstractAction(object):
     :type executor: processing.executors.multilocal.MultiLocalExecutor or processing.executors.multidocker.MultiLocalExecutor
     """
 
-    case_log_format = '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id}'
+    case_log_format = '{course.name}<b><g>:</g></b>{problem.id}<b><g>:</g></b>{case.id}'
 
     def __init__(self, request: ProcessRequest, result_dir: pathlib.Path, problem_dir: pathlib.Path):
         self.request = request
@@ -70,7 +70,7 @@ class AbstractAction(object):
     def _check_stdin_exists(self, subcase: Subcase):
         if not subcase.temp.input.exists():
             logger.opt(ansi=True).warning(
-                '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id} - '
+                '{course.name}<b><g>:</g></b>{problem.id}<b><g>:</g></b>{case.id} - '
                 'input file does not exists, test will be skipped',
                 case=subcase.subcase, problem=self.request.problem, course=self.request.course
             )

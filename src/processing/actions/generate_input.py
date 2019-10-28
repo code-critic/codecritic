@@ -55,9 +55,9 @@ class ProcessRequestGenerateInput(AbstractAction):
 
             if not subcase.case.size:
                 logger.opt(ansi=True).warning(
-                    '{course.name}<b,e,>:</b,e,>{problem.id}<b,e,>:</b,e,>{case.id} - '
+                    '{course.name}<b><e>:</e></b>{problem.id}<b><e>:</e></b>{case.id} - '
                     'Cannot generate input file, property '
-                    '"<b,e,>size</b,e,>" not specified',
+                    '"<b><e>size</e></b>" not specified',
                     case=subcase.case, problem=request.problem, course=request.course
                 )
                 rr[id].status = ExecutorStatus.IGNORE
