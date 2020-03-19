@@ -56,15 +56,17 @@
                     no
                   {% endif %}
                 </td>
-                {% set scores = result.result.scores %}
-                {% set score_all = scores[0] | pad(2) + scores[1] | pad(2) + scores[2] | pad(2) %}
                 <td data-order="{{ score_all }}" class="text-center lighten">
-                  {% if scores | length %}
-                    <span class="score inline no-glow border-0">
-                      <span class="score-value answer-correct">{{ scores[0] | pad(2) }}</span>
-                      <span class="score-value answer-correct-timeout">{{ scores[1] | pad(2) }}</span>
-                      <span class="score-value answer-wrong">{{ scores[2] | pad(2) }}</span>
-                    </span>
+                  {% set scores = result.result.scores %}
+                  {% if scores %}
+                    {% set score_all = scores[0] | pad(2) + scores[1] | pad(2) + scores[2] | pad(2) %}
+                      {% if scores | length %}
+                        <span class="score inline no-glow border-0">
+                          <span class="score-value answer-correct">{{ scores[0] | pad(2) }}</span>
+                          <span class="score-value answer-correct-timeout">{{ scores[1] | pad(2) }}</span>
+                          <span class="score-value answer-wrong">{{ scores[2] | pad(2) }}</span>
+                        </span>
+                      {% endif %}
                   {% endif %}
                 </td>
               </tr>
@@ -74,80 +76,3 @@
       </table>
     {% endif %}
   </div>
-
-  {# <div class="py-3 row no-gutters">
-  {% if not users | length %}
-    <h2>No results</h2>
-  {% else %}
-    {% for user in users %}
-      <div class="col-12 col-md-3 col-sm-6 user-group">
-        <h5 class="text-center mt-4">{{ user._id }}</h5>
-        <div class="row no-gutters">
-          {% for result in user.results %}
-            {% set scores = result.result.scores %}
-            <a target="_blank" class="col-12 {{ result.result.status }} {{ 'review-request' if result.review_request else '' }}" href="/r/{{ result._id }}">
-              <div class="p-1 d-flex flex-column">
-                <div class="details">
-                  <p class='m-1 p-0'>
-                    <span class="time" data-toggle="tooltip" data-placement="left" title="{{ result.time }}">
-                      <i class="far fa-clock"></i>
-                      <span class="time-relative" data-time="{{ result.time * 1000 }}"></span>
-                    </span>
-                  </p>
-                  <p class='m-1 p-0'>
-                    #{{ result.attempt }}
-                    {{ result.result.status }}
-                  </p>
-                </div>
-                
-                <dl class="m-1 p-0">
-                  {% if scores | length %}
-                    <dt>score</dt>
-                    <dd>
-                      <span class="score inline">
-                        <span class="score-value answer-correct">{{ scores[0] | pad(2) }}</span>
-                        <span class="score-value answer-correct-timeout">{{ scores[1] | pad(2) }}</span>
-                        <span class="score-value answer-wrong">{{ scores[2] | pad(2) }}</span>
-                      </span>
-                    </dd>
-                  {% endif %}
-
-                  {% if config.filters.course == 'all' %}
-                    <dt>course</dt>
-                    <dd>{{ result.course }}</dd>
-                  {% endif %}
-
-                  {% if config.filters.problem == 'all' %}
-                    <dt>problem</dt>
-                    <dd>{{ result.problem }}</dd>
-                  {% endif %}
-
-                  {% if config.filters.languages == 'all' %}
-                    <dt>language</dt>
-                    <dd>{{ result.lang }}</dd>
-                  {% endif %}
-                </dl>
-              
-              {% if result.review_request or result.review %}
-                <div class="m-1 text-center">
-                  {% if result.review_request %}
-                    <span class="badge badge-sm badge-danger" data-toggle="tooltip" data-placement="left" title="Review requested on {{ result.review_request }}">
-                      REVIEW
-                    </span>
-                  {% endif %}
-
-                  {% if result.review %}
-                    <span class="badge badge-sm badge-dark" data-toggle="tooltip" data-placement="left" title="Code was commented on">
-                      COMMENTED
-                    </span>
-                  {% endif %}
-                </div>
-              {% endif %}
-              </div>
-            </a>
-          {% endfor %}
-        </div>
-      </div>
-    {% endfor %}
-{% endif %}
-</div> #}

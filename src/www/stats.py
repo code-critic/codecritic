@@ -48,7 +48,7 @@ def register_routes(app, socketio):
             elif period == 'month':
                 gen_time = datetime.datetime.today() - datetime.timedelta(days=31)
             else:
-                gen_time = datetime.datetime.today() - datetime.timedelta(days=365)
+                gen_time = datetime.datetime.today() - datetime.timedelta(days=365*5)
             return ObjectId.from_datetime(gen_time)
 
         # {'course': 'TST-2019', 'problem': 'problem-1', 'filters':
@@ -126,7 +126,10 @@ def register_routes(app, socketio):
             for attempt in item_copy['results']:
                 attempt['time'] = datetime.datetime.timestamp(attempt['_id'].generation_time)
             # item_copy['results'] = sorted(item_copy['results'], key=lambda x: x['time'], reverse=True)
-            result.append(item_copy)
+
+            if 'results' in item_copy:
+                item_copy['results'] = [r for r in item_copy['results'] if 'result' in r]
+                result.append(item_copy)
 
         return flask.json.dumps(result)
 
