@@ -15,6 +15,8 @@
   # reference:                  # you can also use long format, where you specify 
     # name: main.py             # name of the script
     # lang: PY-367              # and language ID from (cfg/langs.yaml) explicitely
+                                # valid laguages: [PY-367, C, CPP, JAVA, PY-276, CS]
+                                # see: https://github.com/code-critic/codecritic/blob/master/cfg/langs.yaml
 
   tests:
     - id: case-1.s              # by adding extension .s
