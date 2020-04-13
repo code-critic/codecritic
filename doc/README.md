@@ -1,58 +1,40 @@
-## Docs for /`{course}`/`{year}`/`config.yaml`
+# How to create a course?
 
-[config_template.yaml](https://github.com/code-critic/codecritic/edit/master/doc/config_template.yaml)
+Every course have its own Github repository which must be manually registered to the running CodeCritic server.
+The course repository must contain folders named by years (2019, 2020, ...)
+where each year can have its own configuration. The configuration is given by the 
+single YAML file `{course repository}`/`{year}`/`config.yaml`.
 
-```yaml
-- id:       problem-1           # directory name!
-  name:     Answer is 42!       # what student will see
-  timeout:  120                 # max time per solution, default is 60
-  avail:    2020-03-11 16:00:00 # problem will be active until YYYY-mm-dd HH:MM:SS
-  reference: main.py            # reference file, which should be in the repository
-                                # for sake of consistency the name should be **main.<extension>**
-                                # such as main.py, main.cc, main.java, ...
-                                # in this short format, the language will be detected
-                                # automatically (which may be incorrect, i.e.
-                                # can't differentiate between python3 and python2)
+Use [config_template.yaml](https://github.com/code-critic/codecritic/edit/master/doc/config_template.yaml)
+as both the template and the documentation.
 
-  # reference:                  # you can also use long format, where you specify 
-    # name: main.py             # name of the script
-    # lang: PY-367              # and language ID from (cfg/langs.yaml) explicitely
-                                # valid laguages: [PY-367, C, CPP, JAVA, PY-276, CS]
-                                # see: https://github.com/code-critic/codecritic/blob/master/cfg/langs.yaml
-
-  tests:
-    - id: case-1.s              # by adding extension .s
-                                # the input will be part of a repository
-      timeout: 0.2              # value in seconds, allowed duration of the solution
-                                # this value is scaled by
-                                # programming language scale factor (cfg/langs.yaml)
-
-    - id: case-2                # this file will be ignored by the git and won't 
-      timeout: 5.0              # be part of this repository
-                                # this usually means, the file will be created 
-                                # using reference script
-      size: 50                  # if size is specified, the will **can** be generated
-                                # using reference script, the value is passed
-                                # to the reference script which then generates
-                                # input file by writing to standard output stream
-                                # in this case the reference script will be called:
-                                #     python3 main.py -p 50
-
-    - id: case-3
-      random: 5                 # this value indicate that there will be generated
-      timeout: 0.2              # several input files (5 in this case)
-                                # this will then generate subcases
-                                # case-3.1, case-3.2, ..., case-3.5
-                                # all cases will be tested when solution is submitted
-      size: 15
-                                # in this case the reference script will be called:
-                                #     python3 main.py -p 15 -r
-
-- id: problem-2
-# to add more tests simple repeat the structure
-# - id: foobar
-#   ...
-#   tests:
-#     - id: ...
-
+The year folder has the structure:
 ```
+|- problem_1
+|  |- input
+|  |  case-1.s    # problem fixed inputs.  
+|  |  ...
+|  main.py        # problem script.
+|  README.md      # problem description, markdown format
+|- problem_2
+|  ...
+|- ...
+| config.yaml     # course configuration.
+| README.md       # course description, markdown format
+```
+
+Every problem is specified through the **script**. It can be written in any suppored language, but must be a single souce file. The script must behave as a reference solution when called without arguments with an input file redirected to its STDIN, e.g.
+
+    python3 main.py < case-1.s
+
+should solve the problem with input from `case-1.s`, solution is printed to the STDOUT.
+
+Optionaly the script can support (pseudorandom) generation of the input files:
+
+    python3 main.py -p <SIZE> -r <I>
+
+should print the generated input file to the STDOUT. 
+<SIZE> is the given problem size 
+<I> is the subtest index 
+These arguments can be used by the script to set the seed of pseudorandom generator and get a reproducible output.
+
