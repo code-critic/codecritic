@@ -1,0 +1,90 @@
+# Main config file for the course consists of a list of individual problems. 
+# This is a commented example which can also seerve as a template.
+
+# Supported languages:
+# configuration file: https://github.com/code-critic/codecritic/blob/master/cfg/langs.yaml
+#
+#                         Time
+#  Language     Code      Scaling   Extension
+#  ----------------------------------
+#  Python 3      PY-367    5        py
+#  Java          JAVA      2.6       java                                
+#  C#            CS        2        cs
+#  C language    C         1        c
+#  C++ 11        CPP       1        cpp
+
+
+# Basic setting example.
+- id:       WaterPour                 # Unique problem ID. All problem related files has to be in 
+                                      # {repository}/{year}/WaterPour
+  
+  name:     Watter pouring problem.   # The public problem title.
+  
+  timeout:  120                       # [s]
+                                      # Upper limit for the total run time of the tests.
+                                      # The process is killed after this limit.
+                                      # Default 60 s.                                                                               
+  
+  avail:    2020-03-11 16:00:00       # The solutions to the problem will accepted until YYYY-mm-dd HH:MM:SS
+  
+  reference: main.py                  # The script file: {repository}/{year}/WaterPour/main.py
+                                      # The language is infered automaticaly from the file extension, 
+                                      # see the table above.   
+  tests:
+    # Test with a fixed input file.
+    
+    - id: case-1.s                    # The input file of the test, located at:
+                                      # {repository}/{year}/WaterPour/input/case-1.s.
+                                      # The reference output is generated through the 'problem management' page
+                                      # using the script without arguments and the input file redirected to STDIN.
+                                      
+      timeout: 0.2                    # [s]
+                                      # The limit for the runtime of the test.
+                                      # Actual limit is this value multiplied by the language scaling factor, see the table.
+                                      # Here the actual timeout is 0.2 * 5 = 1 s.
+
+    # Test with a single generated input file.
+    - id: case-2                      # The unique ID of a test with a generated input.
+                                      # The input must be generated through the 'problem management' page.                                      
+                                      
+      timeout: 5.0                              
+      size: 50                        # The problem size. Obligatory for the generated input. 
+                                      # The input is the standard output of the script call with the '-p <SIZE>' argument:
+                                      # 
+                                      # python3 main.py -p 50 
+                                      #
+                                      # The script can also use the size argument to set the seed of the pseudorandom numbers 
+                                      # to obtain reproducible results.
+                                      
+    # Test with more generated input files for single size.
+    - id: case-3
+      timeout: 0.2
+      size: 15
+      random: 5                       # Number of the input files to generate.
+                                      # In this case it will generate files:  case-3.1, case-3.2, ..., case-3.5                                      
+                                      # The script is called with additional argument '-r <i>'
+                                      # where 'i' is the index of the subtest.
+                                      # E.g.
+                                      #     python3 main.py -p 15 -r 0
+                                      #
+                                      # will be used to generate 'case-3.0'.
+                                      # The outputs are generated for all inputs and the submission must pass
+                                      # all test subcases.
+
+- id: Connections
+  name: Connection search problem.
+  avail:    2020-03-11 16:00:00
+  reference:                          # Long variant with explicit specificaion of the script language.
+    name: main.cpp            
+    lang: CPP                         # default timeout = 60 in use
+                          
+  tests:
+    - id: case-2                                                            
+      timeout: 5.0                    # Here the actual timeout is exactly 5 s.            
+      size: 50                        # For the compiled languages the script is compiled into an executable which is then 
+                                      # called with possible the same arguments. E.g.
+                                      # 
+                                      # main.executable -p 50 
+                                    
+                                      
+  
