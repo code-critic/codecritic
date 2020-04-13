@@ -37,15 +37,6 @@
   run: [java, main]
   compile: [javac, <filename>]
 
-- id: PY-276
-  name: Python 2.7.15
-  scale: 4.4
-  image: automatest/python2
-  version: Python 2.7.15
-  extension: py
-  style: python
-  run: [python2.7, <filename>]
-
 - id: CS
   name: 'C#'
   scale: 2
@@ -60,13 +51,23 @@
 # ------------------------------------ DISABLED FOR NOW ---
 # ---------------------------------------------------------
 
-- id: PASCAL
-  name: Pascal
-  scale: 2.6
-  image: automatest/pascal
-  version: fpc 2.4.0
-  extension: pas
-  style: pascal
-  compile: [fpc, <filename>]
-  run: [./main]
-  disabled: true
+# - id: PASCAL
+#   name: Pascal
+#   scale: 2.6
+#   image: automatest/pascal
+#   version: fpc 2.4.0
+#   extension: pas
+#   style: pascal
+#   compile: [fpc, <filename>]
+#   run: [./main]
+#   disabled: true
+  
+# - id: PY-276
+#   name: Python 2.7.15
+#   scale: 4.4
+#   image: automatest/python2
+#   version: Python 2.7.15
+#   extension: py
+#   style: python
+#   run: [python2.7, <filename>]
+#   disabled: true
