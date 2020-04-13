@@ -448,7 +448,7 @@ class ProblemCase(ADB):
             generated=case_paths.output
         )
 
-    def generate_input_args(self, validate=False):
+    def generate_input_args(self, validate=False, index=0):
         if validate:
             return ['-v']
 
@@ -457,7 +457,7 @@ class ProblemCase(ADB):
             args += ['-p', self.size]
 
         if self.random:
-            args += ['-r']
+            args += ['-r', index]
 
         return [str(x) for x in args]
 
