@@ -1,5 +1,7 @@
 ## Docs for /`{course}`/`{year}`/`config.yaml`
 
+[config_template.yaml](https://github.com/code-critic/codecritic/edit/master/doc/config_template.yaml)
+
 ```yaml
 - id:       problem-1           # directory name!
   name:     Answer is 42!       # what student will see
