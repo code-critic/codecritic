@@ -50,7 +50,8 @@ class ProcessRequestGenerateInput(AbstractAction):
         cmd_base = self._run_cmd
         logger.opt(ansi=True).info('<red>{}</red> - {}', 'RUNNING', cmd_base)
 
-        for subcase in request.iter_subcases():
+        
+        for index, subcase in enumerate(request.iter_subcases()):
             id = subcase.id
 
             if not subcase.case.size:
@@ -67,7 +68,7 @@ class ProcessRequestGenerateInput(AbstractAction):
                 continue
 
             log_base = self.case_log_format.format(case=subcase.subcase, problem=request.problem, course=request.course)
-            cmd = cmd_base + subcase.subcase.generate_input_args()
+            cmd = cmd_base + subcase.subcase.generate_input_args(index)
 
             logger.opt(ansi=True).debug('{} - {}', log_base, cmd)
             rr[id].status = ExecutorStatus.RUNNING
