@@ -68,7 +68,7 @@ class ProcessRequestGenerateInput(AbstractAction):
                 continue
 
             log_base = self.case_log_format.format(case=subcase.subcase, problem=request.problem, course=request.course)
-            cmd = cmd_base + subcase.subcase.generate_input_args(index)
+            cmd = cmd_base + subcase.subcase.generate_input_args(index=index)
 
             logger.opt(ansi=True).debug('{} - {}', log_base, cmd)
             rr[id].status = ExecutorStatus.RUNNING
