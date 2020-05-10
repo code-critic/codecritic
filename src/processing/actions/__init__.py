@@ -139,8 +139,12 @@ class AbstractAction(object):
             ])
         return True
 
-    @classmethod
-    def _evaluate_result(cls, result, compare_result: Comparator, subcase):
+    def _evaluate_result(self, result, compare_result: Comparator, subcase):
+        try:
+            timeout = subcase.timeout * self.request.lang.scale
+           except:
+            timeout = subcase.timeout
+        
         if compare_result:
             # CORRECT RESULT
             if result.status is ExecutorStatus.OK:
@@ -149,9 +153,9 @@ class AbstractAction(object):
 
             # CORRECT RESULT BUT TIMED OUT
             elif result.status is ExecutorStatus.SOFT_TIMEOUT:
-                result.message = 'Submitted solution is correct but does not meet runtime criteria (duration > %1.3f sec)' % subcase.timeout
+                result.message = 'Submitted solution is correct but does not meet runtime criteria (duration > %1.3f sec)' % timeout
                 result.message_details = 'Allowed time is %1.3f sec sec but was running for %1.3f sec' % (
-                    subcase.timeout, result.duration
+                    timeout, result.duration
                 )
                 result.status = ExecutorStatus.ANSWER_CORRECT_TIMEOUT
         else:
@@ -164,7 +168,7 @@ class AbstractAction(object):
             elif result.status is ExecutorStatus.SOFT_TIMEOUT:
                 result.message = 'Submitted solution is incorrect and does not meet runtime criteria'
                 result.message_details = 'Allowed time is %1.3f sec but was running for %1.3f sec' % (
-                    subcase.timeout, result.duration
+                    timeout, result.duration
                 )
                 result.status = ExecutorStatus.ANSWER_WRONG_TIMEOUT
 
