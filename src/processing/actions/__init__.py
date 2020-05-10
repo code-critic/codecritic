@@ -142,7 +142,7 @@ class AbstractAction(object):
     def _evaluate_result(self, result, compare_result: Comparator, subcase):
         try:
             timeout = subcase.timeout * self.request.lang.scale
-           except:
+        except:
             timeout = subcase.timeout
         
         if compare_result:
