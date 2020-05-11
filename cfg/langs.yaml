@@ -6,6 +6,7 @@
   extension: py
   style: python
   run: [python3, <filename>]
+  unittest: [python3, -m, pytest, -rA, --json=.report.json, <filename>]
 
 - id: C
   name: C
