@@ -27,8 +27,8 @@ RUN apk update && apk add \
 # RUN pip3 install --no-cache-dir -v numpy scipy matplotlib \
 #  && pip3 install --no-cache-dir -v pandas seaborn
 
-RUN pip3 install -v pytest \
- && pip  install -v pytest
+RUN pip3 install -v pytest pytest-json \
+ && pip  install -v pytest pytest-json
 
 RUN rm -rf /var/cache/apk/* \
  && rm -rf /var/lib/apt/lists/*
