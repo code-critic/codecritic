@@ -1,6 +1,8 @@
 - id: PY-367
   name: Python 3.6.8
   scale: 5
+  scale-factor: 5
+  scale-start:  0.000
   image: automatest/python3
   version: Python 3.6.8
   extension: py
@@ -11,6 +13,8 @@
 - id: C
   name: C
   scale: 1
+  scale-factor: 1
+  scale-start:  0.000
   image: automatest/cc
   version: gcc 8.2.0
   extension: c
@@ -21,6 +25,8 @@
 - id: CPP
   name: C++
   scale: 1
+  scale-factor: 1
+  scale-start:  0.000
   image: automatest/cc
   version: g++ 8.2.0
   extension: cpp
@@ -31,6 +37,8 @@
 - id: JAVA
   name: Java
   scale: 2.6
+  scale-factor: 2.6
+  scale-start:  0.200
   image: automatest/java
   version: Java 1.8.0_91
   extension: java
@@ -41,6 +49,8 @@
 - id: CS
   name: 'C#'
   scale: 2
+  scale-factor: 2
+  scale-start:  0.000
   image: automatest/cs
   version: Mono 3.0.7
   extension: cs
@@ -55,6 +65,8 @@
 # - id: PASCAL
 #   name: Pascal
 #   scale: 2.6
+#   scale-factor: 2.6
+#   scale-start:  0.000
 #   image: automatest/pascal
 #   version: fpc 2.4.0
 #   extension: pas
@@ -66,6 +78,8 @@
 # - id: PY-276
 #   name: Python 2.7.15
 #   scale: 4.4
+#   scale-factor: 4.4
+#   scale-start:  0.000
 #   image: automatest/python2
 #   version: Python 2.7.15
 #   extension: py
