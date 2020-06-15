@@ -153,6 +153,14 @@ class Mongo(object):
             }
         )
 
+    def update_event_fields(self, _id, **fields):
+        return self.events.update_one(
+            filter=dict(_id=objectid.ObjectId(_id)),
+            update={
+                '$set': fields
+            }
+        )
+
     def last_n_results_from_students(self, n=100, course_id=None, problem_id=None):
         match = self._fix_dict(dict(course=course_id, problem=problem_id, action='solve'))
         group = dict(

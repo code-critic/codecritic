@@ -128,6 +128,9 @@ class CCUtils {
                     if (length == oldLength) {
                         return;
                     }
+                    if ($('#notifications .notification-menu.show').length == 1) {
+                        return;
+                    }
                     $('#notifications').html(Templates.render('common/notifications', { notifications: data.notifications.items }));
                     CCUtils.relativeTime($('#notifications'));
                     if (length > 0) {

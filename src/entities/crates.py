@@ -66,6 +66,7 @@ class TestResult(ICrate):
     compilation: any = None
     time: any = None
     active: any = None
+    points: float = 0.0
 
     def __post_init__(self):
         if self._id and not self.time:

@@ -94,6 +94,12 @@
                   <span class="placeholder-comment-count"></span>
                   comments
                 </a>
+                {% if user.is_admin() %}
+                  <button class="btn btn-large btn-block btn-green"
+                          id="clear-notification">
+                            [debug] clear notification
+                  </button>
+                {% endif %}
                 <div id="source-code">
                   <pre class="small"><code class="hljs"></code></pre>
                 </div>

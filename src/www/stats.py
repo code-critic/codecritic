@@ -48,7 +48,7 @@ def register_routes(app, socketio):
             elif period == 'month':
                 gen_time = datetime.datetime.today() - datetime.timedelta(days=31)
             else:
-                gen_time = datetime.datetime.today() - datetime.timedelta(days=365*5)
+                gen_time = datetime.datetime.today() - datetime.timedelta(days=365 * 5)
             return ObjectId.from_datetime(gen_time)
 
         # {'course': 'TST-2019', 'problem': 'problem-1', 'filters':
@@ -210,6 +210,29 @@ def register_routes(app, socketio):
                 logger.exception('Error while comparing')
                 return 'Error while comparison'
 
+    @app.route('/api/codereview/delete', methods=['POST'])
+    @login_required
+    def clear_notification():
+        data = request.json
+        _id = data['_id']
+        result = dict(result="ok", message="ok")
+        try:
+            delete_many_result = Mongo().events.delete_many(dict(
+                document=_id
+            ))
+            if delete_many_result.deleted_count > 0:
+                result['message'] = f"Ok deleted {delete_many_result.deleted_count} notification related to this result"
+                return result
+
+            if delete_many_result.deleted_count == 0:
+                result['result'] = "warning"
+                result['message'] = f"No notification related to this result found"
+                return result
+        except:
+            result['result'] = 'error'
+            result['message'] = f"No notification related to this result found"
+        return result
+
     @app.route('/api/codereview/add', methods=['POST'])
     @login_required
     def request_review():
@@ -227,15 +250,20 @@ def register_routes(app, socketio):
 
         # notify all teachers
         reviewers = list()
-        for reviewer in document.ref_course.teachers:
+        for reviewer_obj in document.ref_course.teachers:
+            if type(reviewer_obj) is dict:
+                reviewer = str(reviewer_obj.get('id', reviewer_obj))
+            else:
+                reviewer = reviewer_obj
+
             event_document = {
-                'from'       : from_user,
-                'to'         : reviewer,
-                'course'     : document.course,
-                'problem'    : document.problem,
-                'document'   : _id,
-                'event'      : 'codereview',
-                'title'      : f'Code review requested by {from_user}',
+                'from': from_user,
+                'to': reviewer,
+                'course': document.course,
+                'problem': document.problem,
+                'document': _id,
+                'event': 'codereview',
+                'title': f'Code review requested by {from_user}',
                 'description': f'Student {from_user} has requested code review for the problem {document.ref_problem.id}'
             }
 
@@ -292,13 +320,13 @@ def register_routes(app, socketio):
                 logger.info('Not creating notification for self')
             else:
                 event_document = {
-                    'from'       : from_user,
-                    'to'         : recipient,
-                    'course'     : document.course,
-                    'problem'    : document.problem,
-                    'document'   : _id,
-                    'event'      : 'new-comment',
-                    'title'      : f'New comment from {from_user}',
+                    'from': from_user,
+                    'to': recipient,
+                    'course': document.course,
+                    'problem': document.problem,
+                    'document': _id,
+                    'event': 'new-comment',
+                    'title': f'New comment from {from_user}',
                     'description': f'{document.ref_problem.id} User {from_user} commented your code in problem '
                 }
 

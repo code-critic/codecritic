@@ -4,6 +4,7 @@ $(document).ready(function() {
   var sourceCode = $('#source-code');
   var requestReviewBtn = $('#request-review-btn');
   var sourceCodeBlock = $('#source-code').find('pre code').get(0);
+  var clearNotification = $('#clear-notification');
   var _id = current.data('_id');
 
   var finished = false;
@@ -22,6 +23,26 @@ $(document).ready(function() {
       requestReviewBtn.removeClass('disabled alpha-5');
     }
   };
+
+  clearNotification.click(function(ev) {
+    $.ajax({
+      type: 'POST',
+      url: '/api/codereview/delete',
+      dataType: 'json',
+      contentType: 'application/json;charset=UTF-8',
+      data: JSON.stringify({
+        _id: lastObject._id
+      }),
+      success: function(data) {
+        if (data.result == 'ok') {
+          window.toastr.success('Ok, notification removed');
+        } else {
+          window.toastr.warning(data.message);
+        }
+      }
+    });
+    return false;
+  });
 
   requestReviewBtn.click(function(ev) {
     $.ajax({
@@ -73,7 +94,6 @@ $(document).ready(function() {
         currentSrc = event.data.solution;
         lastObject = event.data;
         lastObject._id = $('.live-result').data('uuid');
-        console.log(lastObject);
         renderSourceCode(currentSrc);
         renderComments(null);
       },
@@ -230,7 +250,6 @@ $(document).ready(function() {
         );
         var nodes = "";
         data.results.forEach((item) => {
-          console.log(item);
           nodes += Templates.render('test-result2', item)
         });
         previous.find('.test-cases').html(nodes);

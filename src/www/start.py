@@ -226,6 +226,23 @@ def main():
     logger.info('removing old files from {}', Env.tmp)
 
     # -------------------------------------------------------------------------
+    # from database.mongo import Mongo
+    # ns = []
+    # events = Mongo().events.find(({}))
+    # for e in events:
+    #     eid = str(e["_id"])
+    #     if isinstance(e["to"], dict):
+    #         did = e["document"]
+    #         doc = Mongo().result_by_id(did)
+    #         no_comment = doc.review is None
+    #         user = e["to"]["id"]
+    #         if no_comment:
+    #             Mongo().update_event_fields(eid, to=user)
+    #             ns.append(eid)
+    # print(ns)
+    # exit(0)
+
+    # -------------------------------------------------------------------------
 
     if args.debug:
         app.run(debug=args.debug, host=args.host, port=args.port)
