@@ -1,6 +1,10 @@
 
 all: build
 
+ubuntu-build:
+	docker build -t automatest/ubuntu-base ubuntu-base
+	docker build -t automatest/ubuntu-all ubuntu-all
+
 build:
 	docker build -t automatest/base base
 	docker build -t automatest/cc cc

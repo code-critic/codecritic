@@ -1,15 +1,20 @@
 - id: PY-367
   name: Python 3.6.8
   scale: 5
+  scale-factor: 5
+  scale-start:  0.000
   image: automatest/python3
   version: Python 3.6.8
   extension: py
   style: python
   run: [python3, <filename>]
+  unittest: [python3, -m, pytest, -rA, --json=.report.json, <filename>]
 
 - id: C
   name: C
   scale: 1
+  scale-factor: 1
+  scale-start:  0.000
   image: automatest/cc
   version: gcc 8.2.0
   extension: c
@@ -20,16 +25,20 @@
 - id: CPP
   name: C++
   scale: 1
+  scale-factor: 1
+  scale-start:  0.000
   image: automatest/cc
   version: g++ 8.2.0
   extension: cpp
   style: c_cpp
-  compile: [g++, <filename>, -o, main]
+  compile: [g++, -std=c++11, <filename>, -o, main]
   run: [./main]
 
 - id: JAVA
   name: Java
   scale: 2.6
+  scale-factor: 2.6
+  scale-start:  0.200
   image: automatest/java
   version: Java 1.8.0_91
   extension: java
@@ -37,18 +46,11 @@
   run: [java, main]
   compile: [javac, <filename>]
 
-- id: PY-276
-  name: Python 2.7.15
-  scale: 4.4
-  image: automatest/python2
-  version: Python 2.7.15
-  extension: py
-  style: python
-  run: [python2.7, <filename>]
-
 - id: CS
   name: 'C#'
   scale: 2
+  scale-factor: 2
+  scale-start:  0.000
   image: automatest/cs
   version: Mono 3.0.7
   extension: cs
@@ -60,13 +62,27 @@
 # ------------------------------------ DISABLED FOR NOW ---
 # ---------------------------------------------------------
 
-- id: PASCAL
-  name: Pascal
-  scale: 2.6
-  image: automatest/pascal
-  version: fpc 2.4.0
-  extension: pas
-  style: pascal
-  compile: [fpc, <filename>]
-  run: [./main]
-  disabled: true
+# - id: PASCAL
+#   name: Pascal
+#   scale: 2.6
+#   scale-factor: 2.6
+#   scale-start:  0.000
+#   image: automatest/pascal
+#   version: fpc 2.4.0
+#   extension: pas
+#   style: pascal
+#   compile: [fpc, <filename>]
+#   run: [./main]
+#   disabled: true
+  
+# - id: PY-276
+#   name: Python 2.7.15
+#   scale: 4.4
+#   scale-factor: 4.4
+#   scale-start:  0.000
+#   image: automatest/python2
+#   version: Python 2.7.15
+#   extension: py
+#   style: python
+#   run: [python2.7, <filename>]
+#   disabled: true
