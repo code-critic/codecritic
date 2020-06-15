@@ -12,6 +12,7 @@ $(document).ready(function() {
   var lastTarget = null;
 
   var cc = new CC(current);
+  var ccp = new CC(previous);
 
   var onRender = function() {
     if (lastObject.review_request_) {
@@ -55,12 +56,33 @@ $(document).ready(function() {
         console.log(lastObject);
         renderSourceCode(currentSrc);
         renderComments(null);
+        // register diff
+        CC.registerDiffEvents(event.data._id);
       },
       function(event) {
         console.log('failed', event);
       },
     )
   };
+
+  var rerunSolution = function(doc_id) {
+    ccp.rerunSolution(doc_id,
+      function(event) {
+        $('.live-result').addClass(event.data.result.status);
+        finished = true;
+        currentSrc = event.data.solution;
+        lastObject = event.data;
+        lastObject._id = $('.live-result').data('uuid');
+        console.log(lastObject);
+        renderSourceCode(currentSrc);
+        renderComments(null);
+      },
+      function(event) {
+        console.log('failed', event);
+      },
+    )
+  };
+  
   var registerReviewEvents = function() {
     $('.hljs-ln-n').click(function(event) {
       var $this = $(this);
@@ -208,6 +230,7 @@ $(document).ready(function() {
         );
         var nodes = "";
         data.results.forEach((item) => {
+          console.log(item);
           nodes += Templates.render('test-result2', item)
         });
         previous.find('.test-cases').html(nodes);
@@ -222,6 +245,14 @@ $(document).ready(function() {
         updateCounterPlaceholder();
         previous.find('[data-toggle="tooltip"]').tooltip();
         previous.removeClass('disabled alpha-5');
+        if (data.result == null) {
+          console.log('broken');
+          ccp.connect(function() {
+            setTimeout(rerunSolution, 500, data._id);
+          });
+        }
+        // register diff
+        CC.registerDiffEvents(data._id);
       }
     });
     return false;

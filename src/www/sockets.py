@@ -46,6 +46,22 @@ def broadcast_queue_pop(item):
     emit('queue-pop', dict(status=200, item=item), broadcast=True)
 
 
+def _process_solution_by_id(_id, rerun=False):
+    document = Mongo().result_by_id(_id)
+
+    if document.result is None or rerun:
+        _process_solution(
+            User(dict(id=document.user)),
+            document.action,
+            not document.docker,
+            document.problem,
+            document.course,
+            document.lang,
+            document.solution,
+            document._id
+        )
+
+
 def _process_solution(user, action, skip_docker, problem_id, course_id, lang_id=None, src=None, _id=None):
     if not user.is_admin() and (
             skip_docker or action in (ProcessRequestType.GENERATE_INPUT, ProcessRequestType.GENERATE_OUTPUT)):
@@ -140,6 +156,13 @@ def register_routes(app, socketio):
         except:
             logger.exception('Error while processing solution')
 
+    @socketio.on('rerun-solution', namespace=namespace)
+    def student_submit_solution(data):
+        try:
+            _process_solution_by_id(data['_id'])
+        except:
+            logger.exception('Error while processing solution')
+
     @socketio.on('student-solution-submit', namespace=namespace)
     def student_submit_solution(data):
         print(data)
@@ -225,3 +248,7 @@ def register_routes(app, socketio):
 
         queue.remove(request)
         Emittor.queue_pop(request)
+
+
+#_process_solution_by_id('5cf928bda1309f45af4faf23')
+#exit(0)

@@ -4,7 +4,11 @@
 /// <reference path="templates.ts"/>
 
 function logData(event) {
-  console.log(event);
+  //console.log(event);
+}
+
+enum ServerUrls {
+  FILE_DIFF = '/api/filediff/reference-output/{0}/{1}'
 }
 
 enum Status {
@@ -35,28 +39,28 @@ interface CaseResult {
   duration: number;
   returncode: number;
   message: string;
-  
+
   scores?: number[];
   score?: number;
   cmd?: string;
   uuid?: string;
-  
+
   console: string[];
   message_details: string[];
   attachments: Attachment[];
 }
 
 interface TestResult {
-    action: string;
-    course: string;
-    problem: string;
-    user: string;
-    result: CaseResult;
-    results: CaseResult[];
-    
-    uuid?: string;
-    lang?: string;
-    solution?: string;
+  action: string;
+  course: string;
+  problem: string;
+  user: string;
+  result: CaseResult;
+  results: CaseResult[];
+
+  uuid?: string;
+  lang?: string;
+  solution?: string;
 }
 
 interface CaseEvent {
@@ -119,10 +123,38 @@ class CC {
   public processSolution(_id: string, on_complete?: Function, on_error?: Function) {
     this.on_complete = on_complete;
     this.on_error = on_error;
-    console.log('emitting process solution');
+    console.log('emitting student-process-solution');
     this.socket.emit('student-process-solution', {
       _id: _id,
     });
+  }
+  public rerunSolution(_id: string, on_complete?: Function, on_error?: Function) {
+    this.on_complete = on_complete;
+    this.on_error = on_error;
+    console.log('emitting rerun-solution');
+    this.socket.emit('rerun-solution', {
+      _id: _id,
+    });
+  }
+
+  public static registerDiffEvents(doc_id: string) {
+    $('.cell-diff .btn').click(function() {
+      var case_id = $(this).data('id');
+      var url = ServerUrls.FILE_DIFF.format(doc_id, case_id);
+      var diffResult = $($(this).data('target'));
+      if (diffResult.hasClass('finished')) {
+        diffResult.toggleClass('d-none');
+      } else {
+        $.ajax({
+          type: 'GET',
+          url: url,
+          success: function(data) {
+            diffResult.html(data);
+            diffResult.addClass('finished');
+          }
+        });
+      }
+    }).parent().addClass('registered');
   }
 
   private drawTest(test: CaseResult) {
@@ -159,14 +191,14 @@ class CC {
       console.log('reconnecting ' + attemptNumber);
     });
     this.socket.on('disconnect', (reason) => {
-      console.log('disconnect', reason);
+      //console.log('disconnect', reason);
       if (reason === 'io server disconnect') {
         // the disconnection was initiated by the server, you need to reconnect manually
         this.socket.connect();
       }
     });
     this.socket.on('debug', (event) => {
-      console.log(event);
+      //console.log(event);
     });
   }
 
@@ -195,7 +227,7 @@ class CC {
 
   private registerSocketProcessEvents() {
     this.socket.on('process-start-me', (event: TestEvent) => {
-      logData(event);
+      console.log(event);
 
       this.canvas.html(
         Templates.render('process-execute', event)
@@ -211,7 +243,7 @@ class CC {
     });
 
     this.socket.on('process-end-me', (event: TestEvent) => {
-      logData(event);
+      console.log(event);
       this.canvas.find('.evaluation').addClass(event.data.result.status).show().find('.evaluation-result').html(
         Templates.render('test-result2', event.data.result)
       )
@@ -225,7 +257,7 @@ class CC {
     });
 
     this.socket.on('fatal-error', (event) => {
-      logData(event);
+      console.log(event);
       this.canvas.html(
         Templates.render('fatal-error', event)
       );
@@ -237,22 +269,22 @@ class CC {
 
   private registerSocketTestEvents() {
     this.socket.on('execute-test-start-me', (event: CaseEvent) => {
-      logData(event);
+      console.log(event);
       this.drawTest(event.data);
     });
 
     this.socket.on('execute-test-end-me', (event: CaseEvent) => {
-      logData(event);
+      console.log(event);
       this.drawTest(event.data);
     });
 
     this.socket.on('compile-start-me', (event: CaseEvent) => {
-      logData(event);
+      console.log(event);
       this.drawTest(event.data);
     });
 
     this.socket.on('compile-end-me', (event: CaseEvent) => {
-      logData(event);
+      console.log(event);
       this.drawTest(event.data);
     });
   }

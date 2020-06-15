@@ -7,6 +7,7 @@
 #include <cmath>
 #include <vector>
 #include <queue>
+#include <stdexcept>
 
 using namespace std;
 

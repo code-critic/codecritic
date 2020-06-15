@@ -105,6 +105,12 @@ class ProcessRequest(object):
             logger.debug('using pseudo random tmp dir in debug mode')
             self.rand = 'jan.hybs-DEBUG'
 
+        # fix java code
+        if self.type is ProcessRequestType.SOLVE:
+            if self.lang and self.lang.id == 'JAVA':
+                from utils.javafix import fix_java_solution
+                self.solution = fix_java_solution(self.solution)
+
         self.action_executor = None
         self.subcases = None
         self.result = RequestResult(self)
@@ -244,9 +250,12 @@ class ProcessRequest(object):
             self.result.result.duration = self.action_executor.duration
             ok_score = statuses.count(ExecutorStatus.ANSWER_CORRECT)
             at_score = statuses.count(ExecutorStatus.ANSWER_CORRECT_TIMEOUT)
-            wr_score = statuses.count(ExecutorStatus.ANSWER_WRONG)
-            rest_statuses = (ExecutorStatus.ANSWER_CORRECT, ExecutorStatus.ANSWER_CORRECT_TIMEOUT, ExecutorStatus.ANSWER_WRONG)
-            rest = [x for x in statuses if x not in rest_statuses]
+            rest_statuses = (
+                ExecutorStatus.ANSWER_CORRECT,
+                ExecutorStatus.ANSWER_CORRECT_TIMEOUT,
+                ExecutorStatus.OK,
+            )
+            wr_score = len([x for x in statuses if x not in rest_statuses])
 
             self.result.result.score = (
                 (10**4) * ok_score +
@@ -302,7 +311,7 @@ class ProcessRequest(object):
         logger.info('Saving result to {}', student_full_dir)
 
         if self.result_dir.exists():
-            shutil.copytree(self.result_dir, student_full_dir)
+            shutil.copytree(str(self.result_dir), student_full_dir)
         else:
             logger.warning('dir {} does not exists', self.result_dir)
         student_full_dir.mkdir(parents=True, exist_ok=True)

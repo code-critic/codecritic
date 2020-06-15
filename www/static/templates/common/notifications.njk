@@ -1,9 +1,14 @@
 {% if notifications and notifications | length %}
-  <a class="btn btn-link nav-link waves-effect waves-light p-2 m-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  <a class="btn btn-link nav-link waves-effect waves-light p-2 pr-3 m-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     <i class="fas fa-bell text-white"></i>
     <span class="badge badge-danger z-depth-0 smaller position-absolute">{{ notifications | length }}</span>
   </a>
   <div class="dropdown-menu notification-menu">
+
+    <a class="dropdown-item" data-api-action="/api/notifications/read">
+      <i class="fas fa-ball"></i>
+      Read all notification
+    </a>
     {% for n in notifications %}
       <a class="dropdown-item notification-item px-2 py-1" href="/r/{{ n.document }}">
         <p class="p-0 m-0">

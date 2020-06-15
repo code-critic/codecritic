@@ -2,6 +2,8 @@
 # author: Jan Hybs
 
 from uuid import uuid4
+from itertools import groupby
+from collections import OrderedDict
 
 from typing import List
 from flask import redirect, request, session, url_for
@@ -13,6 +15,8 @@ from env import Env
 from www import admin_required, dump_error, login_required, render_template_ext
 from www.utils_www import Link, Breadcrumbs
 from entities import crates
+
+problem_cat_getter = lambda x: x.cat
 
 
 def register_routes(app, socketio):
@@ -65,15 +69,20 @@ def register_routes(app, socketio):
         breadcrumbs = [Link.CoursesBtn(), Link.CourseBtn(course), Link.ProblemBtn(course, problem)]
 
         return render_template_ext(
-            'results.njk',
+            'view_result.njk',
             user=user,
-            notifications=Mongo().read_notifications(user.id),
+            notifications=Mongo().load_notifications(user.id),
             results=[document],
             result=None,
             requestReview=False,
 
             title='Problem %s' % problem.name,
             breadcrumbs=Breadcrumbs.new(*breadcrumbs),
+            js=[
+                '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js',
+                '/static/js/lib/highlightjs-line-numbers.js'
+            ],
+            js_no_cache=['sockets.js', 'process.js']
         )
 
     @app.route('/results/<string:course_name>/<string:course_year>/<string:problem_id>/<string:_id>')
@@ -100,36 +109,47 @@ def register_routes(app, socketio):
             if document:
                 # add to previous solution if already executed
                 if document.result:
-                    results.append(document.peek())
+                    results.append(document)
                 else:
-                    result = document.peek()
+                    result = document
                     breadcrumbs.append(
                         Link.ProblemBtn(course, problem)
                     )
 
         if Env.use_database:
-            for prev in Mongo().peek_last_n_results(20, user.id, course.id, problem.id):
+            for prev in Mongo().peek_last_n_results(10, user.id, course.id, problem.id):
                 # push only valid result
-                if prev.get('result') and str(prev['_id']) != str(_id):
+                if prev.result and str(prev._id) != str(_id):
                     results.append(prev)
 
         if _id:
             for r in results:
-                if str(r['_id']) == str(_id):
-                    r['active'] = 'active'
+                if str(r._id) == str(_id):
+                    r.active = 'active'
 
-        results = sorted(results, reverse=True, key=lambda x: x.get('attempt'))
+        def get_attempt(obj):
+            try:
+                return int(obj.attempt)
+            except:
+                return 0
+
+        results = sorted(results, reverse=True, key=get_attempt)
 
         return render_template_ext(
-            'results.njk',
+            'view_result.njk',
             user=user,
-            notifications=Mongo().read_notifications(user.id),
+            notifications=Mongo().load_notifications(user.id),
             results=results,
             result=result,
             requestReview=True,
 
             title='Problem %s' % problem.name,
             breadcrumbs=Breadcrumbs.new(*breadcrumbs),
+            js=[
+                '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js',
+                '/static/js/lib/highlightjs-line-numbers.js'
+            ],
+            js_no_cache=['sockets.js', 'process.js']
         )
 
     @app.route('/course/<string:course_name>/<string:course_year>')
@@ -138,22 +158,36 @@ def register_routes(app, socketio):
     def view_course(course_name, course_year):
         user = User(session['user'])
         course = Courses().find_one(name=course_name, year=course_year, only_active=False)
-        problems = list(course.problem_db.find(disabled=(None, False)))
+        problems: List[Problem] = sorted(
+            list(course.problem_db.find(disabled=(None, False))),
+            key=problem_cat_getter
+        )
+
         languages = Languages.db().find(disabled=(None, False))
 
+        if not user.is_admin():
+            problems = [p for p in problems if p.is_visible()]
+
+        cat_problems = OrderedDict()
+        for cat, items in groupby(problems, key=problem_cat_getter):
+            cat_problems[cat] = list(items)
+
         return render_template_ext(
-            'submit.njk',
+            'view_course.njk',
             user=user,
-            notifications=Mongo().read_notifications(user.id),
+            notifications=Mongo().load_notifications(user.id),
             course=course,
             languages=languages,
+            has_categories=len(cat_problems) > 1,
             problems=problems,
+            cat_problems=cat_problems,
 
             title=course.name,
             subtitle=course.year,
             breadcrumbs=Breadcrumbs.new(
                 Link.CoursesBtn(),
             ),
+            js_no_cache=['solution.js']
         )
 
     @app.route('/admin/<string:course_name>/<string:course_year>/<string:problem_id>')
@@ -168,9 +202,10 @@ def register_routes(app, socketio):
         languages = Languages.db().find(disabled=(None, False))
 
         return render_template_ext(
-            'problem.njk',
+            'admin_problem.njk',
+            tags=course.tags,
             user=user,
-            notifications=Mongo().read_notifications(user.id),
+            notifications=Mongo().load_notifications(user.id),
             course=course,
             languages=languages,
             problem=problem,
@@ -181,6 +216,7 @@ def register_routes(app, socketio):
                 Link.CoursesBtn(),
                 Link.CourseBtn(course)
             ),
+            js_no_cache=['sockets.js', 'manage-problem.js']
         )
 
     @app.route('/courses')
@@ -194,9 +230,9 @@ def register_routes(app, socketio):
         ))
 
         return render_template_ext(
-            'courses.njk',
+            'view_courses.njk',
             title='Course list',
             user=user,
-            notifications=Mongo().read_notifications(user.id),
+            notifications=Mongo().load_notifications(user.id),
             courses=courses
         )

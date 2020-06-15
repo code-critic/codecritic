@@ -4,7 +4,8 @@
 from typing import Optional, List
 import pathlib
 from dataclasses import dataclass, field, asdict
-
+from utils.crypto import sha1
+from loguru import logger
 
 Text = List[str]
 
@@ -23,11 +24,11 @@ class Attachment(ICrate):
 
 @dataclass
 class CaseResult(ICrate):
-    id: str
-    status: str
-    duration: float
-    returncode: int
-    message: str
+    id: str = None
+    status: str = None
+    duration: float = None
+    returncode: int = None
+    message: Optional[str] = None
 
     score: Optional[int] = None
     scores: Optional[List[int]] = None
@@ -38,14 +39,18 @@ class CaseResult(ICrate):
     message_details: Optional[Text] = field(default_factory=list)
     attachments: List[Attachment] = field(default_factory=list)
 
+    def __post_init__(self):
+        if self.id and not self.uuid:
+            self.uuid = sha1(self.id)
+
 
 @dataclass
 class TestResult(ICrate):
-    action: str
     user: str
     course: str
     problem: str
-    docker: bool
+    action: str = None
+    docker: bool = None
     result: Optional[CaseResult] = None
     results: List[CaseResult] = field(default_factory=list)
 
@@ -59,6 +64,38 @@ class TestResult(ICrate):
     review_request: Optional[dict] = None
 
     compilation: any = None
+    time: any = None
+    active: any = None
+
+    def __post_init__(self):
+        if self._id and not self.time:
+            try:
+                import datetime
+                self.time = datetime.datetime.timestamp(self._id.generation_time)
+            except:
+                self.time = 0
+
+        try:
+            if self.results:
+                for i, x in enumerate(self.results):
+                    if isinstance(x, dict):
+                        self.results[i] = CaseResult(**x)
+        except Exception as e:
+            logger.exception("Error wile converting dict to CaseResult")
+
+    @property
+    def firstname(self):
+        try:
+            return str(self.user.split('.')[0]).capitalize()
+        except:
+            return self.user
+
+    @property
+    def lastname(self):
+        try:
+            return str(self.user.split('.')[-1]).capitalize()
+        except:
+            return self.user
 
     @property
     def ref_course(self):

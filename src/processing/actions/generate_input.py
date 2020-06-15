@@ -50,14 +50,15 @@ class ProcessRequestGenerateInput(AbstractAction):
         cmd_base = self._run_cmd
         logger.opt(ansi=True).info('<red>{}</red> - {}', 'RUNNING', cmd_base)
 
-        for subcase in request.iter_subcases():
+        
+        for index, subcase in enumerate(request.iter_subcases()):
             id = subcase.id
 
             if not subcase.case.size:
                 logger.opt(ansi=True).warning(
-                    '{course.name}<b,e,>:</b,e,>{problem.id}<b,e,>:</b,e,>{case.id} - '
+                    '{course.name}<b><e>:</e></b>{problem.id}<b><e>:</e></b>{case.id} - '
                     'Cannot generate input file, property '
-                    '"<b,e,>size</b,e,>" not specified',
+                    '"<b><e>size</e></b>" not specified',
                     case=subcase.case, problem=request.problem, course=request.course
                 )
                 rr[id].status = ExecutorStatus.IGNORE
@@ -67,7 +68,7 @@ class ProcessRequestGenerateInput(AbstractAction):
                 continue
 
             log_base = self.case_log_format.format(case=subcase.subcase, problem=request.problem, course=request.course)
-            cmd = cmd_base + subcase.subcase.generate_input_args()
+            cmd = cmd_base + subcase.subcase.generate_input_args(index=index + 1)
 
             logger.opt(ansi=True).debug('{} - {}', log_base, cmd)
             rr[id].status = ExecutorStatus.RUNNING

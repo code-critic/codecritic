@@ -1,29 +1,37 @@
 #!/bin/python3
 # author: Jan Hybs
-import pathlib
-
-import typing
-from collections import defaultdict
-
-import yaml
 import copy
 import datetime as dt
+import pathlib
+import typing
+from collections import defaultdict
+from dataclasses import dataclass
+
+import yaml
+from loguru import logger
 
 from database import parse_dt
 from database.yamldb import ADB, YamlDB
 from entities.crates import Attachment
-from exceptions import FatalException, ConfigurationException
-
-from utils import strings
 from env import Env
-
-from loguru import logger
-
+from exceptions import ConfigurationException, FatalException
+from utils import strings
 from utils.paths import IOEFiles
 
 
 class InvalidConfiguration(Exception):
     pass
+
+
+class SimpleUser(dict):
+    """
+    :type id: str
+    :type tags: list[str]
+    """
+    def __init__(self, **kwargs):
+        self.id = kwargs.pop('id')
+        self.tags = kwargs.pop('tags', [])
+        super().__init__(kwargs)
 
 
 class User(ADB):
@@ -53,12 +61,9 @@ class User(ADB):
     def is_admin(self):
         return self.role in ('root', 'admin')
 
-    def in_course(self, course):
-        """
-        :param course: Course
-        """
+    def in_course(self, course: 'Course'):
         if course.students:
-            if self.id in course.students:
+            if self.id in [x.id for x in course.students]:
                 return True
 
         if course.teachers:
@@ -79,7 +84,7 @@ class User(ADB):
     def affi_pairs(self):
         items = self.affi.split(', ') if self.affi else list()
         for i in range(0, len(items), 3):
-            yield ', '.join(items[i:i+3])
+            yield ', '.join(items[i:i + 3])
 
 
 class Course(ADB):
@@ -90,7 +95,8 @@ class Course(ADB):
     :type year: str
     :type disabled: bool
     :type teachers: list[str]
-    :type students: list[str]
+    :type students: list[SimpleUser]
+    :type tags: list[dict[str, list[str]]]
     """
     storage = 'courses.yaml'
     _problems = dict()
@@ -103,7 +109,14 @@ class Course(ADB):
         self.year = item.get('year')
         self.disabled = item.get('disabled', False)
         self.teachers = item.get('teachers', list())
-        self.students = item.get('students', list())
+        self.students = []
+        self.tags = item.get('tags', [])
+
+        for student in item.get('students', []):
+            if isinstance(student, dict):
+                self.students.append(SimpleUser(**student))
+            else:
+                self.students.append(SimpleUser(id=student))
 
         if 'config' in item:
             self.yaml_file = pathlib.Path(item['config'])
@@ -124,6 +137,12 @@ class Course(ADB):
     def peek(self):
         return self._peek('id', 'name', 'desc', 'year', 'enabled')
 
+    def student_has_tag(self, student_id, tag, value):
+        students = [x for x in self.students if x.id == student_id]
+        if not students:
+            return False
+        return value in students[0].tags
+
     @property
     def problem_db(self):
         """
@@ -141,6 +160,7 @@ class Courses(object):
     """
     :type courses: typing.List[Course]
     """
+
     def __init__(self):
         self.courses = list()
         for course, config in self._iter_courses():
@@ -236,6 +256,7 @@ class Script(object):
     :type lang: str
     :type path: pathlib.Path
     """
+
     def __init__(self, item: dict):
         super().__init__()
         self.path = None
@@ -251,7 +272,7 @@ class Script(object):
                 langs = list(Languages.db().find(extension=ext))
                 if len(langs) > 1:
                     logger.warning('ambiguous language language auto detected from file %s' % self.name)
-                    
+
                 self.lang = langs[0].id
             except:
                 raise InvalidConfiguration('Could not find the language of a reference file %s' % self.name)
@@ -284,10 +305,12 @@ class Problem(ADB):
         super().__init__()
         self.id = str(item['id'])
         self.name = item.get('name', self.id)
+        self.cat = item.get('cat', '__all__')
         self.desc = item.get('desc')
         self.reference = Script(item.get('reference')) if item.get('reference') else None
         self.disabled = item.get('disabled', False)
         self.avail = parse_dt(item.get('avail'))
+        self.since = parse_dt(item.get('since'))
         self.course = item.get('course')
         self.problem_dir = self.course.problems_dir / self.id
         self.relative_problem_dir = self.problem_dir.relative_to(Env.root)
@@ -302,7 +325,7 @@ class Problem(ADB):
             self.tests.append(ProblemCase(test, self))
 
     def peek(self):
-        return self._peek('id', 'name', 'disabled', 'timeout')
+        return self._peek('id', 'name', 'disabled', 'timeout', 'cat')
 
     @property
     def description(self):
@@ -322,11 +345,20 @@ class Problem(ADB):
     @property
     def time_left(self):
         if not self.avail:
-            return 10**10
+            return 10 ** 10
         return int((self.avail - dt.datetime.now()).total_seconds())
+
+    @property
+    def time_since(self):
+        if not self.since:
+            return 10 ** 10
+        return int((dt.datetime.now() - self.since).total_seconds())
 
     def is_active(self):
         return not self.disabled and self.time_left > 0
+
+    def is_visible(self):
+        return not self.disabled and self.time_since > 0
 
     @property
     def test_ids(self) -> typing.List[str]:
@@ -402,7 +434,21 @@ class ProblemCase(ADB):
             logger.exception('attachments')
             return []
 
-    def generate_input_args(self, validate=False):
+    def get_path_to_output_files(self, user_dir: pathlib.Path):
+        case_paths = IOEFiles(user_dir.relative_to(Env.root), self.id)
+        reference_files = IOEFiles(self.problem.relative_problem_dir, self.id)
+
+        @dataclass
+        class OutputCrate:
+            reference: pathlib.Path
+            generated: pathlib.Path
+
+        return OutputCrate(
+            reference=reference_files.output,
+            generated=case_paths.output
+        )
+
+    def generate_input_args(self, validate=False, index=0):
         if validate:
             return ['-v']
 
@@ -411,7 +457,7 @@ class ProblemCase(ADB):
             args += ['-p', self.size]
 
         if self.random:
-            args += ['-r']
+            args += ['-r', index]
 
         return [str(x) for x in args]
 
@@ -444,4 +490,3 @@ class Notifications(object):
 
     def peek(self, full=True):
         return self.__dict__
-

@@ -5,6 +5,7 @@ import time
 
 import yaml
 from bson import objectid
+from bson.errors import InvalidId
 from loguru import logger
 from pymongo import MongoClient
 from singleton_decorator import singleton
@@ -13,6 +14,7 @@ from database.objects import Notifications
 from entities.crates import ICrate
 from env import Env
 from utils.strings import ensure_iterable
+from utils.type_util import ensure_type
 
 
 SINCE_EPOCH = datetime.datetime.fromtimestamp(0)
@@ -71,7 +73,8 @@ class Mongo(object):
         if isinstance(result, ICrate):
             result = result.peek()
 
-        logger.error('_id: {}', _id)
+        _id: objectid.ObjectId = ensure_type(_id, objectid.ObjectId)
+
         try:
             cp = result.copy()
             cp.update(extra)
@@ -87,7 +90,7 @@ class Mongo(object):
 
         result.update(extra)
         if _id:
-            result['_id'] = objectid.ObjectId(_id)
+            result['_id'] = _id
             return self.data.replace_one(dict(_id=result['_id']), result)
 
         if '_id' in result:
@@ -116,7 +119,9 @@ class Mongo(object):
         return cursor
 
     def peek_last_n_results(self, n=10, user_id=None, course_id=None, problem_id=None, statuses=None, status_op='$in'):
+        from entities.crates import TestResult
         filters = self._fix_dict(dict(user=user_id, course=course_id, problem=problem_id))
+        filters['action'] = 'solve'
 
         statuses = ensure_iterable(statuses)
         if statuses:
@@ -127,11 +132,15 @@ class Mongo(object):
             filters, {x: 1 for x in self.base_properties}
         ).sort('_id', -1).limit(n)
 
-        return cursor
+        return [TestResult(**x) for x in cursor]
 
     def result_by_id(self, _id):
         from entities.crates import TestResult
-        result = self.data.find_one(dict(_id=objectid.ObjectId(_id)))
+        try:
+            result = self.data.find_one(dict(_id=objectid.ObjectId(_id)))
+        except InvalidId:
+            return None
+
         if result:
             return TestResult(**result)
         return None
@@ -169,7 +178,7 @@ class Mongo(object):
     def load_results(self, *args, **kwargs):
         return self.data.find(*args, **kwargs)
 
-    def read_notifications(self, user_id, course_id=None, problem_id=None):
+    def load_notifications(self, user_id, course_id=None, problem_id=None):
         filters = dict(to=user_id)
         if course_id:
             filters['course'] = course_id
@@ -179,6 +188,16 @@ class Mongo(object):
         result = list(self.events.find(filters))
         return Notifications(*result)
 
+    def read_notifications(self, user_id, n_id):
+        if n_id == 'all':
+            ns = self.load_notifications(user_id=user_id).items
+            for n in ns:
+                self.mark_as_read(n_id=n['_id'])
+            return len(ns) if ns else 0
+        else:
+            self.mark_as_read(n_id=n_id)
+            return 1
+
     def add_notification(self, data):
         id = {'from': data['from'], 'to': data['to'], 'document': data['document']}
         if self.events.find_one(id) is None:
@@ -186,14 +205,23 @@ class Mongo(object):
             return self.events.insert_one(data).acknowledged
         return False
 
-    def mark_as_read(self, to, _id, event):
+    def mark_as_read(self, to=None, _id=None, event=None, n_id=None):
         """
         Will remove notifications where recipient is to and document is _id
         :param to:
         :param _id:
         :return:
         """
-        return self.events.delete_many(dict(to=to, document=_id, event=event))
+        if n_id:
+            return self.events.delete_one(dict(_id=n_id))
+
+        if to:
+            if event:
+                return self.events.delete_many(dict(to=to, document=_id, event=event))
+            else:
+                return self.events.delete_many(dict(to=to))
+        else:
+            return self.events.delete_many(dict(document=_id, event=event))
 
     @staticmethod
     def _fix_dict(d: dict):

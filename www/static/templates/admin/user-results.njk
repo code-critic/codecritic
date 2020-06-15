@@ -1,70 +1,78 @@
-<div class="py-3">
-  <hr class="my-2"/>
-
+<div class="py-3 row no-gutters d-flex align-content-stretch flex-column">
   {% if not users | length %}
-    <h3>No results</h3>
+    <h2>No results</h2>
   {% else %}
-    {% for user in users %}
-      <h2>{{ user._id }}</h2>
-      <div class="row no-gutters">
-        {% for result in user.results %}
-          {% set scores = result.result.scores %}
-          <a target="_blank" class="col-12 col-sm-2 {{ result.result.status }} {{ 'review-request' if result.review_request else '' }}" href="/r/{{ result._id }}">
-            <div class="p-1 d-flex flex-column">
-              <div class="details">
-                <p class='p-0 m-0'>
-                  <span class="time" data-toggle="tooltip" data-placement="left" title="{{ result.time }}">
-                    <i class="far fa-clock"></i>
-                    <span class="time-relative" data-time="{{ result.time * 1000 }}"></span>
+     total: {{ users | length}}
+    <table id="table_id" class="table table-sm table-bordered">
+      <thead class="thead-light">
+        <tr>
+          <th width="40">
+            <i class="pr-1 fas fa-hashtag"></i>
+          </th>
+          <th>
+            <i class="pr-1 fas fa-user"></i>Student</th>
+          <th>
+            <i class="pr-1 fas fa-clock"></i>Date</th>
+          <th>
+            <i class="pr-1 fas fa-check"></i>Status</th>
+          <th>
+            <i class="pr-1 fas fa-project-diagram"></i>Problem</th>
+          <th>
+            <i class="pr-1 fas fa-comment"></i>
+          </th>
+          <th>
+            <i class="pr-1 fas fa-star"></i>
+          </th>
+          <th>
+            <i class="pr-1 fas fa-list-ol"></i>Score
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          {% for result in user.results %}
+            <tr class="element-link {{ result.result.status }}" data-href="/r/{{ result._id }}">
+              <td class="text-center lighten">{{ result.attempt }}</td>
+              <td>{{ user._id }}</td>
+              <td data-order="{{ result.time }}">
+                <span class="time-relative-short" data-toggle="tooltip" data-time="{{ result.time * 1000 }}">{{ result.time }}</span>
+              </td>
+              <td class="text-center">{{ result.result.status }}</td>
+              <td class="text-center">{{ result.problem }}</td>
+              <td class="text-center">
+                {% if result.review_request %}
+                  <span class="badge badge-sm badge-dark" data-toggle="tooltip" data-placement="left" title="Code was commented on">
+                    COMMENTED
                   </span>
-                </p>
-                <p class='p-0 m-0'>
-                  #{{ result.attempt }} {{ result.result.status }}
-                </p>
-              </div>
-              <dl class="m-0 p-0">
-                {% if scores | length %}
-                  <dt>score</dt>
-                  <dd>
-                    <span class="score">
-                      <span class="score-value answer-correct">{{ scores[0] | pad(2) }}</span>
-                      <span class="score-value answer-correct-timeout">{{ scores[1] | pad(2) }}</span>
-                      <span class="score-value answer-wrong">{{ scores[2] | pad(2) }}</span>
+                {% else %}
+                  no
+                {% endif %}
+                <td class="text-center">
+                  {% if result.review_request %}
+                    <span class="badge badge-sm badge-danger" data-toggle="tooltip" data-placement="left" title="Review requested on {{ result.review_request }}">
+                      REVIEW
                     </span>
-                  </dd>
-                {% endif %}
-
-                {% if config.course == 'all' %}
-                  <dt>course</dt>
-                  <dd>{{ result.course }}</dd>
-                {% endif %}
-
-                {% if config.problem == 'all' %}
-                  <dt>problem</dt>
-                  <dd>{{ result.problem }}</dd>
-                {% endif %}
-
-                <dt>language</dt>
-                <dd>{{ result.lang }}</dd>
-              </dl>
-            </div>
-
-            <span class="text-center d-block">
-            {% if result.review_request %}
-              <span class="badge badge-sm badge-danger" data-toggle="tooltip" data-placement="left" title="Review requested on {{ result.review_request }}">
-                REVIEW
-              </span>
-            {% endif %}
-
-            {% if result.review %}
-              <span class="badge badge-sm badge-dark" data-toggle="tooltip" data-placement="left" title="Code was commented on">
-                COMMENTED
-              </span>
-            {% endif %}
-            </span>
-          </a>
-        {% endfor %}
-      </div>
-    {% endfor %}
-  {% endif %}
-</div>
+                  {% else %}
+                    no
+                  {% endif %}
+                </td>
+                <td data-order="{{ score_all }}" class="text-center lighten">
+                  {% set scores = result.result.scores %}
+                  {% if scores %}
+                    {% set score_all = scores[0] | pad(2) + scores[1] | pad(2) + scores[2] | pad(2) %}
+                      {% if scores | length %}
+                        <span class="score inline no-glow border-0">
+                          <span class="score-value answer-correct">{{ scores[0] | pad(2) }}</span>
+                          <span class="score-value answer-correct-timeout">{{ scores[1] | pad(2) }}</span>
+                          <span class="score-value answer-wrong">{{ scores[2] | pad(2) }}</span>
+                        </span>
+                      {% endif %}
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>

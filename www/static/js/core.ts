@@ -150,6 +150,18 @@ class CCUtils {
     $('#log').append(msg);
   }
 
+  static apiCall(url: string, data: any, success: any=null, error: any=null) {
+    $.ajax({
+      type: 'POST',
+      dataType: "json",
+      url: url,
+      contentType: 'application/json;charset=UTF-8',
+      data: data ? JSON.stringify(data) : null,
+      success: success,
+      error: error,
+    });
+  }
+
   static loadNotifications (callback?: Function) {
     $.ajax({
       type: 'POST',
@@ -178,7 +190,22 @@ class CCUtils {
           } else {
             $('#notifications').addClass('d-none');
           }
-          
+
+          $('a[data-api-action]').each((index, elem) => {
+              $(elem).click((i) => {
+                const action = $(elem).data['api-action'];
+                CCUtils.apiCall(
+                  '/api/notifications/read',
+                  {_id: 'all'},
+                  data => {
+                    console.log(data);
+                  },
+                  data => {
+                    console.log(data);
+                  }
+                )
+              })
+          });
           window.favicon.badge(length);
         }
       },
@@ -194,6 +221,11 @@ class CCUtils {
       $(this).text(dt.fromNow());
       $(this).parent().attr('title', dt.locale('cs').format('llll'));
     });
+    $(element).find('.time-relative-short').each(function(i, element) {
+      var dt = window.moment(Number($(this).data('time')));
+      $(this).text(dt.fromNow());
+      $(this).attr('title', dt.locale('cs').format('llll'));
+    });
   }
   
   static enableTooltips(element: HTMLElement|JQuery) {
@@ -208,8 +240,8 @@ $(document).ready(function() {
     name: $user.data('user-name'),
     isAdmin: $user.data('user-admin') == 'True',
   }
-  console.log(window.user);
   Globals.initEnv();
+  CCUtils.relativeTime($('.time'));
   $('[data-toggle="tooltip"]').tooltip();
   window.favicon = new (<any> window).Favico({
 		animation : 'up', //'popFade',

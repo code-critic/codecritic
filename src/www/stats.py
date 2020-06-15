@@ -11,7 +11,7 @@ from flask import request, session
 from loguru import logger
 
 from database.mongo import Mongo
-from database.objects import User
+from database.objects import User, Courses
 from env import Env
 from www import login_required
 
@@ -48,7 +48,7 @@ def register_routes(app, socketio):
             elif period == 'month':
                 gen_time = datetime.datetime.today() - datetime.timedelta(days=31)
             else:
-                gen_time = datetime.datetime.today() - datetime.timedelta(days=365)
+                gen_time = datetime.datetime.today() - datetime.timedelta(days=365*5)
             return ObjectId.from_datetime(gen_time)
 
         # {'course': 'TST-2019', 'problem': 'problem-1', 'filters':
@@ -68,7 +68,7 @@ def register_routes(app, socketio):
         sort_by_inner = data['filters']['sort-by-inner']
         sort_by_outer = data['filters']['sort-by-outer']
         search = str(data['filters']['search']).strip()
-        print(search)
+
         if search:
             filters['user'] = {'$regex': f".*{search}.*"}
 
@@ -91,10 +91,33 @@ def register_routes(app, socketio):
                 '_id': '$user',
                 'results': {'$push': '$$ROOT'}  # $$ROOT
             }},
-            {'$sort': {sort_by_outer: -1}},
         ]
-        print(pipeline, limit_per_user)
+        # print(pipeline, limit_per_user)
         items = list(Mongo().data.aggregate(pipeline))
+        try:
+            course = Courses()[data['course']]
+        except:
+            course = None
+
+        if course:
+            for key in data['filters'].keys():
+                if key.startswith('tag-'):
+                    tag = key[4:]
+                    value = data['filters'][key]
+                    if value == 'all':
+                        continue
+
+                    items = [x for x in items if course.student_has_tag(x['_id'], tag, value)]
+
+        # tags = .get('tag-group', None)
+
+        def add_fields(x):
+            x['firstname'] = str(x['_id']).split('.')[0]
+            x['lastname'] = str(x['_id']).split('.')[-1]
+            return x
+
+        items = map(add_fields, items)
+        items = sorted(items, key=lambda x: x[sort_by_outer])
 
         result = list()
         for item in items:
@@ -103,7 +126,10 @@ def register_routes(app, socketio):
             for attempt in item_copy['results']:
                 attempt['time'] = datetime.datetime.timestamp(attempt['_id'].generation_time)
             # item_copy['results'] = sorted(item_copy['results'], key=lambda x: x['time'], reverse=True)
-            result.append(item_copy)
+
+            if 'results' in item_copy:
+                item_copy['results'] = [r for r in item_copy['results'] if 'result' in r]
+                result.append(item_copy)
 
         return flask.json.dumps(result)
 
@@ -117,9 +143,9 @@ def register_routes(app, socketio):
         if output_dir:
             for case in result.results:
                 try:
-                    case_config = result.ref_problem[case['id']]
+                    case_config = result.ref_problem[case.id]
                     if case_config:
-                        case['attachments'] = case_config.get_attachments(
+                        case.attachments = case_config.get_attachments(
                             user_dir=Env.root.joinpath(output_dir)
                         )
                 except AttributeError:
@@ -142,8 +168,47 @@ def register_routes(app, socketio):
     def load_notifications():
         user = User(session['user'])
         return flask.json.dumps(dict(
-            notifications=Mongo().read_notifications(user.id).peek(),
+            notifications=Mongo().load_notifications(user.id).peek(),
         ))
+
+    @app.route('/api/notifications/read', methods=['POST'])
+    @login_required
+    def read_notifications():
+        user = User(session['user'])
+        data = request.json
+
+        return flask.json.dumps(dict(
+            notifications=Mongo().read_notifications(user.id, n_id=data['_id'])
+        ))
+
+    @app.route('/api/filediff/reference-output/<string:doc_id>/<string:case_id>', methods=['GET'])
+    @login_required
+    def get_side_by_side_diff(doc_id, case_id):
+        result = Mongo().result_by_id(doc_id)
+        output_dir = result.output_dir
+
+        if output_dir:
+            try:
+                case_config = result.ref_problem[case_id]
+                if case_config:
+                    attachments = case_config.get_path_to_output_files(
+                        user_dir=Env.root.joinpath(output_dir)
+                    )
+                    from utils import comparison
+                    result = comparison.line_by_line_diff(
+                        Env.root / attachments.reference,
+                        Env.root / attachments.generated
+                    )
+                    return result.html
+                else:
+                    logger.error(f'Could not find case {case_id}')
+                    return f'Could not find case {case_id}'
+            except FileNotFoundError:
+                logger.exception('Could not find files for comparison')
+                return 'Could not find files'
+            except:
+                logger.exception('Error while comparing')
+                return 'Error while comparison'
 
     @app.route('/api/codereview/add', methods=['POST'])
     @login_required
@@ -242,7 +307,7 @@ def register_routes(app, socketio):
                 else:
                     logger.warning('notification already exists: {}', event_document)
 
-        mark_as_read = Mongo().mark_as_read(to=user.id, _id=_id, event='codereview')
+        mark_as_read = Mongo().mark_as_read(_id=_id, event='codereview', to=None)
         logger.info('mark-as-read: {}', mark_as_read)
 
         update_one = Mongo().update_fields(_id, review=review)

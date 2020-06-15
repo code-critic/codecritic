@@ -1,6 +1,9 @@
 function logData(event) {
-    console.log(event);
 }
+var ServerUrls;
+(function (ServerUrls) {
+    ServerUrls["FILE_DIFF"] = "/api/filediff/reference-output/{0}/{1}";
+})(ServerUrls || (ServerUrls = {}));
 var Status;
 (function (Status) {
     Status["IN_QUEUE"] = "in-queue";
@@ -55,10 +58,38 @@ class CC {
     processSolution(_id, on_complete, on_error) {
         this.on_complete = on_complete;
         this.on_error = on_error;
-        console.log('emitting process solution');
+        console.log('emitting student-process-solution');
         this.socket.emit('student-process-solution', {
             _id: _id,
         });
+    }
+    rerunSolution(_id, on_complete, on_error) {
+        this.on_complete = on_complete;
+        this.on_error = on_error;
+        console.log('emitting rerun-solution');
+        this.socket.emit('rerun-solution', {
+            _id: _id,
+        });
+    }
+    static registerDiffEvents(doc_id) {
+        $('.cell-diff .btn').click(function () {
+            var case_id = $(this).data('id');
+            var url = ServerUrls.FILE_DIFF.format(doc_id, case_id);
+            var diffResult = $($(this).data('target'));
+            if (diffResult.hasClass('finished')) {
+                diffResult.toggleClass('d-none');
+            }
+            else {
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    success: function (data) {
+                        diffResult.html(data);
+                        diffResult.addClass('finished');
+                    }
+                });
+            }
+        }).parent().addClass('registered');
     }
     drawTest(test) {
         var canvas = this.canvas.find(`#e-${test.uuid} .execution-test`);
@@ -83,13 +114,11 @@ class CC {
             console.log('reconnecting ' + attemptNumber);
         });
         this.socket.on('disconnect', (reason) => {
-            console.log('disconnect', reason);
             if (reason === 'io server disconnect') {
                 this.socket.connect();
             }
         });
         this.socket.on('debug', (event) => {
-            console.log(event);
         });
     }
     registerSocketQueueEvents() {
@@ -109,7 +138,7 @@ class CC {
     }
     registerSocketProcessEvents() {
         this.socket.on('process-start-me', (event) => {
-            logData(event);
+            console.log(event);
             this.canvas.html(Templates.render('process-execute', event));
             var nodes = "";
             event.data.results.forEach((item) => {
@@ -119,7 +148,7 @@ class CC {
             this.canvas.find('.final-evaluation').html(Templates.render('test-result2', event.data.result));
         });
         this.socket.on('process-end-me', (event) => {
-            logData(event);
+            console.log(event);
             this.canvas.find('.evaluation').addClass(event.data.result.status).show().find('.evaluation-result').html(Templates.render('test-result2', event.data.result));
             this.drawTest(event.data.result);
             event.data.results.forEach((item) => {
@@ -130,7 +159,7 @@ class CC {
             }
         });
         this.socket.on('fatal-error', (event) => {
-            logData(event);
+            console.log(event);
             this.canvas.html(Templates.render('fatal-error', event));
             if (this.on_error) {
                 this.on_error(event);
@@ -139,19 +168,19 @@ class CC {
     }
     registerSocketTestEvents() {
         this.socket.on('execute-test-start-me', (event) => {
-            logData(event);
+            console.log(event);
             this.drawTest(event.data);
         });
         this.socket.on('execute-test-end-me', (event) => {
-            logData(event);
+            console.log(event);
             this.drawTest(event.data);
         });
         this.socket.on('compile-start-me', (event) => {
-            logData(event);
+            console.log(event);
             this.drawTest(event.data);
         });
         this.socket.on('compile-end-me', (event) => {
-            logData(event);
+            console.log(event);
             this.drawTest(event.data);
         });
     }

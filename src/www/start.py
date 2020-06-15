@@ -6,15 +6,12 @@ import sys
 from loguru import logger
 from env import Env
 
-
 logger.configure(handlers=[
     dict(sink=sys.stdout),
     dict(sink=Env.log_file, colorize=True)
 ])
 
-
 from entities.crates import CaseResult
-
 
 c = CaseResult(
     id='self.id',
@@ -29,6 +26,7 @@ c = CaseResult(
     score=151651,
     scores=[13, 65, 8],
 )
+
 
 # app.run(debug=args.debug, host=args.host, port=args.port)
 
@@ -80,110 +78,110 @@ def register_routes(app, socketio):
 
 
 o = {
-    "_id" : "5cc6be848bfa8a5da73d17e9",
-    "lang" : "CPP",
-    "solution" : "#include <iostream>\r\nusing namespace std;\r\n\r\nint main() \r\n{\r\n    cout << 10 << endl;\r\n    cout << 15 << endl;\r\n    cout << 46 << endl;\r\n    return 0;\r\n}",
-    "docker" : False,
-    "action" : "solve",
-    "user" : "root",
-    "course" : "TST-2019",
-    "problem" : "problem-1",
-    "result" : {
-        "id" : "Result",
-        "status" : "answer-wrong",
-        "duration" : 9.69145011901855,
-        "returncode" : None,
-        "message" : "Submitted solution is wrong",
-        "score" : 10006,
-        "scores" : [
+    "_id": "5cc6be848bfa8a5da73d17e9",
+    "lang": "CPP",
+    "solution": "#include <iostream>\r\nusing namespace std;\r\n\r\nint main() \r\n{\r\n    cout << 10 << endl;\r\n    cout << 15 << endl;\r\n    cout << 46 << endl;\r\n    return 0;\r\n}",
+    "docker": False,
+    "action": "solve",
+    "user": "root",
+    "course": "TST-2019",
+    "problem": "problem-1",
+    "result": {
+        "id": "Result",
+        "status": "answer-wrong",
+        "duration": 9.69145011901855,
+        "returncode": None,
+        "message": "Submitted solution is wrong",
+        "score": 10006,
+        "scores": [
             1,
             0,
             6
         ]
     },
-    "results" : [
+    "results": [
         {
-            "id" : "Compilation",
-            "status" : "ok",
-            "cmd" : "g++ main.cpp -o main",
-            "duration" : 7.35814046859741,
-            "returncode" : 0,
-            "score" : 0,
-            "scores" : []
+            "id": "Compilation",
+            "status": "ok",
+            "cmd": "g++ main.cpp -o main",
+            "duration": 7.35814046859741,
+            "returncode": 0,
+            "score": 0,
+            "scores": []
         },
         {
-            "id" : "case-1.s",
-            "status" : "answer-correct",
-            "cmd" : "./main",
-            "duration" : 0.0785830020904541,
-            "returncode" : 0,
-            "message" : "Submitted solution is correct",
-            "score" : 0,
-            "scores" : []
+            "id": "case-1.s",
+            "status": "answer-correct",
+            "cmd": "./main",
+            "duration": 0.0785830020904541,
+            "returncode": 0,
+            "message": "Submitted solution is correct",
+            "score": 0,
+            "scores": []
         },
         {
-            "id" : "case-2",
-            "status" : "answer-wrong",
-            "cmd" : "./main",
-            "duration" : 0.0173075199127197,
-            "returncode" : 0,
-            "message" : "Submitted solution is incorrect",
-            "score" : 0,
-            "scores" : []
+            "id": "case-2",
+            "status": "answer-wrong",
+            "cmd": "./main",
+            "duration": 0.0173075199127197,
+            "returncode": 0,
+            "message": "Submitted solution is incorrect",
+            "score": 0,
+            "scores": []
         },
         {
-            "id" : "case-3.0",
-            "status" : "answer-wrong",
-            "cmd" : "./main",
-            "duration" : 0.0140361785888672,
-            "returncode" : 0,
-            "message" : "Submitted solution is incorrect",
-            "score" : 0,
-            "scores" : []
+            "id": "case-3.0",
+            "status": "answer-wrong",
+            "cmd": "./main",
+            "duration": 0.0140361785888672,
+            "returncode": 0,
+            "message": "Submitted solution is incorrect",
+            "score": 0,
+            "scores": []
         },
         {
-            "id" : "case-3.1",
-            "status" : "answer-wrong",
-            "cmd" : "./main",
-            "duration" : 0.0361495018005371,
-            "returncode" : 0,
-            "message" : "Submitted solution is incorrect",
-            "score" : 0,
-            "scores" : []
+            "id": "case-3.1",
+            "status": "answer-wrong",
+            "cmd": "./main",
+            "duration": 0.0361495018005371,
+            "returncode": 0,
+            "message": "Submitted solution is incorrect",
+            "score": 0,
+            "scores": []
         },
         {
-            "id" : "case-3.2",
-            "status" : "answer-wrong",
-            "cmd" : "./main",
-            "duration" : 0.0138497352600098,
-            "returncode" : 0,
-            "message" : "Submitted solution is incorrect",
-            "score" : 0,
-            "scores" : []
+            "id": "case-3.2",
+            "status": "answer-wrong",
+            "cmd": "./main",
+            "duration": 0.0138497352600098,
+            "returncode": 0,
+            "message": "Submitted solution is incorrect",
+            "score": 0,
+            "scores": []
         },
         {
-            "id" : "case-3.3",
-            "status" : "answer-wrong",
-            "cmd" : "./main",
-            "duration" : 0.0343863964080811,
-            "returncode" : 0,
-            "message" : "Submitted solution is incorrect",
-            "score" : 0,
-            "scores" : []
+            "id": "case-3.3",
+            "status": "answer-wrong",
+            "cmd": "./main",
+            "duration": 0.0343863964080811,
+            "returncode": 0,
+            "message": "Submitted solution is incorrect",
+            "score": 0,
+            "scores": []
         },
         {
-            "id" : "case-3.4",
-            "status" : "answer-wrong",
-            "cmd" : "./main",
-            "duration" : 0.0512194633483887,
-            "returncode" : 0,
-            "message" : "Submitted solution is incorrect",
-            "score" : 0,
-            "scores" : []
+            "id": "case-3.4",
+            "status": "answer-wrong",
+            "cmd": "./main",
+            "duration": 0.0512194633483887,
+            "returncode": 0,
+            "message": "Submitted solution is incorrect",
+            "score": 0,
+            "scores": []
         }
     ],
-    "output_dir" : "courses/course-template/2019/results/root/problem-1/348-200-W-answer-wrong",
-    "attempt" : 348
+    "output_dir": "courses/course-template/2019/results/root/problem-1/348-200-W-answer-wrong",
+    "attempt": 348
 }
 
 
@@ -258,5 +256,3 @@ if __name__ == '__main__':
     # f = diff.make_file(a, b)
     #
     # Path('foo.html').write_text(f)
-
-

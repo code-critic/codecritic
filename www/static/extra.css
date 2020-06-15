@@ -1,0 +1,7 @@
+.prob-desc img {
+    max-width: 100%;
+}
+
+.diff td.gen, .diff td.ref {
+    white-space: pre;
+}

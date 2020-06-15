@@ -20,7 +20,7 @@ class AbstractAction(object):
     :type executor: processing.executors.multilocal.MultiLocalExecutor or processing.executors.multidocker.MultiLocalExecutor
     """
 
-    case_log_format = '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id}'
+    case_log_format = '{course.name}<b><g>:</g></b>{problem.id}<b><g>:</g></b>{case.id}'
 
     def __init__(self, request: ProcessRequest, result_dir: pathlib.Path, problem_dir: pathlib.Path):
         self.request = request
@@ -54,10 +54,14 @@ class AbstractAction(object):
 
         if result.failed():
             if result.status is ExecutorStatus.GLOBAL_TIMEOUT:
-                raise CompileException('Compilation was interrupted (did not finish in time)', details=result.read_stdout())
+                details = str(result.read_stdout())
+                logger.error('Compilation failed:\n{}', details)
+                raise CompileException('Compilation was interrupted (did not finish in time)', details=details)
             else:
                 result.status = ExecutorStatus.COMPILATION_FAILED
-                raise CompileException('Compilation failed', details=result.read_stdout())
+                details = str(result.read_stdout())
+                logger.error('Compilation failed:\n{}', details)
+                raise CompileException('Compilation failed', details=details)
 
         self.request.event_compile.close_event.trigger(self.request.result.compilation)
 
@@ -66,7 +70,7 @@ class AbstractAction(object):
     def _check_stdin_exists(self, subcase: Subcase):
         if not subcase.temp.input.exists():
             logger.opt(ansi=True).warning(
-                '{course.name}<b,g,>:</b,g,>{problem.id}<b,g,>:</b,g,>{case.id} - '
+                '{course.name}<b><g>:</g></b>{problem.id}<b><g>:</g></b>{case.id} - '
                 'input file does not exists, test will be skipped',
                 case=subcase.subcase, problem=self.request.problem, course=self.request.course
             )
@@ -135,8 +139,12 @@ class AbstractAction(object):
             ])
         return True
 
-    @classmethod
-    def _evaluate_result(cls, result, compare_result, subcase):
+    def _evaluate_result(self, result, compare_result: Comparator, subcase):
+        try:
+            timeout = subcase.timeout * self.request.lang.scale
+        except:
+            timeout = subcase.timeout
+        
         if compare_result:
             # CORRECT RESULT
             if result.status is ExecutorStatus.OK:
@@ -145,9 +153,9 @@ class AbstractAction(object):
 
             # CORRECT RESULT BUT TIMED OUT
             elif result.status is ExecutorStatus.SOFT_TIMEOUT:
-                result.message = 'Submitted solution is correct but does not meet runtime criteria'
+                result.message = 'Submitted solution is correct but does not meet runtime criteria (duration > %1.3f sec)' % timeout
                 result.message_details = 'Allowed time is %1.3f sec sec but was running for %1.3f sec' % (
-                    subcase.timeout, result.duration
+                    timeout, result.duration
                 )
                 result.status = ExecutorStatus.ANSWER_CORRECT_TIMEOUT
         else:
@@ -160,9 +168,9 @@ class AbstractAction(object):
             elif result.status is ExecutorStatus.SOFT_TIMEOUT:
                 result.message = 'Submitted solution is incorrect and does not meet runtime criteria'
                 result.message_details = 'Allowed time is %1.3f sec but was running for %1.3f sec' % (
-                    subcase.timeout, result.duration
+                    timeout, result.duration
                 )
                 result.status = ExecutorStatus.ANSWER_WRONG_TIMEOUT
 
-            result.console = compare_result.message
+            #result.console = compare_result.message
         return result

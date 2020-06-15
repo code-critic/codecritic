@@ -112,6 +112,7 @@ class ExecutorResult(object):
         self.id = None
 
         self.duration = 0.0
+        self.timeout = 0.0
 
         self.message = None
         self.message_details = None
