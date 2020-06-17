@@ -6,6 +6,7 @@ import pathlib
 import typing
 from collections import defaultdict
 from dataclasses import dataclass
+import os
 
 import yaml
 from loguru import logger
@@ -334,10 +335,11 @@ class Problem(ADB):
 
         try:
             readme = self.course.problems_dir.joinpath(self.id, 'README.md')
-            with open(readme, 'r') as fp:
-                import markdown
+            if os.path.exists(readme):
+                with open(readme, 'r') as fp:
+                    import markdown
 
-                return markdown.markdown(fp.read(), extensions=['fenced_code'])
+                    return markdown.markdown(fp.read(), extensions=['fenced_code'])
         except Exception as e:
             print(e)
             pass
