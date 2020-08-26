@@ -6,6 +6,13 @@ RUN apt update && apt install -y \
     bash \
     man \
     wget \
+    libpng-dev \
+    libfreetype6-dev \
+    libblas-dev \
+    liblapack-dev \
+    gfortran \
+    build-essential \
+    xorg \
  && rm -rf /var/cache/apt/* \
  && rm -rf /var/lib/apt/lists/* \
  && adduser --system --group --disabled-password worker
