@@ -1,13 +1,3 @@
-- id: MATLAB
-  name: Matlab
-  version: R2020a
-  scale-factor: 2.000
-  scale-start:  8.500
-  image: automatest/matlab
-  extension: m
-  style: matlab
-  run: [matlab, -nodesktop, -nosplash, -nodisplay, -r, "\"<filename-no-ext>;exit;\""]
-
 - id: PY-367
   name: Python 3.6.8
   scale: 5
