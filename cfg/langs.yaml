@@ -31,7 +31,7 @@
   version: g++ 8.2.0
   extension: cpp
   style: c_cpp
-  compile: [g++, -std=c++11, <filename>, -o, main]
+  compile: [g++, -std=c++17, <filename>, -o, main]
   run: [./main]
 
 - id: JAVA
